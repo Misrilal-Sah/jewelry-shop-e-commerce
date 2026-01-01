@@ -1,0 +1,69 @@
+/* Alert Button */
+.alert-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.alert-button:hover:not(:disabled) {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+.alert-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Back in Stock */
+.alert-button.back_in_stock {
+  border-color: #22c55e;
+  color: #22c55e;
+}
+
+.alert-button.back_in_stock.subscribed {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: #22c55e;
+}
+
+.alert-button.back_in_stock:hover:not(:disabled) {
+  background: rgba(34, 197, 94, 0.15);
+}
+
+/* Price Drop */
+.alert-button.price_drop {
+  border-color: var(--text-muted);
+}
+
+.alert-button.price_drop.subscribed {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.alert-button.price_drop:hover:not(:disabled) {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+/* Compact version */
+.alert-button.compact {
+  padding: var(--space-sm) var(--space-md);
+  font-size: 0.75rem;
+}
+
+.alert-button.compact svg {
+  width: 14px;
+  height: 14px;
+}

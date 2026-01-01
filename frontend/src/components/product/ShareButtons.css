@@ -1,0 +1,201 @@
+/* Share Buttons Container */
+.share-buttons-container {
+  position: relative;
+}
+
+.share-trigger-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.share-trigger-btn:hover {
+  background: var(--accent-gold);
+  border-color: var(--accent-gold);
+  color: white;
+}
+
+/* Share Dropdown - Opens ABOVE the button (default) */
+.share-dropdown {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  width: 280px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.25);
+  z-index: 100;
+  animation: shareIn 0.15s ease-out;
+  overflow: hidden;
+}
+
+/* Share Dropdown - Opens BELOW the button (for blog) */
+.share-buttons-container.position-below .share-dropdown {
+  bottom: auto;
+  top: calc(100% + 8px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+}
+
+@keyframes shareIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Header */
+.share-dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.share-dropdown-header span {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.share-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.share-close-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* Share Options */
+.share-options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+}
+
+.share-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-xs) var(--space-sm);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-width: 48px;
+}
+
+.share-option span {
+  font-size: 0.625rem;
+  color: var(--text-secondary);
+}
+
+.share-option:hover {
+  background: var(--bg-secondary);
+}
+
+.share-option:hover span {
+  color: var(--text-primary);
+}
+
+/* Twitter icon - visible in dark mode */
+.share-option .twitter-icon {
+  fill: var(--text-primary);
+}
+
+/* Copy Section */
+.share-copy-section {
+  display: flex;
+  gap: 6px;
+  padding: var(--space-sm) var(--space-md);
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.copy-link-input {
+  flex: 1;
+  padding: 8px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copy-link-input:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+}
+
+.copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--accent-gold);
+  border: none;
+  border-radius: var(--radius-md);
+  color: white;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.copy-btn:hover {
+  background: var(--accent-gold-dark);
+}
+
+.copy-btn.copied {
+  background: var(--success);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .share-dropdown {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+  
+  .share-options {
+    padding: var(--space-lg);
+    gap: var(--space-md);
+  }
+}

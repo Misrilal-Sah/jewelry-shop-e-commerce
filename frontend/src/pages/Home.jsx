@@ -1,0 +1,547 @@
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Sparkles, Crown, Gift, Star, Zap, Quote } from 'lucide-react';
+import ProductCard from '../components/product/ProductCard';
+import QuickViewModal from '../components/product/QuickViewModal';
+import FlashSaleTimer from '../components/product/FlashSaleTimer';
+import { useToast } from '../components/ui/Toast';
+import { useAuth } from '../context/AuthContext';
+import SEO from '../components/SEO';
+import './Home.css';
+
+const Home = () => {
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const toast = useToast();
+  const { user, isAuthenticated, token } = useAuth();
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [quickViewProduct, setQuickViewProduct] = useState(null);
+  const [flashSales, setFlashSales] = useState([]);
+  const [testimonials, setTestimonials] = useState([]);
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+
+  // Fetch subscription state from DB on mount for logged-in users
+  useEffect(() => {
+    const fetchSubscriptionState = async () => {
+      if (!isAuthenticated || !token) return;
+      
+      try {
+        const res = await fetch('/api/email/preferences', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setIsSubscribed(data.newsletter === true || data.newsletter === 1);
+        }
+      } catch (error) {
+        console.error('Failed to fetch subscription state');
+      }
+    };
+    
+    fetchSubscriptionState();
+  }, [isAuthenticated, token]);
+
+  // Subscribe logged-in user using their account email
+  const handleAuthenticatedSubscribe = async () => {
+    if (!user?.email) return;
+    
+    // Already subscribed - show info toast
+    if (isSubscribed) {
+      toast.info('You are already subscribed to our newsletter!');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    try {
+      // Update email preferences to enable newsletter
+      const res = await fetch('/api/email/preferences', {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}` 
+        },
+        body: JSON.stringify({ newsletter: true, offers: true, festive: true, others: true })
+      });
+      
+      if (res.ok) {
+        setIsSubscribed(true);
+        toast.success('Successfully subscribed to newsletter!');
+      } else {
+        toast.error('Failed to subscribe. Please try again.');
+      }
+    } catch (error) {
+      toast.error('Failed to subscribe. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Subscribe guest user with email input
+  const handleGuestSubscribe = async (e) => {
+    e.preventDefault();
+    if (!newsletterEmail.trim()) {
+      toast.error('Please enter your email');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const res = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newsletterEmail })
+      });
+      const data = await res.json();
+      
+      if (res.ok) {
+        toast.success(data.message || 'Successfully subscribed! You\'ll get 10% off your first order.');
+        setNewsletterEmail('');
+      } else {
+        toast.error(data.message || 'Failed to subscribe');
+      }
+    } catch (error) {
+      toast.error('Failed to subscribe. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Mock products data for initial display
+  const mockProducts = [
+    {
+      id: 1,
+      name: 'Royal Diamond Solitaire Ring',
+      category: 'rings',
+      metal_type: 'diamond',
+      purity: '18K',
+      weight_grams: 4.5,
+      metal_price: 125000,
+      making_charges: 15000,
+      images: ['https://res.cloudinary.com/ddrlxvnsh/image/upload/v1766855925/jewllery_shop/products/jxyw8vx454t3mnr2q8is.jpg'],
+      rating: 4.8,
+      review_count: 124
+    },
+    {
+      id: 2,
+      name: 'Traditional Gold Necklace Set',
+      category: 'necklaces',
+      metal_type: 'gold',
+      purity: '22K',
+      weight_grams: 45,
+      metal_price: 285000,
+      making_charges: 35000,
+      images: ['https://res.cloudinary.com/ddrlxvnsh/image/upload/v1766855925/jewllery_shop/products/ygijqk8osfqg10qmlzuu.jpg'],
+      rating: 4.9,
+      review_count: 89
+    },
+    {
+      id: 3,
+      name: 'Diamond Stud Earrings',
+      category: 'earrings',
+      metal_type: 'diamond',
+      purity: '18K',
+      weight_grams: 3.2,
+      metal_price: 85000,
+      making_charges: 10000,
+      images: ['https://res.cloudinary.com/ddrlxvnsh/image/upload/v1766855925/jewllery_shop/products/expgtk7ilimekmrjewg3.jpg'],
+      rating: 4.7,
+      review_count: 156
+    },
+    {
+      id: 4,
+      name: 'Gold Kada Bangles Set',
+      category: 'bangles',
+      metal_type: 'gold',
+      purity: '22K',
+      weight_grams: 32,
+      metal_price: 195000,
+      making_charges: 25000,
+      images: ['https://res.cloudinary.com/ddrlxvnsh/image/upload/v1766855925/jewllery_shop/products/gycyiwsxjsof0i0meafg.jpg'],
+      rating: 4.6,
+      review_count: 78
+    }
+  ];
+
+  useEffect(() => {
+    // Try to fetch from API, fallback to mock data
+    const fetchFeatured = async () => {
+      try {
+        const res = await fetch('/api/products/featured');
+        if (res.ok) {
+          const data = await res.json();
+          setFeaturedProducts(data.length > 0 ? data : mockProducts);
+        } else {
+          setFeaturedProducts(mockProducts);
+        }
+      } catch (error) {
+        setFeaturedProducts(mockProducts);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFeatured();
+    fetchFlashSales();
+    fetchTestimonials();
+  }, []);
+
+  // Fetch active flash sales
+  const fetchFlashSales = async () => {
+    try {
+      const res = await fetch('/api/flash-sales/active');
+      if (res.ok) {
+        const data = await res.json();
+        setFlashSales(data);
+      }
+    } catch (error) {
+      console.error('Fetch flash sales error:', error);
+    }
+  };
+
+  // Fetch testimonials
+  const fetchTestimonials = async () => {
+    try {
+      const res = await fetch('/api/testimonials');
+      if (res.ok) {
+        const data = await res.json();
+        setTestimonials(data);
+      }
+    } catch (error) {
+      console.error('Fetch testimonials error:', error);
+    }
+  };
+
+  // Auto-rotate testimonials
+  useEffect(() => {
+    if (testimonials.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentTestimonial(prev => (prev + 1) % testimonials.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [testimonials.length]);
+
+  // Cloudinary base URL
+  const cloudinaryBase = 'https://res.cloudinary.com/ddrlxvnsh/image/upload/v1766855925/jewllery_shop/products';
+  
+  const categories = [
+    { name: 'Rings', icon: '💍', path: '/products?category=rings', image: `${cloudinaryBase}/jxyw8vx454t3mnr2q8is.jpg` },
+    { name: 'Necklaces', icon: '📿', path: '/products?category=necklaces', image: `${cloudinaryBase}/ygijqk8osfqg10qmlzuu.jpg` },
+    { name: 'Earrings', icon: '✨', path: '/products?category=earrings', image: `${cloudinaryBase}/expgtk7ilimekmrjewg3.jpg` },
+    { name: 'Bangles', icon: '⭕', path: '/products?category=bangles', image: `${cloudinaryBase}/gycyiwsxjsof0i0meafg.jpg` }
+  ];
+
+  const collections = [
+    { 
+      name: 'Wedding Collection', 
+      subtitle: 'Celebrate your special day', 
+      path: '/products?collection=wedding',
+      image: `${cloudinaryBase}/fhlj3efhaafo5amfefyy.jpg`
+    },
+    { 
+      name: 'Daily Wear', 
+      subtitle: 'Elegance for everyday', 
+      path: '/products?collection=daily',
+      image: `${cloudinaryBase}/expgtk7ilimekmrjewg3.jpg`
+    },
+    { 
+      name: 'Festive', 
+      subtitle: 'Shine at every celebration', 
+      path: '/products?collection=festive',
+      image: `${cloudinaryBase}/gycyiwsxjsof0i0meafg.jpg`
+    }
+  ];
+
+  return (
+    <>
+    <SEO 
+      title="Premium Indian Jewelry"
+      description="Aabhar - Exquisite Gold, Diamond, Silver & Platinum Jewelry for Every Occasion. Discover our handcrafted collection of rings, necklaces, earrings, and bangles."
+      type="website"
+    />
+    <div className="home">
+      {/* Hero Section */}
+      <section className="hero">
+        <div className="hero-bg">
+          <img src={`${cloudinaryBase}/fhlj3efhaafo5amfefyy.jpg`} alt="" />
+          <div className="hero-overlay"></div>
+        </div>
+        <div className="container hero-content">
+          <div className="hero-text animate-slide-up">
+            <span className="hero-badge">
+              <Sparkles size={16} /> Premium Indian Jewelry
+            </span>
+            <h1>Exquisite Jewelry for <span className="text-gradient">Every Occasion</span></h1>
+            <p>Discover our handcrafted collection of gold, diamond, silver, and platinum jewelry. BIS Hallmarked with lifetime exchange.</p>
+            <div className="hero-actions">
+              <Link to="/products" className="btn btn-primary btn-lg">
+                Shop Collection <ArrowRight size={20} />
+              </Link>
+              <Link to="/products?collection=wedding" className="btn btn-secondary btn-lg">
+                Bridal Collection
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Flash Sales Section */}
+      {flashSales.length > 0 && (
+        <section className="flash-sales-section">
+          <div className="container">
+            <div className="flash-sales-header">
+              <div className="flash-sales-title">
+                <Zap size={28} className="flash-icon" />
+                <h2>Flash Sale</h2>
+                <span className="flash-badge">Limited Time!</span>
+              </div>
+            </div>
+            <div className="flash-sales-grid">
+              {flashSales.slice(0, 4).map((sale) => {
+                const images = typeof sale.images === 'string' ? JSON.parse(sale.images) : sale.images;
+                const gstPercent = parseFloat(sale.gst_percent || 3) / 100;
+                const originalPrice = parseFloat(sale.original_price) || 0;
+                const originalPriceWithGst = originalPrice * (1 + gstPercent);
+                const discountedPrice = sale.flash_price 
+                  ? parseFloat(sale.flash_price) 
+                  : originalPrice * (1 - sale.discount_percentage / 100);
+                const discountedPriceWithGst = discountedPrice * (1 + gstPercent);
+                
+                return (
+                  <Link to={`/products/${sale.product_id}`} key={sale.id} className="flash-sale-card">
+                    <div className="flash-sale-badge">
+                      <Zap size={14} />
+                      {sale.discount_percentage}% OFF
+                    </div>
+                    <div className="flash-sale-timer-badge">
+                      <FlashSaleTimer endTime={sale.end_time} size="small" showLabel={false} />
+                    </div>
+                    <div className="flash-sale-image">
+                      <img src={images?.[0] || '/placeholder.jpg'} alt={sale.name} />
+                    </div>
+                    <div className="flash-sale-info">
+                      <h4>{sale.name}</h4>
+                      <div className="flash-sale-prices">
+                        <span className="original-price">₹{Math.round(originalPriceWithGst).toLocaleString()}</span>
+                        <span className="discounted-price">₹{Math.round(discountedPriceWithGst).toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Categories */}
+      <section className="categories-section">
+        <div className="container">
+          <div className="section-header">
+            <h2>Shop by Category</h2>
+            <p>Find the perfect piece for every style</p>
+          </div>
+          <div className="categories-grid">
+            {categories.map((cat) => (
+              <Link to={cat.path} key={cat.name} className="category-card">
+                <div className="category-image">
+                  <img src={cat.image} alt={cat.name} />
+                </div>
+                <h3>{cat.name}</h3>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Products */}
+      <section className="featured-section">
+        <div className="container">
+          <div className="section-header">
+            <div>
+              <h2>Featured Collection</h2>
+              <p>Our most loved pieces, handpicked for you</p>
+            </div>
+            <Link to="/products" className="btn btn-secondary">
+              View All <ArrowRight size={16} />
+            </Link>
+          </div>
+          <div className="products-grid">
+            {loading ? (
+              Array(4).fill(0).map((_, i) => (
+                <div key={i} className="product-skeleton">
+                  <div className="skeleton" style={{ height: 280 }}></div>
+                  <div className="skeleton" style={{ height: 24, marginTop: 16, width: '80%' }}></div>
+                  <div className="skeleton" style={{ height: 20, marginTop: 8, width: '50%' }}></div>
+                </div>
+              ))
+            ) : (
+              featuredProducts.map((product) => (
+                <ProductCard 
+                  key={product.id} 
+                  product={product} 
+                  onQuickView={setQuickViewProduct}
+                />
+              ))
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Collections Banner */}
+      <section className="collections-section">
+        <div className="container">
+          <div className="section-header text-center">
+            <span className="section-badge"><Crown size={16} /> Curated Collections</span>
+            <h2>Explore Our Collections</h2>
+            <p>From wedding elegance to everyday charm</p>
+          </div>
+          <div className="collections-grid">
+            {collections.map((col) => (
+              <Link to={col.path} key={col.name} className="collection-card">
+                <div className="collection-image">
+                  <img src={col.image} alt={col.name} />
+                </div>
+                <div className="collection-content">
+                  <h3>{col.name}</h3>
+                  <p>{col.subtitle}</p>
+                  <span className="collection-link">
+                    Explore <ArrowRight size={16} />
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="features-section">
+        <div className="container">
+          <div className="features-grid">
+            <div className="feature-card">
+              <div className="feature-icon">
+                <Star />
+              </div>
+              <h4>BIS Hallmarked</h4>
+              <p>100% certified gold and silver jewelry with purity guarantee</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <Gift />
+              </div>
+              <h4>Lifetime Exchange</h4>
+              <p>Exchange your old jewelry at full value anytime</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <Crown />
+              </div>
+              <h4>Premium Craftsmanship</h4>
+              <p>Handcrafted by master artisans with decades of expertise</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      {testimonials.length > 0 && (
+        <section className="testimonials-section">
+          <div className="container">
+            <div className="section-header">
+              <h2>What Our Customers Say</h2>
+              <p>Trusted by thousands of happy customers</p>
+            </div>
+            <div className="testimonials-carousel">
+              <div className="testimonial-card">
+                <Quote size={32} className="quote-icon" />
+                <p className="testimonial-text">"{testimonials[currentTestimonial]?.testimonial_text}"</p>
+                <div className="testimonial-author">
+                  {testimonials[currentTestimonial]?.customer_image ? (
+                    <img 
+                      src={testimonials[currentTestimonial].customer_image} 
+                      alt={testimonials[currentTestimonial].customer_name}
+                      className="author-avatar"
+                    />
+                  ) : (
+                    <div className="author-avatar-fallback">
+                      {testimonials[currentTestimonial]?.customer_name?.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <div className="author-info">
+                    <strong>{testimonials[currentTestimonial]?.customer_name}</strong>
+                    {testimonials[currentTestimonial]?.customer_location && (
+                      <span>{testimonials[currentTestimonial].customer_location}</span>
+                    )}
+                    <div className="testimonial-stars">
+                      {Array.from({ length: testimonials[currentTestimonial]?.rating || 5 }, (_, i) => (
+                        <Star key={i} size={14} fill="#d4af37" color="#d4af37" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {testimonials.length > 1 && (
+                <div className="testimonial-dots">
+                  {testimonials.map((_, index) => (
+                    <button
+                      key={index}
+                      className={`dot ${index === currentTestimonial ? 'active' : ''}`}
+                      onClick={() => setCurrentTestimonial(index)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Newsletter CTA */}
+      <section className="cta-section">
+        <div className="container">
+          <div className="cta-card">
+            <div className="cta-content">
+              <h2>Get 10% Off Your First Order</h2>
+              <p>Subscribe to our newsletter for exclusive offers and new arrivals</p>
+              
+              {isAuthenticated ? (
+                <button 
+                  className={`btn btn-primary cta-subscribe-btn ${isSubscribed ? 'subscribed' : ''}`}
+                  onClick={handleAuthenticatedSubscribe}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Subscribing...' : isSubscribed ? '✓ Subscribed' : 'Subscribe to Newsletter'}
+                </button>
+              ) : (
+                <form className="cta-form" onSubmit={handleGuestSubscribe}>
+                  <input 
+                    type="email" 
+                    placeholder="Enter your email" 
+                    value={newsletterEmail}
+                    onChange={(e) => setNewsletterEmail(e.target.value)}
+                    disabled={isSubmitting}
+                  />
+                  <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                    {isSubmitting ? 'Subscribing...' : 'Subscribe'}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    {/* Quick View Modal */}
+    {quickViewProduct && (
+      <QuickViewModal 
+        product={quickViewProduct} 
+        onClose={() => setQuickViewProduct(null)} 
+      />
+    )}
+  </>
+  );
+};
+
+export default Home;

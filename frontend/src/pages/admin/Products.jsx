@@ -1,0 +1,544 @@
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { 
+  LayoutDashboard, Package, ShoppingCart, Users, Tag, Shield, Mail, Zap,
+  BarChart3, Plus, Edit, Trash2, Search, Image, AlertTriangle,
+  ChevronUp, ChevronDown, ChevronsUpDown, Archive, RotateCcw, 
+  ChevronLeft, ChevronRight, Quote, HelpCircle, FileText, Activity
+} from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../components/ui/Toast';
+import './Admin.css';
+
+const Products = () => {
+  const navigate = useNavigate();
+  const { user, isAuthenticated, token, loading: authLoading } = useAuth();
+  const toast = useToast();
+  
+  // Core data state
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [pageSizeOpen, setPageSizeOpen] = useState(false);
+  
+  // Sorting state
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+  
+  // Filter state
+  const [showInactive, setShowInactive] = useState(false);
+  
+  // Modal state
+  const [deleteModal, setDeleteModal] = useState({ show: false, product: null });
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!isAuthenticated || user?.role !== 'admin') {
+      navigate('/login');
+      return;
+    }
+    fetchProducts();
+  }, [isAuthenticated, user, authLoading, currentPage, pageSize, showInactive, sortConfig]);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: pageSize.toString(),
+        includeInactive: showInactive.toString()
+      });
+      
+      if (sortConfig.key) {
+        params.append('sortBy', sortConfig.key);
+        params.append('sortOrder', sortConfig.direction);
+      }
+      
+      console.log('=== FETCH PRODUCTS ===');
+      console.log('Params:', params.toString());
+      console.log('showInactive:', showInactive);
+      console.log('sortConfig:', sortConfig);
+      
+      const res = await fetch(`/api/admin/products?${params}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        console.log('Response:', data);
+        setProducts(data.products || []);
+        setTotalProducts(data.pagination?.total || 0);
+      }
+    } catch (error) {
+      console.error('Fetch products error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Sorting handler
+  const handleSort = (key) => {
+    let direction = 'ASC';
+    if (sortConfig.key === key) {
+      if (sortConfig.direction === 'ASC') direction = 'DESC';
+      else if (sortConfig.direction === 'DESC') {
+        // Reset to no sorting
+        setSortConfig({ key: null, direction: null });
+        return;
+      }
+    }
+    setSortConfig({ key, direction });
+    setCurrentPage(1);
+  };
+
+  // Get sort icon for column
+  const getSortIcon = (key) => {
+    if (sortConfig.key !== key) {
+      return <ChevronsUpDown size={14} className="sort-icon neutral" />;
+    }
+    if (sortConfig.direction === 'ASC') {
+      return <ChevronUp size={14} className="sort-icon asc" />;
+    }
+    return <ChevronDown size={14} className="sort-icon desc" />;
+  };
+
+  // Click outside to close dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.custom-select')) {
+        setPageSizeOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleDeleteClick = (product) => {
+    setDeleteModal({ show: true, product });
+  };
+
+  const handleDeleteConfirm = async (permanent = false) => {
+    const { product } = deleteModal;
+    if (!product) return;
+    
+    try {
+      const url = permanent 
+        ? `/api/admin/products/${product.id}?permanent=true`
+        : `/api/admin/products/${product.id}`;
+      
+      const res = await fetch(url, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(data.message);
+        if (permanent) {
+          setProducts(products.filter(p => p.id !== product.id));
+        } else {
+          // Update product to inactive in local state
+          setProducts(products.map(p => 
+            p.id === product.id ? { ...p, is_active: false } : p
+          ));
+        }
+      } else {
+        toast.error('Failed to delete product');
+      }
+    } catch (error) {
+      toast.error('Failed to delete product');
+    } finally {
+      setDeleteModal({ show: false, product: null });
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteModal({ show: false, product: null });
+  };
+
+  const handleRestore = async (product) => {
+    try {
+      const res = await fetch(`/api/admin/products/${product.id}`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}` 
+        },
+        body: JSON.stringify({ is_active: true })
+      });
+      
+      if (res.ok) {
+        toast.success('Product restored');
+        setProducts(products.map(p => 
+          p.id === product.id ? { ...p, is_active: true } : p
+        ));
+      }
+    } catch (error) {
+      toast.error('Failed to restore product');
+    }
+  };
+
+  const formatPrice = (product) => {
+    const total = parseFloat(product.metal_price) + parseFloat(product.making_charges || 0);
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(total);
+  };
+
+  const getFirstImage = (images) => {
+    try {
+      const imgs = typeof images === 'string' ? JSON.parse(images) : images;
+      return imgs && imgs.length > 0 ? imgs[0] : null;
+    } catch {
+      return null;
+    }
+  };
+
+  // Client-side search filter
+  const filteredProducts = products.filter(p => 
+    p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Pagination calculations
+  const totalPages = Math.ceil(totalProducts / pageSize);
+
+  if (authLoading) {
+    return (
+      <div className="admin-page">
+        <div className="admin-loading">Loading...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="admin-page">
+      {/* Enhanced Delete Modal */}
+      {deleteModal.show && (
+        <div className="confirm-modal-overlay" onClick={handleDeleteCancel}>
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="confirm-modal-icon">
+              <AlertTriangle size={48} />
+            </div>
+            <h3 className="confirm-modal-title">Delete Product?</h3>
+            <p className="confirm-modal-message">
+              What would you like to do with "<strong>{deleteModal.product?.name}</strong>"?
+            </p>
+            <div className="confirm-modal-actions three-buttons">
+              <button className="btn btn-secondary" onClick={handleDeleteCancel}>
+                Cancel
+              </button>
+              <button className="btn btn-warning" onClick={() => handleDeleteConfirm(false)}>
+                <Archive size={16} /> Set Inactive
+              </button>
+              <button className="btn btn-danger" onClick={() => handleDeleteConfirm(true)}>
+                <Trash2 size={16} /> Delete Forever
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <aside className="admin-sidebar">
+        <div className="sidebar-header">
+          <Link to="/" className="admin-logo">
+            <span className="logo-text">Aabhar</span>
+            <span className="logo-accent">Admin</span>
+          </Link>
+        </div>
+        <nav className="admin-nav">
+          <Link to="/admin" className="nav-item">
+            <LayoutDashboard size={18} /> Dashboard
+          </Link>
+          <Link to="/admin/products" className="nav-item active">
+            <Package size={18} /> Products
+          </Link>
+          <Link to="/admin/orders" className="nav-item">
+            <ShoppingCart size={18} /> Orders
+          </Link>
+          <Link to="/admin/customers" className="nav-item">
+            <Users size={18} /> Customers
+          </Link>
+          <Link to="/admin/coupons" className="nav-item">
+            <Tag size={18} /> Coupons
+          </Link>
+          <Link to="/admin/flash-sales" className="nav-item">
+            <Zap size={18} /> Flash Sales
+          </Link>
+          <Link to="/admin/bulk-orders" className="nav-item">
+            <Package size={18} /> Bulk Orders
+          </Link>
+          <Link to="/admin/testimonials" className="nav-item">
+            <Quote size={18} /> Testimonials
+          </Link>
+          <Link to="/admin/faqs" className="nav-item">
+            <HelpCircle size={18} /> FAQs
+          </Link>
+          <Link to="/admin/blog" className="nav-item">
+            <FileText size={18} /> Blog
+          </Link>
+          <Link to="/admin/reports" className="nav-item">
+            <BarChart3 size={18} /> Reports
+          </Link>
+          <Link to="/admin/users" className="nav-item">
+            <Shield size={18} /> Admin Users
+          </Link>
+          <Link to="/admin/email-center" className="nav-item">
+            <Mail size={18} /> Email Center
+          </Link>
+          <Link to="/admin/logs" className="nav-item">
+            <Activity size={18} /> Logs
+          </Link>
+        </nav>
+        <div className="sidebar-footer">
+          <Link to="/" className="back-to-store">← Back to Store</Link>
+        </div>
+      </aside>
+
+      <main className="admin-content">
+        <header className="admin-header">
+          <h1>Products</h1>
+          <button 
+            className="btn btn-primary"
+            onClick={() => navigate('/admin/products/new')}
+          >
+            <Plus size={18} /> Add Product
+          </button>
+        </header>
+
+        {/* Table Controls: Search, Filter, Page Size */}
+        <div className="admin-toolbar">
+          <div className="search-box">
+            <Search size={18} />
+            <input 
+              type="text" 
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          
+          <div className="toolbar-controls">
+            <label className="checkbox-toggle">
+              <input 
+                type="checkbox" 
+                checked={showInactive}
+                onChange={(e) => {
+                  setShowInactive(e.target.checked);
+                  setCurrentPage(1);
+                }}
+              />
+              <span className="checkbox-label-text">Show Inactive</span>
+            </label>
+            
+            <div className="page-size-control">
+              <span>Show:</span>
+              <div className="custom-select">
+                <div 
+                  className={`custom-select-trigger ${pageSizeOpen ? 'open' : ''}`}
+                  onClick={() => setPageSizeOpen(!pageSizeOpen)}
+                >
+                  <span>{pageSize}</span>
+                  <ChevronDown size={16} className={`select-arrow ${pageSizeOpen ? 'rotated' : ''}`} />
+                </div>
+                {pageSizeOpen && (
+                  <div className="custom-select-options">
+                    {[10, 20, 30, 40, 50].map(size => (
+                      <div 
+                        key={size}
+                        className={`custom-select-option ${pageSize === size ? 'selected' : ''}`}
+                        onClick={() => {
+                          setPageSize(size);
+                          setCurrentPage(1);
+                          setPageSizeOpen(false);
+                        }}
+                      >
+                        {size}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Products Table */}
+        <div className="admin-table-wrapper">
+          <table className="admin-table sortable-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th className="sortable-header" onClick={() => handleSort('name')}>
+                  Product {getSortIcon('name')}
+                </th>
+                <th className="sortable-header" onClick={() => handleSort('category')}>
+                  Category {getSortIcon('category')}
+                </th>
+                <th className="sortable-header" onClick={() => handleSort('metal_type')}>
+                  Metal {getSortIcon('metal_type')}
+                </th>
+                <th className="sortable-header" onClick={() => handleSort('metal_price')}>
+                  Price {getSortIcon('metal_price')}
+                </th>
+                <th className="sortable-header" onClick={() => handleSort('stock')}>
+                  Stock {getSortIcon('stock')}
+                </th>
+                <th className="sortable-header" onClick={() => handleSort('is_active')}>
+                  Status {getSortIcon('is_active')}
+                </th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="8" className="loading-cell">Loading...</td>
+                </tr>
+              ) : filteredProducts.length === 0 ? (
+                <tr>
+                  <td colSpan="8" className="empty-cell">
+                    <div className="empty-state-inline">
+                      <Package size={48} className="empty-icon" />
+                      <h3>No Products Found</h3>
+                      <p>Start building your jewelry collection by adding your first product.</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredProducts.map((product) => {
+                  const img = getFirstImage(product.images);
+                  return (
+                    <tr key={product.id} className={!product.is_active ? 'inactive-row' : ''}>
+                      <td>
+                        {img ? (
+                          <img 
+                            src={img} 
+                            alt={product.name} 
+                            className="product-thumbnail"
+                            style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 4 }}
+                          />
+                        ) : (
+                          <div 
+                            className="no-image" 
+                            style={{ 
+                              width: 48, height: 48, 
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              background: 'var(--bg-secondary)', borderRadius: 4
+                            }}
+                          >
+                            <Image size={20} color="var(--text-muted)" />
+                          </div>
+                        )}
+                      </td>
+                      <td>
+                        <div className="product-cell">
+                          <span className="product-name">{product.name}</span>
+                        </div>
+                      </td>
+                      <td className="capitalize">{product.category}</td>
+                      <td className="capitalize">{product.purity} {product.metal_type}</td>
+                      <td>{formatPrice(product)}</td>
+                      <td>
+                        <span className={`stock-badge ${product.stock <= 5 ? 'low' : ''}`}>
+                          {product.stock}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={`status-badge ${product.is_active ? 'active' : 'inactive'}`}>
+                          {product.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="action-btns">
+                          <button 
+                            className="action-btn edit"
+                            onClick={() => navigate(`/admin/products/edit/${product.id}`)}
+                            title="Edit"
+                          >
+                            <Edit size={16} />
+                          </button>
+                          {!product.is_active && (
+                            <button 
+                              className="action-btn restore"
+                              onClick={() => handleRestore(product)}
+                              title="Restore"
+                            >
+                              <RotateCcw size={16} />
+                            </button>
+                          )}
+                          <button 
+                            className="action-btn delete"
+                            onClick={() => handleDeleteClick(product)}
+                            title="Delete"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="pagination">
+            <div className="pagination-info">
+              Showing {((currentPage - 1) * pageSize) + 1} - {Math.min(currentPage * pageSize, totalProducts)} of {totalProducts} products
+            </div>
+            <div className="pagination-controls">
+              <button 
+                className="page-btn"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(currentPage - 1)}
+              >
+                <ChevronLeft size={16} />
+              </button>
+              
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+                return (
+                  <button
+                    key={pageNum}
+                    className={`page-btn ${currentPage === pageNum ? 'active' : ''}`}
+                    onClick={() => setCurrentPage(pageNum)}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              
+              <button 
+                className="page-btn"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(currentPage + 1)}
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+};
+
+export default Products;

@@ -1,0 +1,219 @@
+.faq-page {
+  padding: var(--space-3xl) 0;
+  min-height: 70vh;
+}
+
+.faq-header {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.faq-icon {
+  color: var(--accent-gold);
+  margin-bottom: var(--space-md);
+}
+
+.faq-header h1 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  margin-bottom: var(--space-sm);
+  color: var(--text-primary);
+}
+
+.faq-header p {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+/* Category Filters */
+.faq-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+}
+
+.filter-btn {
+  padding: var(--space-sm) var(--space-lg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.filter-btn:hover {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+.filter-btn.active {
+  background: var(--accent-gold);
+  border-color: var(--accent-gold);
+  color: white;
+}
+
+/* FAQ Content */
+.faq-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.faq-category {
+  margin-bottom: var(--space-xl);
+}
+
+.category-title {
+  font-family: var(--font-body);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--accent-gold);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-xs);
+  border-bottom: 2px solid var(--accent-gold);
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.faq-item {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all var(--transition-fast);
+}
+
+.faq-item:hover {
+  border-color: var(--accent-gold-light);
+}
+
+.faq-item.expanded {
+  border-color: var(--accent-gold);
+  box-shadow: var(--shadow-md);
+}
+
+.faq-question {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md) var(--space-lg);
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.faq-question:hover {
+  background: var(--bg-secondary);
+}
+
+.faq-question span {
+  flex: 1;
+  padding-right: var(--space-md);
+}
+
+.faq-question svg {
+  flex-shrink: 0;
+  color: var(--accent-gold);
+}
+
+.faq-answer {
+  padding: 0 var(--space-lg) var(--space-lg);
+  color: var(--text-secondary);
+  line-height: 1.7;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Empty State */
+.faq-page .empty-state {
+  text-align: center;
+  padding: var(--space-3xl) 0;
+}
+
+.faq-page .empty-state-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto var(--space-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  color: var(--text-muted);
+}
+
+.faq-page .empty-state svg {
+  color: var(--text-muted);
+}
+
+.faq-page .empty-state h2 {
+  margin-bottom: var(--space-sm);
+}
+
+.faq-page .empty-state p {
+  color: var(--text-muted);
+}
+
+/* Contact CTA */
+.faq-contact {
+  text-align: center;
+  padding: var(--space-2xl);
+  margin-top: var(--space-2xl);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-lg);
+}
+
+.faq-contact h3 {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-sm);
+}
+
+.faq-contact p {
+  color: var(--text-muted);
+  margin-bottom: var(--space-lg);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .faq-header h1 {
+    font-size: 2rem;
+  }
+
+  .faq-question {
+    padding: var(--space-md);
+    font-size: 0.95rem;
+  }
+
+  .faq-answer {
+    padding: 0 var(--space-md) var(--space-md);
+  }
+
+  .filter-btn {
+    padding: var(--space-xs) var(--space-md);
+    font-size: 0.85rem;
+  }
+}
