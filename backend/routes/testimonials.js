@@ -4,13 +4,17 @@ const { authMiddleware, adminMiddleware } = require('../middleware/authMiddlewar
 const {
   getTestimonials,
   getAllTestimonials,
+  submitTestimonial,
   createTestimonial,
   updateTestimonial,
   deleteTestimonial
 } = require('../controllers/testimonialController');
 
-// Public route
+// Public route - get approved testimonials for homepage
 router.get('/', getTestimonials);
+
+// Customer submission route (requires auth, not admin)
+router.post('/submit', authMiddleware, submitTestimonial);
 
 // Admin routes (require auth + admin role)
 router.get('/admin', authMiddleware, adminMiddleware, getAllTestimonials);

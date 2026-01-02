@@ -375,6 +375,7 @@
 .discount-row .discount-value {
   color: var(--success);
   font-weight: 600;
+  font-size: 1rem;
 }
 
 /* Spin Animation */

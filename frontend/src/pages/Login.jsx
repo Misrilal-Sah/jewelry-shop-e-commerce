@@ -113,7 +113,7 @@ const Login = () => {
                 className="logo-emblem"
               />
               <span className="logo-divider">|</span>
-              <span className="logo-text">Aabhar</span>
+              <span className="logo-text">AABHAR</span>
             </Link>
             <h1>Welcome Back</h1>
             <p>Sign in to access your account</p>

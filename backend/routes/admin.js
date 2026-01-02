@@ -135,4 +135,65 @@ router.post('/delete-image', async (req, res) => {
   }
 });
 
+// Test Birthday/Anniversary Scheduler (Admin only)
+const { sendBirthdayEmails, sendAnniversaryEmails } = require('../scheduler/birthdayScheduler');
+const pool = require('../config/db');
+
+router.post('/test-birthday', async (req, res) => {
+  try {
+    const { email, type = 'birthday' } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+    
+    // Update user's birthday/anniversary to today for testing
+    const today = new Date();
+    
+    if (type === 'birthday') {
+      await pool.query('UPDATE users SET birthday = ? WHERE email = ?', [today, email]);
+      console.log(`🧪 Test: Updated ${email} birthday to today`);
+      
+      // Run birthday scheduler
+      const count = await sendBirthdayEmails();
+      
+      res.json({ 
+        success: true, 
+        message: `Birthday test completed! Sent ${count} email(s) and notification(s)`,
+        details: {
+          email,
+          type: 'birthday',
+          emailsSent: count,
+          notificationCreated: count > 0
+        }
+      });
+    } else {
+      await pool.query('UPDATE users SET anniversary = ? WHERE email = ?', [today, email]);
+      console.log(`🧪 Test: Updated ${email} anniversary to today`);
+      
+      // Run anniversary scheduler
+      const count = await sendAnniversaryEmails();
+      
+      res.json({ 
+        success: true, 
+        message: `Anniversary test completed! Sent ${count} email(s) and notification(s)`,
+        details: {
+          email,
+          type: 'anniversary',
+          emailsSent: count,
+          notificationCreated: count > 0
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Test birthday error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Test failed', 
+      error: error.message 
+    });
+  }
+});
+
 module.exports = router;
+

@@ -30,10 +30,12 @@ const FAQs = () => {
   // Sorting
   const [sortConfig, setSortConfig] = useState({ key: 'display_order', direction: 'ASC' });
   
-  // Search
+  // Search & Filter
   const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
   
-  const categoryOptions = ['General', 'Orders', 'Shipping', 'Returns', 'Products', 'Payment'];
+  const categoryOptions = ['General', 'Orders', 'Shipping', 'Returns', 'Products', 'Payment', 'Offers', 'Account', 'Support', 'Care'];
   
   const [formData, setFormData] = useState({
     question: '',
@@ -180,8 +182,12 @@ const FAQs = () => {
     return <ChevronDown size={14} className="sort-icon desc" />;
   };
 
-  // Filter FAQs by search query
+  // Filter FAQs by search query and category
   const filteredFaqs = faqs.filter(faq => {
+    // Category filter
+    if (categoryFilter && faq.category !== categoryFilter) return false;
+    
+    // Search filter
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
@@ -260,6 +266,46 @@ const FAQs = () => {
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
             />
+          </div>
+          
+          {/* Category Filter Dropdown */}
+          <div className="category-filter">
+            <div className="custom-select" style={{ minWidth: '160px' }}>
+              <div 
+                className={`custom-select-trigger ${categoryDropdownOpen ? 'open' : ''}`}
+                onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
+              >
+                <span>{categoryFilter || 'All Categories'}</span>
+                <ChevronDown size={16} className={`select-arrow ${categoryDropdownOpen ? 'rotated' : ''}`} />
+              </div>
+              {categoryDropdownOpen && (
+                <div className="custom-select-options">
+                  <div 
+                    className={`custom-select-option ${!categoryFilter ? 'selected' : ''}`}
+                    onClick={() => {
+                      setCategoryFilter('');
+                      setCurrentPage(1);
+                      setCategoryDropdownOpen(false);
+                    }}
+                  >
+                    All Categories
+                  </div>
+                  {categoryOptions.map(cat => (
+                    <div 
+                      key={cat}
+                      className={`custom-select-option ${categoryFilter === cat ? 'selected' : ''}`}
+                      onClick={() => {
+                        setCategoryFilter(cat);
+                        setCurrentPage(1);
+                        setCategoryDropdownOpen(false);
+                      }}
+                    >
+                      {cat}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           
           <div className="toolbar-controls">

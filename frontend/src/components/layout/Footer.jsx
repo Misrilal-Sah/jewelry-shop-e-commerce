@@ -159,7 +159,7 @@ const Footer = () => {
                   className="logo-emblem"
                 />
                 <span className="logo-divider">|</span>
-                <span className="logo-text">Aabhar</span>
+                <span className="logo-text">AABHAR</span>
               </Link>
               <p className="footer-about">
                 Premium Indian jewelry crafted with love and tradition. 

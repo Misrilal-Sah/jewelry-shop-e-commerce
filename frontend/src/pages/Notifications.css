@@ -185,6 +185,37 @@
   color: #3b82f6;
 }
 
+/* Birthday & Anniversary celebration styles */
+.notification-card .notification-icon.type-birthday {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(255, 215, 0, 0.15));
+  color: #d4af37;
+}
+
+.notification-card .notification-icon.type-anniversary {
+  background: linear-gradient(135deg, rgba(232, 164, 184, 0.2), rgba(255, 182, 193, 0.15));
+  color: #e8a4b8;
+}
+
+.notification-card.celebration {
+  border-left: 3px solid #d4af37;
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.08), transparent);
+}
+
+.notification-card.celebration.unread {
+  animation: celebrationPulse 2s ease-in-out infinite;
+}
+
+@keyframes celebrationPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+  50% { box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); }
+}
+
+.celebration-btn {
+  background: linear-gradient(135deg, #d4af37 0%, #b8973d 100%) !important;
+  border: none;
+  cursor: pointer;
+}
+
 .notification-card .notification-content {
   flex: 1;
   min-width: 0;

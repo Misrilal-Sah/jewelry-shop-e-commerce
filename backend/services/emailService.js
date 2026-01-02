@@ -33,7 +33,7 @@ const getUnsubscribeFooter = (email) => {
     <tr>
       <td style="padding: 25px 40px; text-align: center; background: #0d0d0d;">
         <p style="margin: 0 0 10px; font-size: 12px; color: #666666;">
-          You're receiving this email because you subscribed to Aabhar's newsletter.
+          You're receiving this email because you subscribed to AABHAR's newsletter.
         </p>
         <a href="${unsubscribeUrl}" style="color: #888888; font-size: 12px; text-decoration: underline;">
           Unsubscribe from our newsletter
@@ -55,12 +55,15 @@ const getEmailHeader = () => {
           <td style="text-align: center;">
             <table align="center" cellpadding="0" cellspacing="0" border="0">
               <tr>
-                <td style="vertical-align: middle; padding-right: 12px;">
-                  <img src="${emblemUrl}" alt="Aabhar" width="60" style="display: block; border-radius: 50%; width: 60px; height: auto;" />
+                <td style="vertical-align: middle; padding-right: 8px;">
+                  <img src="${emblemUrl}" alt="AABHAR" width="50" style="display: block; width: 50px; height: auto;" />
+                </td>
+                <td style="vertical-align: middle; padding: 0 10px 8px 10px; color: #d4af37; font-size: 40px; font-weight: 300; line-height: 1;">
+                  |
                 </td>
                 <td style="vertical-align: middle;">
-                  <h1 style="margin: 0; font-family: 'Georgia', serif; font-size: 28px; font-weight: normal; letter-spacing: 6px; color: #d4af37;">
-                    Aabhar
+                  <h1 style="margin: 0; font-family: 'Georgia', serif; font-size: 32px; font-weight: 600; letter-spacing: 8px; color: #d4af37; text-transform: uppercase;">
+                    AABHAR
                   </h1>
                 </td>
               </tr>
@@ -109,7 +112,7 @@ const getEmailFooter = () => `
               123 Jewelry Lane, Mumbai, Maharashtra 400001
             </p>
             <p style="margin: 0; font-size: 11px; color: #555555;">
-              © ${new Date().getFullYear()} Aabhar. All rights reserved.
+              © ${new Date().getFullYear()} AABHAR. All rights reserved.
             </p>
           </td>
         </tr>
@@ -126,7 +129,7 @@ const wrapEmailContent = (content, email = null) => `
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Aabhar</title>
+  <title>AABHAR</title>
   <!--[if mso]>
   <style type="text/css">
     table { border-collapse: collapse; }
@@ -158,7 +161,7 @@ const getOTPEmailTemplate = (otp, type) => {
   const isSignup = type === 'signup';
   const title = isSignup ? 'Verify Your Email' : 'Reset Password';
   const subtitle = isSignup 
-    ? 'Welcome to Aabhar! Please verify your email to complete your registration.'
+    ? 'Welcome to AABHAR! Please verify your email to complete your registration.'
     : 'You requested to reset your password. Use the code below.';
 
   const content = `
@@ -636,7 +639,7 @@ const getAdminPromotionTemplate = (userData) => {
         <div style="width: 60px; height: 1px; background: linear-gradient(90deg, transparent, #d4af37, transparent); margin: 25px auto;"></div>
         
         <p style="margin: 0 0 35px; font-size: 15px; color: #888888; line-height: 1.8; max-width: 420px; margin-left: auto; margin-right: auto;">
-          You have been granted administrative privileges for Aabhar. As an admin, you now have full access to manage the store, products, orders, and customers.
+          You have been granted administrative privileges for AABHAR. As an admin, you now have full access to manage the store, products, orders, and customers.
         </p>
         
         <div style="background: linear-gradient(135deg, #1f1f1f 0%, #151515 100%); border: 1px solid #333; border-radius: 12px; padding: 30px 40px; margin-bottom: 35px; text-align: left;">
@@ -697,13 +700,13 @@ const getAdminPromotionTemplate = (userData) => {
 const sendAdminPromotionEmail = async (email, userData) => {
   try {
     const transporter = createTransporter();
-    const fromName = process.env.SMTP_FROM_NAME || 'Aabhar';
+    const fromName = process.env.SMTP_FROM_NAME || 'AABHAR';
     const fromEmail = process.env.SMTP_EMAIL;
     
     const mailOptions = {
       from: `"${fromName}" <${fromEmail}>`,
       to: email,
-      subject: '🛡️ You\'ve Been Promoted to Admin - Aabhar',
+      subject: '🛡️ You\'ve Been Promoted to Admin - AABHAR',
       html: getAdminPromotionTemplate(userData)
     };
     
@@ -724,12 +727,12 @@ const sendAdminPromotionEmail = async (email, userData) => {
 const sendOTPEmail = async (email, otp, type) => {
   try {
     const transporter = createTransporter();
-    const fromName = process.env.SMTP_FROM_NAME || 'Aabhar';
+    const fromName = process.env.SMTP_FROM_NAME || 'AABHAR';
     const fromEmail = process.env.SMTP_EMAIL;
     
     const subject = type === 'signup' 
-      ? 'Verify Your Email - Aabhar' 
-      : 'Reset Your Password - Aabhar';
+      ? 'Verify Your Email - AABHAR' 
+      : 'Reset Your Password - AABHAR';
     
     const mailOptions = {
       from: `"${fromName}" <${fromEmail}>`,
@@ -751,31 +754,31 @@ const sendOTPEmail = async (email, otp, type) => {
 const sendMarketingEmail = async (email, type, data = {}) => {
   try {
     const transporter = createTransporter();
-    const fromName = process.env.SMTP_FROM_NAME || 'Aabhar';
+    const fromName = process.env.SMTP_FROM_NAME || 'AABHAR';
     const fromEmail = process.env.SMTP_EMAIL;
     
     let subject, html;
     
     switch (type) {
       case 'newsletter':
-        subject = 'Welcome to Aabhar Newsletter! 💎';
+        subject = 'Welcome to AABHAR Newsletter! 💎';
         html = getWelcomeNewsletterTemplate(email);
         break;
       case 'offers':
-        subject = `🎁 Special Offer: ${data.discount || '20'}% OFF at Aabhar!`;
+        subject = `🎁 Special Offer: ${data.discount || '20'}% OFF at AABHAR!`;
         html = getSpecialOffersTemplate(email, data);
         break;
       case 'festive':
-        subject = `🪔 ${data.festival || 'Festive'} Greetings from Aabhar!`;
+        subject = `🪔 ${data.festival || 'Festive'} Greetings from AABHAR!`;
         html = getFestiveEmailTemplate(email, data);
         break;
       case 'others':
       case 'arrivals':
-        subject = '✨ New Arrivals at Aabhar - Be the First!';
+        subject = '✨ New Arrivals at AABHAR - Be the First!';
         html = getNewArrivalsTemplate(email, data.products);
         break;
       case 'order':
-        subject = `Order Confirmed - ${data.orderId} | Aabhar`;
+        subject = `Order Confirmed - ${data.orderId} | AABHAR`;
         html = getOrderConfirmationTemplate(data);
         break;
       default:
@@ -840,7 +843,7 @@ const getEmailPreviewHTML = () => {
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Aabhar Email Templates Preview</title>
+  <title>AABHAR Email Templates Preview</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; }
@@ -859,7 +862,7 @@ const getEmailPreviewHTML = () => {
 </head>
 <body>
   <div class="container">
-    <h1>Aabhar</h1>
+    <h1>AABHAR</h1>
     <p class="subtitle">Email Templates Preview</p>
     
     <div class="templates-grid">
@@ -1109,13 +1112,13 @@ const getPriceDropTemplate = (email, productData) => {
 const sendBackInStockEmail = async (email, productData) => {
   try {
     const transporter = createTransporter();
-    const fromName = process.env.SMTP_FROM_NAME || 'Aabhar';
+    const fromName = process.env.SMTP_FROM_NAME || 'AABHAR';
     const fromEmail = process.env.SMTP_EMAIL;
     
     const mailOptions = {
       from: `"${fromName}" <${fromEmail}>`,
       to: email,
-      subject: `🔔 Back In Stock: ${productData.productName} - Aabhar`,
+      subject: `🔔 Back In Stock: ${productData.productName} - AABHAR`,
       html: getBackInStockTemplate(email, productData)
     };
     
@@ -1132,7 +1135,7 @@ const sendBackInStockEmail = async (email, productData) => {
 const sendPriceDropEmail = async (email, productData) => {
   try {
     const transporter = createTransporter();
-    const fromName = process.env.SMTP_FROM_NAME || 'Aabhar';
+    const fromName = process.env.SMTP_FROM_NAME || 'AABHAR';
     const fromEmail = process.env.SMTP_EMAIL;
     
     const mailOptions = {
@@ -1338,13 +1341,13 @@ const getBulkOrderAdminNotificationTemplate = (data) => {
 const sendBulkOrderCustomerConfirmation = async (data) => {
   try {
     const transporter = createTransporter();
-    const fromName = process.env.SMTP_FROM_NAME || 'Aabhar';
+    const fromName = process.env.SMTP_FROM_NAME || 'AABHAR';
     const fromEmail = process.env.SMTP_EMAIL;
     
     const mailOptions = {
       from: `"${fromName}" <${fromEmail}>`,
       to: data.email,
-      subject: '✓ Bulk Order Inquiry Received - Aabhar',
+      subject: '✓ Bulk Order Inquiry Received - AABHAR',
       html: getBulkOrderCustomerConfirmationTemplate(data)
     };
     
@@ -1361,13 +1364,13 @@ const sendBulkOrderCustomerConfirmation = async (data) => {
 const sendBulkOrderAdminNotification = async (data) => {
   try {
     const transporter = createTransporter();
-    const fromName = process.env.SMTP_FROM_NAME || 'Aabhar';
+    const fromName = process.env.SMTP_FROM_NAME || 'AABHAR';
     const fromEmail = process.env.SMTP_EMAIL;
     
     const mailOptions = {
       from: `"${fromName}" <${fromEmail}>`,
       to: data.adminEmail,
-      subject: `📦 New Bulk Order Inquiry from ${data.customerName} - Aabhar`,
+      subject: `📦 New Bulk Order Inquiry from ${data.customerName} - AABHAR`,
       html: getBulkOrderAdminNotificationTemplate(data)
     };
     
@@ -1570,13 +1573,13 @@ const getAnniversaryEmailTemplate = (email, data = {}) => {
 const sendBirthdayEmail = async (email, data) => {
   try {
     const transporter = createTransporter();
-    const fromName = process.env.SMTP_FROM_NAME || 'Aabhar';
+    const fromName = process.env.SMTP_FROM_NAME || 'AABHAR';
     const fromEmail = process.env.SMTP_EMAIL;
     
     const mailOptions = {
       from: `"${fromName}" <${fromEmail}>`,
       to: email,
-      subject: `🎂 Happy Birthday ${data.name}! Here's a Special Gift - Aabhar`,
+      subject: `🎂 Happy Birthday ${data.name}! Here's a Special Gift - AABHAR`,
       html: getBirthdayEmailTemplate(email, data)
     };
     
@@ -1593,13 +1596,13 @@ const sendBirthdayEmail = async (email, data) => {
 const sendAnniversaryEmail = async (email, data) => {
   try {
     const transporter = createTransporter();
-    const fromName = process.env.SMTP_FROM_NAME || 'Aabhar';
+    const fromName = process.env.SMTP_FROM_NAME || 'AABHAR';
     const fromEmail = process.env.SMTP_EMAIL;
     
     const mailOptions = {
       from: `"${fromName}" <${fromEmail}>`,
       to: email,
-      subject: `💍 Happy Anniversary ${data.name}! A Gift for You - Aabhar`,
+      subject: `💍 Happy Anniversary ${data.name}! A Gift for You - AABHAR`,
       html: getAnniversaryEmailTemplate(email, data)
     };
     

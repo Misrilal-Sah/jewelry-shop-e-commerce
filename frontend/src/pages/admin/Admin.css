@@ -4565,3 +4565,278 @@ h2.modal-title-centered {
 .spinning {
   animation: spin 1s linear infinite;
 }
+
+/* ==========================================
+   TESTIMONIAL ADMIN STYLES
+   ========================================== */
+
+/* Status Filter Tabs */
+.status-filter-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-secondary);
+  padding: 4px;
+  border-radius: var(--radius-md);
+  margin-right: auto;
+}
+
+.status-tab {
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-tab:hover {
+  color: var(--text-primary);
+  background: var(--bg-card);
+}
+
+.status-tab.active {
+  background: var(--bg-card);
+  color: var(--accent-gold);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.pending-count-badge {
+  background: #f1c40f;
+  color: #000;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  min-width: 18px;
+  text-align: center;
+}
+
+/* Status Cell */
+.status-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.status-cell .status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+}
+
+/* Testimonial Status Custom Dropdown */
+.testimonial-status-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.status-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  min-width: 110px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.status-dropdown-trigger:hover {
+  border-color: var(--accent-gold);
+}
+
+.status-dropdown-trigger svg {
+  transition: transform 0.2s;
+}
+
+.status-dropdown-trigger svg.rotated {
+  transform: rotate(180deg);
+}
+
+/* Status-specific trigger colors */
+.status-dropdown-trigger.pending {
+  background-color: rgba(241, 196, 15, 0.12);
+  border-color: rgba(241, 196, 15, 0.4);
+  color: #f1c40f;
+}
+
+.status-dropdown-trigger.approved {
+  background-color: rgba(39, 174, 96, 0.12);
+  border-color: rgba(39, 174, 96, 0.4);
+  color: #27ae60;
+}
+
+.status-dropdown-trigger.declined {
+  background-color: rgba(231, 76, 60, 0.12);
+  border-color: rgba(231, 76, 60, 0.4);
+  color: #e74c3c;
+}
+
+/* Dropdown options */
+.status-dropdown-options {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 130px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  overflow: hidden;
+}
+
+.status-dropdown-option {
+  padding: 10px 14px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.status-dropdown-option:hover {
+  background: var(--bg-secondary);
+}
+
+.status-dropdown-option.selected {
+  background: var(--bg-secondary);
+}
+
+/* Color-coded option text */
+.status-dropdown-option.pending {
+  color: #f1c40f;
+}
+
+.status-dropdown-option.approved {
+  color: #27ae60;
+}
+
+.status-dropdown-option.declined {
+  color: #e74c3c;
+}
+
+/* Light theme overrides */
+[data-theme="light"] .status-dropdown-trigger.pending {
+  color: #9a7c0e;
+}
+
+[data-theme="light"] .status-dropdown-trigger.approved {
+  color: #1e8449;
+}
+
+[data-theme="light"] .status-dropdown-trigger.declined {
+  color: #c0392b;
+}
+
+[data-theme="light"] .status-dropdown-option.pending {
+  color: #9a7c0e;
+}
+
+[data-theme="light"] .status-dropdown-option.approved {
+  color: #1e8449;
+}
+
+[data-theme="light"] .status-dropdown-option.declined {
+  color: #c0392b;
+}
+
+/* Homepage Toggle */
+.homepage-toggle {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.homepage-toggle:hover:not(:disabled) {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+.homepage-toggle.active {
+  background: rgba(212, 175, 55, 0.15);
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+.homepage-toggle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Share Experience Button */
+.share-experience-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+/* Testimonial Edit Modal - User Info */
+.testimonial-user-info {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+}
+
+.user-avatar-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.user-avatar-large-fallback {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--accent-gold);
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.user-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.user-details .form-group {
+  margin-bottom: 0;
+}
+
+.user-details .form-input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background: var(--bg-primary);
+}
+

@@ -5,6 +5,7 @@
 const cron = require('node-cron');
 const pool = require('../config/db');
 const { sendBirthdayEmail, sendAnniversaryEmail } = require('../services/emailService');
+const { createNotification } = require('../controllers/notificationController');
 
 // Coupon settings
 const BIRTHDAY_DISCOUNT = 15;
@@ -13,11 +14,20 @@ const MIN_ORDER = 1000;
 const COUPON_VALID_DAYS = 7;
 
 /**
- * Generate unique coupon code for birthday/anniversary
+ * Generate unique coupon code with user initials for birthday/anniversary
+ * Format: MS-BDAY-12-2026 (initials-type-userId-year)
  */
-const generateCouponCode = (type, userId, year) => {
+const generateCouponCode = (type, userId, year, userName) => {
   const prefix = type === 'birthday' ? 'BDAY' : 'ANNIV';
-  return `${prefix}-${userId}-${year}`;
+  // Get initials from name (first 2 letters of first and last name, or first 2 letters if single name)
+  const nameParts = (userName || 'XX').trim().split(/\s+/);
+  let initials;
+  if (nameParts.length >= 2) {
+    initials = (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
+  } else {
+    initials = nameParts[0].substring(0, 2).toUpperCase();
+  }
+  return `${initials}-${prefix}-${userId}-${year}`;
 };
 
 /**
@@ -37,7 +47,7 @@ const createCoupon = async (code, discount, userId, type) => {
     
     if (existing.length > 0) {
       console.log(`Coupon ${code} already exists, skipping creation`);
-      return code;
+      return { code, endDate };
     }
     
     // Use the same column names as admin-created coupons
@@ -47,10 +57,43 @@ const createCoupon = async (code, discount, userId, type) => {
     `, [code, `${type === 'birthday' ? 'Birthday' : 'Anniversary'} special for user ${userId}`, discount, MIN_ORDER, startDate, endDate]);
     
     console.log(`Created ${type} coupon: ${code}`);
-    return code;
+    return { code, endDate };
   } catch (error) {
     console.error('Error creating coupon:', error);
-    return code; // Still return code for email
+    return { code, endDate: new Date(Date.now() + COUPON_VALID_DAYS * 24 * 60 * 60 * 1000) };
+  }
+};
+
+/**
+ * Create birthday/anniversary notification with coupon data
+ */
+const createSpecialNotification = async (userId, type, userName, couponCode, discount, validUntil) => {
+  try {
+    const title = type === 'birthday' 
+      ? `🎂 Happy Birthday, ${userName}!` 
+      : `💍 Happy Anniversary, ${userName}!`;
+    
+    const message = type === 'birthday'
+      ? `Celebrate your special day with ${discount}% off! Use code ${couponCode}`
+      : `Celebrate your love with ${discount}% off! Use code ${couponCode}`;
+    
+    // Store coupon details as JSON in metadata column
+    const metadata = JSON.stringify({
+      type: type,
+      couponCode: couponCode,
+      discount: discount,
+      minOrder: MIN_ORDER,
+      validUntil: validUntil.toISOString()
+    });
+    
+    await pool.query(`
+      INSERT INTO notifications (user_id, type, title, message, metadata, is_read)
+      VALUES (?, ?, ?, ?, ?, FALSE)
+    `, [userId, type, title, message, metadata]);
+    
+    console.log(`Created ${type} notification for user ${userId}`);
+  } catch (error) {
+    console.error('Error creating notification:', error);
   }
 };
 
@@ -76,9 +119,10 @@ const sendBirthdayEmails = async () => {
     
     for (const user of users) {
       try {
-        const couponCode = generateCouponCode('birthday', user.id, year);
-        await createCoupon(couponCode, BIRTHDAY_DISCOUNT, user.id, 'birthday');
+        const couponCode = generateCouponCode('birthday', user.id, year, user.name);
+        const { endDate } = await createCoupon(couponCode, BIRTHDAY_DISCOUNT, user.id, 'birthday');
         
+        // Send email
         await sendBirthdayEmail(user.email, {
           name: user.name,
           couponCode,
@@ -87,7 +131,10 @@ const sendBirthdayEmails = async () => {
           validDays: COUPON_VALID_DAYS
         });
         
-        console.log(`✅ Birthday email sent to ${user.email}`);
+        // Create in-app notification
+        await createSpecialNotification(user.id, 'birthday', user.name, couponCode, BIRTHDAY_DISCOUNT, endDate);
+        
+        console.log(`✅ Birthday email + notification sent to ${user.email}`);
       } catch (error) {
         console.error(`❌ Failed to send birthday email to ${user.email}:`, error.message);
       }
@@ -122,9 +169,10 @@ const sendAnniversaryEmails = async () => {
     
     for (const user of users) {
       try {
-        const couponCode = generateCouponCode('anniversary', user.id, year);
-        await createCoupon(couponCode, ANNIVERSARY_DISCOUNT, user.id, 'anniversary');
+        const couponCode = generateCouponCode('anniversary', user.id, year, user.name);
+        const { endDate } = await createCoupon(couponCode, ANNIVERSARY_DISCOUNT, user.id, 'anniversary');
         
+        // Send email
         await sendAnniversaryEmail(user.email, {
           name: user.name,
           couponCode,
@@ -133,7 +181,10 @@ const sendAnniversaryEmails = async () => {
           validDays: COUPON_VALID_DAYS
         });
         
-        console.log(`✅ Anniversary email sent to ${user.email}`);
+        // Create in-app notification
+        await createSpecialNotification(user.id, 'anniversary', user.name, couponCode, ANNIVERSARY_DISCOUNT, endDate);
+        
+        console.log(`✅ Anniversary email + notification sent to ${user.email}`);
       } catch (error) {
         console.error(`❌ Failed to send anniversary email to ${user.email}:`, error.message);
       }

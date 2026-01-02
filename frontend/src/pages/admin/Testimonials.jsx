@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Package, ShoppingCart, Users, BarChart3, Tag, Shield, Mail, Zap,
   Plus, Edit2, Trash2, X, Star, Quote, Upload, HelpCircle, AlertTriangle,
-  ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight, FileText, Activity
+  ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight, FileText, Activity,
+  Check, XCircle, Home, Clock
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../components/ui/Toast';
@@ -33,6 +34,13 @@ const Testimonials = () => {
   // Sorting
   const [sortConfig, setSortConfig] = useState({ key: 'display_order', direction: 'ASC' });
   
+  // Status filter
+  const [statusFilter, setStatusFilter] = useState('all');
+  const statusOptions = ['all', 'pending', 'approved', 'declined'];
+  
+  // Status dropdown for each testimonial
+  const [openStatusDropdown, setOpenStatusDropdown] = useState(null);
+  
   const [formData, setFormData] = useState({
     customer_name: '',
     customer_location: '',
@@ -40,10 +48,12 @@ const Testimonials = () => {
     testimonial_text: '',
     rating: 5,
     display_order: 0,
-    is_active: true
+    is_active: true,
+    status: 'approved',
+    is_homepage: 1
   });
 
-  // Rating options including half stars
+  // Rating options (including half stars)
   const ratingOptions = [
     { value: 5, label: '★★★★★ (5 Stars)' },
     { value: 4.5, label: '★★★★½ (4.5 Stars)' },
@@ -91,7 +101,9 @@ const Testimonials = () => {
       testimonial_text: '',
       rating: 5,
       display_order: 0,
-      is_active: true
+      is_active: true,
+      status: 'approved',
+      is_homepage: 1
     });
     setImagePreview(null);
     setShowModal(true);
@@ -106,7 +118,9 @@ const Testimonials = () => {
       testimonial_text: testimonial.testimonial_text || '',
       rating: testimonial.rating || 5,
       display_order: testimonial.display_order || 0,
-      is_active: testimonial.is_active
+      is_active: testimonial.is_active,
+      status: testimonial.status || 'approved',
+      is_homepage: testimonial.is_homepage ?? 1
     });
     setImagePreview(testimonial.customer_image || null);
     setShowModal(true);
@@ -280,8 +294,68 @@ const Testimonials = () => {
     return name ? name.charAt(0).toUpperCase() : '?';
   };
 
+  // Quick status update for approve/decline
+  const handleQuickStatusChange = async (id, newStatus, is_homepage) => {
+    try {
+      const res = await fetch(`/api/testimonials/admin/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: newStatus, is_homepage })
+      });
+      if (res.ok) {
+        toast.success(`Testimonial ${newStatus}!`);
+        fetchTestimonials();
+      } else {
+        toast.error('Failed to update status');
+      }
+    } catch (error) {
+      toast.error('Failed to update status');
+    }
+  };
+
+  // Toggle homepage visibility
+  const handleHomepageToggle = async (id, currentStatus, currentIsHomepage) => {
+    const newIsHomepage = currentIsHomepage ? 0 : 1;
+    try {
+      const res = await fetch(`/api/testimonials/admin/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: currentStatus, is_homepage: newIsHomepage })
+      });
+      if (res.ok) {
+        toast.success(newIsHomepage ? 'Testimonial added to homepage!' : 'Testimonial removed from homepage!');
+        fetchTestimonials();
+      } else {
+        toast.error('Failed to update homepage visibility');
+      }
+    } catch (error) {
+      toast.error('Failed to update homepage visibility');
+    }
+  };
+
+  // Get status badge color
+  const getStatusBadgeClass = (status) => {
+    switch (status) {
+      case 'pending': return 'pending';
+      case 'approved': return 'active';
+      case 'declined': return 'inactive';
+      default: return '';
+    }
+  };
+
+  // Filter by status
+  const filteredTestimonials = testimonials.filter(t => 
+    statusFilter === 'all' || t.status === statusFilter
+  );
+
   // Sort and paginate testimonials
-  const sortedTestimonials = [...testimonials].sort((a, b) => {
+  const sortedTestimonials = [...filteredTestimonials].sort((a, b) => {
     if (!sortConfig.key) return 0;
     const aVal = a[sortConfig.key];
     const bVal = b[sortConfig.key];
@@ -294,6 +368,9 @@ const Testimonials = () => {
   const totalPages = Math.ceil(totalItems / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
   const paginatedTestimonials = sortedTestimonials.slice(startIndex, startIndex + pageSize);
+
+  // Count pending
+  const pendingCount = testimonials.filter(t => t.status === 'pending').length;
 
   if (authLoading) {
     return <div className="admin-page"><div className="admin-loading">Loading...</div></div>;
@@ -334,14 +411,26 @@ const Testimonials = () => {
       <main className="admin-content">
         <header className="admin-header">
           <h1>Customer Testimonials</h1>
-          <button className="btn btn-primary" onClick={openAddModal}>
-            <Plus size={18} /> Add Testimonial
-          </button>
         </header>
 
         {/* Toolbar */}
         <div className="admin-toolbar">
           <div className="toolbar-controls">
+            {/* Status Filter Tabs */}
+            <div className="status-filter-tabs">
+              {statusOptions.map(status => (
+                <button
+                  key={status}
+                  className={`status-tab ${statusFilter === status ? 'active' : ''}`}
+                  onClick={() => { setStatusFilter(status); setCurrentPage(1); }}
+                >
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                  {status === 'pending' && pendingCount > 0 && (
+                    <span className="pending-count-badge">{pendingCount}</span>
+                  )}
+                </button>
+              ))}
+            </div>
             <div className="page-size-control">
               <span>Show:</span>
               <div className="custom-select">
@@ -398,8 +487,8 @@ const Testimonials = () => {
                   <th className="sortable-header" onClick={() => handleSort('rating')}>
                     Rating {getSortIcon('rating')}
                   </th>
-                  <th>Order</th>
                   <th>Status</th>
+                  <th>Homepage</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -424,6 +513,9 @@ const Testimonials = () => {
                           {testimonial.customer_location && (
                             <span className="customer-location">{testimonial.customer_location}</span>
                           )}
+                          {testimonial.user_email && (
+                            <span className="customer-location">{testimonial.user_email}</span>
+                          )}
                         </div>
                       </div>
                     </td>
@@ -437,11 +529,45 @@ const Testimonials = () => {
                     <td>
                       <div className="stars-cell">{renderStars(testimonial.rating)}</div>
                     </td>
-                    <td>{testimonial.display_order}</td>
                     <td>
-                      <span className={`status-badge ${testimonial.is_active ? 'active' : 'inactive'}`}>
-                        {testimonial.is_active ? 'Active' : 'Inactive'}
-                      </span>
+                      <div className="testimonial-status-dropdown">
+                        <div 
+                          className={`status-dropdown-trigger ${testimonial.status}`}
+                          onClick={() => setOpenStatusDropdown(openStatusDropdown === testimonial.id ? null : testimonial.id)}
+                        >
+                          <span>{testimonial.status.charAt(0).toUpperCase() + testimonial.status.slice(1)}</span>
+                          <ChevronDown size={14} className={openStatusDropdown === testimonial.id ? 'rotated' : ''} />
+                        </div>
+                        {openStatusDropdown === testimonial.id && (
+                          <div className="status-dropdown-options">
+                            {['pending', 'approved', 'declined'].map(status => (
+                              <div 
+                                key={status}
+                                className={`status-dropdown-option ${status} ${testimonial.status === status ? 'selected' : ''}`}
+                                onClick={() => {
+                                  if (status !== testimonial.status) {
+                                    const newIsHomepage = status === 'approved' ? 1 : 0;
+                                    handleQuickStatusChange(testimonial.id, status, newIsHomepage);
+                                  }
+                                  setOpenStatusDropdown(null);
+                                }}
+                              >
+                                {status.charAt(0).toUpperCase() + status.slice(1)}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td>
+                      <button
+                        className={`homepage-toggle ${testimonial.is_homepage ? 'active' : ''}`}
+                        onClick={() => handleHomepageToggle(testimonial.id, testimonial.status, testimonial.is_homepage)}
+                        title={testimonial.is_homepage ? 'Remove from homepage' : 'Show on homepage'}
+                        disabled={testimonial.status !== 'approved'}
+                      >
+                        <Home size={16} />
+                      </button>
                     </td>
                     <td>
                       <div className="action-buttons">
@@ -518,80 +644,48 @@ const Testimonials = () => {
         </div>
       </main>
 
-      {/* Add/Edit Modal */}
-      {showModal && (
+      {/* Edit Modal */}
+      {showModal && editingTestimonial && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <button className="close-btn" onClick={() => setShowModal(false)}>
               <X size={18} />
             </button>
-            <h2>{editingTestimonial ? 'Edit Testimonial' : 'Add Testimonial'}</h2>
+            <h2>Edit Testimonial</h2>
             
             <form onSubmit={handleSubmit}>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Customer Name *</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={formData.customer_name}
-                    onChange={e => setFormData({...formData, customer_name: e.target.value})}
-                    placeholder="e.g. Priya Sharma"
-                    required
+              {/* User Info Display - Read Only */}
+              <div className="testimonial-user-info">
+                {editingTestimonial.customer_image ? (
+                  <img 
+                    src={editingTestimonial.customer_image} 
+                    alt={editingTestimonial.customer_name}
+                    className="user-avatar-large"
                   />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Location</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={formData.customer_location}
-                    onChange={e => setFormData({...formData, customer_location: e.target.value})}
-                    placeholder="e.g. Mumbai"
-                  />
-                </div>
-              </div>
-              
-              {/* Image Upload Section */}
-              <div className="form-group">
-                <label className="form-label">Customer Photo</label>
-                <div className="image-upload-area">
-                  {imagePreview ? (
-                    <div className="image-preview-container">
-                      <img src={imagePreview} alt="Preview" className="image-preview" />
-                      <button type="button" className="remove-image-btn" onClick={removeImage}>
-                        <X size={16} />
-                      </button>
-                    </div>
-                  ) : (
-                    <div 
-                      className="upload-placeholder"
-                      onClick={() => fileInputRef.current?.click()}
-                      onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                      onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const files = e.dataTransfer.files;
-                        if (files && files.length > 0) {
-                          // Create a fake event to pass to handleImageUpload
-                          handleImageUpload({ target: { files: [files[0]] } });
-                        }
-                      }}
-                    >
-                      <Upload size={32} />
-                      <span>{uploading ? 'Uploading...' : 'Click or drop photo here'}</span>
-                      <span className="upload-hint">Max 5MB, JPG/PNG</span>
-                    </div>
-                  )}
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    style={{ display: 'none' }}
-                    disabled={uploading}
-                  />
+                ) : (
+                  <div className="user-avatar-large-fallback">
+                    {getAvatarFallback(formData.customer_name)}
+                  </div>
+                )}
+                <div className="user-details">
+                  <div className="form-group">
+                    <label>Customer Name</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={formData.customer_name}
+                      disabled
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Location</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={formData.customer_location || 'Not specified'}
+                      disabled
+                    />
+                  </div>
                 </div>
               </div>
               
@@ -632,24 +726,12 @@ const Testimonials = () => {
                 </div>
               </div>
               
-              <div className="form-group checkbox-group">
-                <label className="checkbox-container">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_active}
-                    onChange={e => setFormData({...formData, is_active: e.target.checked})}
-                  />
-                  <span className="custom-checkbox"></span>
-                  <span className="checkbox-text">Active (show on homepage)</span>
-                </label>
-              </div>
-              
               <div className="form-actions centered">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary" disabled={uploading}>
-                  {editingTestimonial ? 'Update Testimonial' : 'Add Testimonial'}
+                <button type="submit" className="btn btn-primary">
+                  Update Testimonial
                 </button>
               </div>
             </form>

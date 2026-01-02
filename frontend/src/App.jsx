@@ -48,6 +48,7 @@ import { ShortcutsProvider } from './context/ShortcutsContext';
 import CommandPalette from './components/ui/CommandPalette';
 import CookieConsent from './components/ui/CookieConsent';
 import NewsletterPopup from './components/NewsletterPopup';
+import Chatbot from './components/Chatbot/Chatbot';
 import './App.css';
 
 // Component to conditionally show footer
@@ -111,6 +112,7 @@ const AppContent = () => {
       <CommandPalette />
       <CookieConsent />
       <NewsletterPopup />
+      <Chatbot />
     </ShortcutsProvider>
   );
 };

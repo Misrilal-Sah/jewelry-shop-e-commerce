@@ -258,7 +258,7 @@ const Register = () => {
                 className="logo-emblem"
               />
               <span className="logo-divider">|</span>
-              <span className="logo-text">Aabhar</span>
+              <span className="logo-text">AABHAR</span>
             </Link>
             
             {step === 1 ? (

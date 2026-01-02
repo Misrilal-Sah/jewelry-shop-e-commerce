@@ -1,24 +1,29 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Bell, Check, Trash2, Package, TrendingDown, ShoppingBag, ArrowLeft } from 'lucide-react';
+import { Bell, Check, Trash2, Package, TrendingDown, ShoppingBag, ArrowLeft, Cake, Heart } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/ui/Toast';
+import CelebrationModal from '../components/CelebrationModal/CelebrationModal';
 import './Notifications.css';
 
 const Notifications = () => {
-  const { isAuthenticated, token } = useAuth();
+  const { isAuthenticated, token, loading: authLoading } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [celebrationModal, setCelebrationModal] = useState({ isOpen: false, data: null });
 
   useEffect(() => {
+    // Wait for auth to load before checking authentication
+    if (authLoading) return;
+    
     if (!isAuthenticated) {
       navigate('/login');
       return;
     }
     fetchNotifications();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, authLoading]);
 
   const fetchNotifications = async () => {
     try {
@@ -76,6 +81,37 @@ const Notifications = () => {
     }
   };
 
+  const handleNotificationClick = (notification) => {
+    // Check if it's a birthday or anniversary notification
+    if (notification.type === 'birthday' || notification.type === 'anniversary') {
+      // Parse metadata if it exists
+      let metadata = notification.metadata;
+      if (typeof metadata === 'string') {
+        try {
+          metadata = JSON.parse(metadata);
+        } catch (e) {
+          console.error('Failed to parse metadata:', e);
+        }
+      }
+      
+      if (metadata) {
+        setCelebrationModal({ isOpen: true, data: metadata });
+        if (!notification.is_read) {
+          markAsRead(notification.id);
+        }
+        return;
+      }
+    }
+    
+    // For other notifications with links, navigate
+    if (notification.link) {
+      if (!notification.is_read) {
+        markAsRead(notification.id);
+      }
+      navigate(notification.link);
+    }
+  };
+
   const getIcon = (type) => {
     switch (type) {
       case 'back_in_stock':
@@ -84,6 +120,10 @@ const Notifications = () => {
         return <TrendingDown size={20} />;
       case 'order':
         return <ShoppingBag size={20} />;
+      case 'birthday':
+        return <Cake size={20} />;
+      case 'anniversary':
+        return <Heart size={20} />;
       default:
         return <Bell size={20} />;
     }
@@ -156,7 +196,7 @@ const Notifications = () => {
             {notifications.map((notification) => (
               <div 
                 key={notification.id}
-                className={`notification-card ${!notification.is_read ? 'unread' : ''}`}
+                className={`notification-card ${!notification.is_read ? 'unread' : ''} ${notification.type === 'birthday' || notification.type === 'anniversary' ? 'celebration' : ''}`}
               >
                 <div className={`notification-icon type-${notification.type}`}>
                   {getIcon(notification.type)}
@@ -169,7 +209,15 @@ const Notifications = () => {
                   <span className="notification-time">{formatTime(notification.created_at)}</span>
                 </div>
                 <div className="notification-actions">
-                  {notification.link && (
+                  {/* Special button for birthday/anniversary */}
+                  {(notification.type === 'birthday' || notification.type === 'anniversary') ? (
+                    <button 
+                      className="view-btn celebration-btn"
+                      onClick={() => handleNotificationClick(notification)}
+                    >
+                      🎁 View Gift
+                    </button>
+                  ) : notification.link && (
                     <Link 
                       to={notification.link} 
                       className="view-btn"
@@ -200,8 +248,16 @@ const Notifications = () => {
           </div>
         )}
       </div>
+
+      {/* Celebration Modal for Birthday/Anniversary */}
+      <CelebrationModal 
+        isOpen={celebrationModal.isOpen}
+        onClose={() => setCelebrationModal({ isOpen: false, data: null })}
+        data={celebrationModal.data}
+      />
     </div>
   );
 };
 
 export default Notifications;
+

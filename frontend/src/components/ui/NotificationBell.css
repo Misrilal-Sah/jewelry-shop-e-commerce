@@ -221,6 +221,22 @@
   color: #3b82f6;
 }
 
+/* Birthday & Anniversary icons */
+.notification-icon.type-birthday {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(255, 215, 0, 0.15));
+  color: #d4af37;
+}
+
+.notification-icon.type-anniversary {
+  background: linear-gradient(135deg, rgba(232, 164, 184, 0.2), rgba(255, 182, 193, 0.15));
+  color: #e8a4b8;
+}
+
+/* Celebration notification style */
+.notification-item.celebration {
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.08), transparent);
+}
+
 .notification-content {
   flex: 1;
   min-width: 0;
@@ -248,18 +264,24 @@
   margin-top: 2px;
 }
 
+/* View button - Gold themed */
 .notification-link {
   font-size: 0.7rem;
-  color: var(--accent-gold);
+  font-weight: 600;
+  color: #000;
+  background: linear-gradient(135deg, var(--accent-gold) 0%, #b8973d 100%);
+  border: none;
   text-decoration: none;
-  padding: var(--space-xs);
+  padding: 6px 12px;
   border-radius: var(--radius-sm);
-  transition: background var(--transition-fast);
+  cursor: pointer;
+  transition: all var(--transition-fast);
   flex-shrink: 0;
 }
 
 .notification-link:hover {
-  background: rgba(183, 149, 63, 0.1);
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(183, 149, 63, 0.4);
 }
 
 /* View All Link */

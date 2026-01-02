@@ -154,7 +154,7 @@ const Header = () => {
             className="logo-emblem"
           />
           <span className="logo-divider">|</span>
-          <span className="logo-text">Aabhar</span>
+          <span className="logo-text">AABHAR</span>
         </div>
 
         {/* Desktop Navigation */}

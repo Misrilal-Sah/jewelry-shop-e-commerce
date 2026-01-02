@@ -105,7 +105,7 @@ const Checkout = () => {
     modal.loading('Verifying Coupon', 'Please wait while we verify your coupon code...');
 
     try {
-      const res = await fetch('/api/orders/validate-coupon', {
+      const res = await fetch('/api/cart/coupon/validate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

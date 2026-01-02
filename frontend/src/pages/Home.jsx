@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, Crown, Gift, Star, Zap, Quote } from 'lucide-react';
+import { ArrowRight, Sparkles, Crown, Gift, Star, Zap, Quote, MessageSquarePlus, Truck } from 'lucide-react';
 import ProductCard from '../components/product/ProductCard';
 import QuickViewModal from '../components/product/QuickViewModal';
 import FlashSaleTimer from '../components/product/FlashSaleTimer';
+import TestimonialModal from '../components/TestimonialModal/TestimonialModal';
 import { useToast } from '../components/ui/Toast';
 import { useAuth } from '../context/AuthContext';
 import SEO from '../components/SEO';
@@ -21,6 +22,7 @@ const Home = () => {
   const [flashSales, setFlashSales] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [showTestimonialModal, setShowTestimonialModal] = useState(false);
 
   // Fetch subscription state from DB on mount for logged-in users
   useEffect(() => {
@@ -418,7 +420,7 @@ const Home = () => {
       {/* Features */}
       <section className="features-section">
         <div className="container">
-          <div className="features-grid">
+          <div className="features-grid features-grid-centered">
             <div className="feature-card">
               <div className="feature-icon">
                 <Star />
@@ -440,6 +442,13 @@ const Home = () => {
               <h4>Premium Craftsmanship</h4>
               <p>Handcrafted by master artisans with decades of expertise</p>
             </div>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <Truck />
+              </div>
+              <h4>Secure Delivery</h4>
+              <p>Insured shipping with tamper-proof packaging across India</p>
+            </div>
           </div>
         </div>
       </section>
@@ -449,8 +458,19 @@ const Home = () => {
         <section className="testimonials-section">
           <div className="container">
             <div className="section-header">
-              <h2>What Our Customers Say</h2>
-              <p>Trusted by thousands of happy customers</p>
+              <div>
+                <h2>What Our Customers Say</h2>
+                <p>Trusted by thousands of happy customers</p>
+              </div>
+              {isAuthenticated && (
+                <button 
+                  className="btn btn-secondary share-experience-btn"
+                  onClick={() => setShowTestimonialModal(true)}
+                >
+                  <MessageSquarePlus size={18} />
+                  Share Your Experience
+                </button>
+              )}
             </div>
             <div className="testimonials-carousel">
               <div className="testimonial-card">
@@ -474,9 +494,28 @@ const Home = () => {
                       <span>{testimonials[currentTestimonial].customer_location}</span>
                     )}
                     <div className="testimonial-stars">
-                      {Array.from({ length: testimonials[currentTestimonial]?.rating || 5 }, (_, i) => (
-                        <Star key={i} size={14} fill="#d4af37" color="#d4af37" />
-                      ))}
+                      {(() => {
+                        const rating = testimonials[currentTestimonial]?.rating || 5;
+                        const fullStars = Math.floor(rating);
+                        const hasHalfStar = rating % 1 >= 0.5;
+                        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+                        return (
+                          <>
+                            {Array.from({ length: fullStars }, (_, i) => (
+                              <Star key={`full-${i}`} size={14} fill="#d4af37" color="#d4af37" />
+                            ))}
+                            {hasHalfStar && (
+                              <span style={{ position: 'relative', display: 'inline-flex', width: '14px', height: '14px' }}>
+                                <Star size={14} fill="none" color="#555" style={{ position: 'absolute' }} />
+                                <Star size={14} fill="#d4af37" color="#d4af37" style={{ position: 'absolute', clipPath: 'inset(0 50% 0 0)' }} />
+                              </span>
+                            )}
+                            {Array.from({ length: emptyStars }, (_, i) => (
+                              <Star key={`empty-${i}`} size={14} fill="none" color="#555" />
+                            ))}
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                 </div>
@@ -540,6 +579,16 @@ const Home = () => {
         onClose={() => setQuickViewProduct(null)} 
       />
     )}
+
+    {/* Testimonial Submit Modal */}
+    <TestimonialModal
+      isOpen={showTestimonialModal}
+      onClose={() => setShowTestimonialModal(false)}
+      onSuccess={(msg) => {
+        toast.success(msg);
+        fetchTestimonials();
+      }}
+    />
   </>
   );
 };
