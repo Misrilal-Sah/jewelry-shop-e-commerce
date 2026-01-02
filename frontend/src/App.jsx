@@ -39,6 +39,7 @@ import AdminFAQs from './pages/admin/FAQs';
 import AdminBlog from './pages/admin/AdminBlog';
 import AdminBulkOrders from './pages/admin/BulkOrders';
 import AdminLogs from './pages/admin/Logs';
+import CommonDetails from './pages/admin/CommonDetails';
 import BulkOrder from './pages/BulkOrder';
 import FAQPage from './pages/FAQPage';
 import Blog from './pages/Blog';
@@ -99,6 +100,7 @@ const AppContent = () => {
             <Route path="/admin/blog" element={<AdminBlog />} />
             <Route path="/admin/bulk-orders" element={<AdminBulkOrders />} />
             <Route path="/admin/logs" element={<AdminLogs />} />
+            <Route path="/admin/common-details" element={<CommonDetails />} />
             <Route path="/bulk-order" element={<BulkOrder />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />

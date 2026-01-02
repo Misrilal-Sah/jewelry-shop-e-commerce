@@ -27,6 +27,7 @@ const blogRoutes = require('./routes/blog');
 const bulkOrderRoutes = require('./routes/bulkOrders');
 const logsRoutes = require('./routes/logs');
 const chatbotRoutes = require('./routes/chatbot');
+const commonDetailsRoutes = require('./routes/commonDetails');
 const requestLogger = require('./middleware/requestLogger');
 const { startCampaignScheduler } = require('./scheduler/campaignScheduler');
 const { startSegmentationScheduler } = require('./scheduler/segmentationScheduler');
@@ -72,6 +73,7 @@ app.use('/api/blog', blogRoutes);
 app.use('/api/bulk-orders', bulkOrderRoutes);
 app.use('/api/logs', logsRoutes);
 app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/common', commonDetailsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

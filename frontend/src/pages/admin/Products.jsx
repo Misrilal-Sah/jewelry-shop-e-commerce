@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  LayoutDashboard, Package, ShoppingCart, Users, Tag, Shield, Mail, Zap,
+  LayoutDashboard, Package, ShoppingCart, Users, Tag, Shield, Mail, Zap, Settings,
   BarChart3, Plus, Edit, Trash2, Search, Image, AlertTriangle,
   ChevronUp, ChevronDown, ChevronsUpDown, Archive, RotateCcw, 
   ChevronLeft, ChevronRight, Quote, HelpCircle, FileText, Activity
@@ -290,6 +290,9 @@ const Products = () => {
           </Link>
           <Link to="/admin/email-center" className="nav-item">
             <Mail size={18} /> Email Center
+          </Link>
+          <Link to="/admin/common-details" className="nav-item">
+            <Settings size={18} /> Common Details
           </Link>
           <Link to="/admin/logs" className="nav-item">
             <Activity size={18} /> Logs

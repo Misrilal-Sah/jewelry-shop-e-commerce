@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Package, ShoppingCart, Users, Tag,
-  BarChart3, AlertTriangle, TrendingUp, IndianRupee, Shield, Mail, Zap, Quote, HelpCircle, FileText, Activity
+  BarChart3, AlertTriangle, TrendingUp, IndianRupee, Shield, Mail, Zap, 
+  Quote, HelpCircle, FileText, Activity, Settings, PlusCircle, Gift, 
+  MessageSquare, Megaphone, Star, Percent, Box
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './Admin.css';
@@ -111,6 +113,9 @@ const Dashboard = () => {
           <Link to="/admin/email-center" className="nav-item">
             <Mail size={18} /> Email Center
           </Link>
+          <Link to="/admin/common-details" className="nav-item">
+            <Settings size={18} /> Common Details
+          </Link>
           <Link to="/admin/logs" className="nav-item">
             <Activity size={18} /> Logs
           </Link>
@@ -192,21 +197,137 @@ const Dashboard = () => {
               )}
             </div>
 
-            {/* Quick Actions */}
-            <div className="quick-actions">
-              <h2>Quick Actions</h2>
-              <div className="actions-grid">
-                <Link to="/admin/products" className="action-card">
-                  <Package size={24} />
-                  <span>Manage Products</span>
+            {/* Quick Actions - Main */}
+            <div className="dashboard-section">
+              <div className="dashboard-section-header">
+                <h2><Zap size={20} /> Quick Actions</h2>
+              </div>
+              <div className="dashboard-actions-grid">
+                <Link to="/admin/products/new" className="dashboard-action-item">
+                  <div className="dashboard-action-icon add">
+                    <PlusCircle size={24} />
+                  </div>
+                  <div className="dashboard-action-content">
+                    <span className="dashboard-action-title">Add Product</span>
+                    <span className="dashboard-action-desc">Create new product listing</span>
+                  </div>
                 </Link>
-                <Link to="/admin/orders" className="action-card">
-                  <ShoppingCart size={24} />
-                  <span>View Orders</span>
+                <Link to="/admin/orders" className="dashboard-action-item">
+                  <div className="dashboard-action-icon orders">
+                    <ShoppingCart size={24} />
+                  </div>
+                  <div className="dashboard-action-content">
+                    <span className="dashboard-action-title">View Orders</span>
+                    <span className="dashboard-action-desc">Manage customer orders</span>
+                  </div>
                 </Link>
-                <Link to="/admin/reports" className="action-card">
-                  <BarChart3 size={24} />
-                  <span>Sales Reports</span>
+                <Link to="/admin/products" className="dashboard-action-item">
+                  <div className="dashboard-action-icon products">
+                    <Package size={24} />
+                  </div>
+                  <div className="dashboard-action-content">
+                    <span className="dashboard-action-title">All Products</span>
+                    <span className="dashboard-action-desc">View & edit inventory</span>
+                  </div>
+                </Link>
+                <Link to="/admin/customers" className="dashboard-action-item">
+                  <div className="dashboard-action-icon customers">
+                    <Users size={24} />
+                  </div>
+                  <div className="dashboard-action-content">
+                    <span className="dashboard-action-title">Customers</span>
+                    <span className="dashboard-action-desc">View customer data</span>
+                  </div>
+                </Link>
+              </div>
+            </div>
+
+            {/* Management & Marketing */}
+            <div className="dashboard-section">
+              <div className="dashboard-section-header">
+                <h2><Settings size={20} /> Management & Marketing</h2>
+              </div>
+              <div className="dashboard-actions-grid">
+                <Link to="/admin/coupons" className="dashboard-action-item">
+                  <div className="dashboard-action-icon coupons">
+                    <Percent size={24} />
+                  </div>
+                  <div className="dashboard-action-content">
+                    <span className="dashboard-action-title">Coupons</span>
+                    <span className="dashboard-action-desc">Manage discount codes</span>
+                  </div>
+                </Link>
+                <Link to="/admin/flash-sales" className="dashboard-action-item">
+                  <div className="dashboard-action-icon flash">
+                    <Zap size={24} />
+                  </div>
+                  <div className="dashboard-action-content">
+                    <span className="dashboard-action-title">Flash Sales</span>
+                    <span className="dashboard-action-desc">Create limited offers</span>
+                  </div>
+                </Link>
+                <Link to="/admin/email" className="dashboard-action-item">
+                  <div className="dashboard-action-icon email">
+                    <Mail size={24} />
+                  </div>
+                  <div className="dashboard-action-content">
+                    <span className="dashboard-action-title">Email Center</span>
+                    <span className="dashboard-action-desc">Send campaigns</span>
+                  </div>
+                </Link>
+                <Link to="/admin/reports" className="dashboard-action-item">
+                  <div className="dashboard-action-icon reports">
+                    <BarChart3 size={24} />
+                  </div>
+                  <div className="dashboard-action-content">
+                    <span className="dashboard-action-title">Reports</span>
+                    <span className="dashboard-action-desc">Analytics & insights</span>
+                  </div>
+                </Link>
+              </div>
+            </div>
+
+            {/* Content Management */}
+            <div className="dashboard-section">
+              <div className="dashboard-section-header">
+                <h2><FileText size={20} /> Content Management</h2>
+              </div>
+              <div className="dashboard-actions-grid">
+                <Link to="/admin/testimonials" className="dashboard-action-item">
+                  <div className="dashboard-action-icon testimonials">
+                    <Star size={24} />
+                  </div>
+                  <div className="dashboard-action-content">
+                    <span className="dashboard-action-title">Testimonials</span>
+                    <span className="dashboard-action-desc">Customer reviews</span>
+                  </div>
+                </Link>
+                <Link to="/admin/faqs" className="dashboard-action-item">
+                  <div className="dashboard-action-icon faqs">
+                    <HelpCircle size={24} />
+                  </div>
+                  <div className="dashboard-action-content">
+                    <span className="dashboard-action-title">FAQs</span>
+                    <span className="dashboard-action-desc">Manage questions</span>
+                  </div>
+                </Link>
+                <Link to="/admin/blog" className="dashboard-action-item">
+                  <div className="dashboard-action-icon blog">
+                    <FileText size={24} />
+                  </div>
+                  <div className="dashboard-action-content">
+                    <span className="dashboard-action-title">Blog</span>
+                    <span className="dashboard-action-desc">Write articles</span>
+                  </div>
+                </Link>
+                <Link to="/admin/common-details" className="dashboard-action-item">
+                  <div className="dashboard-action-icon settings">
+                    <Settings size={24} />
+                  </div>
+                  <div className="dashboard-action-content">
+                    <span className="dashboard-action-title">Site Settings</span>
+                    <span className="dashboard-action-desc">Categories & more</span>
+                  </div>
                 </Link>
               </div>
             </div>

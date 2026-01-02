@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  LayoutDashboard, Package, ShoppingCart, Users, BarChart3, Tag, Shield, Mail, Zap,
+  LayoutDashboard, Package, ShoppingCart, Users, BarChart3, Tag, Shield, Mail, Zap, Settings,
   Plus, Edit2, Trash2, Search, X, ChevronDown, ChevronLeft, ChevronRight, 
   Archive, RotateCcw, AlertTriangle, ChevronUp, ChevronsUpDown, Quote, HelpCircle, FileText, Activity
 } from 'lucide-react';
@@ -288,6 +288,7 @@ const Coupons = () => {
           <Link to="/admin/reports" className="nav-item"><BarChart3 size={18} /> Reports</Link>
           <Link to="/admin/users" className="nav-item"><Shield size={18} /> Admin Users</Link>
           <Link to="/admin/email-center" className="nav-item"><Mail size={18} /> Email Center</Link>
+          <Link to="/admin/common-details" className="nav-item"><Settings size={18} /> Common Details</Link>
           <Link to="/admin/logs" className="nav-item"><Activity size={18} /> Logs</Link>
         </nav>
         <div className="sidebar-footer">

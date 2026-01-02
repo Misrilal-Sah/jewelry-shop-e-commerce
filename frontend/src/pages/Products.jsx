@@ -15,6 +15,36 @@ const Products = () => {
   const [sortOpen, setSortOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const sortRef = useRef(null);
+  
+  // Dynamic filter options from API
+  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [collectionOptions, setCollectionOptions] = useState([]);
+
+  // Fetch categories and collections for filters on mount
+  useEffect(() => {
+    const fetchFilterOptions = async () => {
+      try {
+        const [catRes, colRes] = await Promise.all([
+          fetch('/api/common/categories/public'),
+          fetch('/api/common/collections/public')
+        ]);
+        if (catRes.ok) {
+          const cats = await catRes.json();
+          setCategoryOptions(cats.map(c => c.name));
+        }
+        if (colRes.ok) {
+          const cols = await colRes.json();
+          setCollectionOptions(cols.map(c => c.name));
+        }
+      } catch (error) {
+        console.error('Failed to fetch filter options:', error);
+        // Fallback to hardcoded values
+        setCategoryOptions(['rings', 'necklaces', 'earrings', 'bangles']);
+        setCollectionOptions(['wedding', 'daily', 'festive', 'modern']);
+      }
+    };
+    fetchFilterOptions();
+  }, []);
 
   // Parse comma-separated URL params into arrays
   const parseArrayParam = (param) => {
@@ -312,8 +342,6 @@ const Products = () => {
     (filters.min_price ? 1 : 0) + 
     (filters.max_price ? 1 : 0);
 
-  const categories = ['rings', 'necklaces', 'earrings', 'bangles'];
-  const collections = ['wedding', 'daily', 'festive', 'modern'];
   const metals = ['gold', 'diamond', 'silver', 'platinum'];
   const purities = ['22K', '18K', '14K', '950', '925'];
 
@@ -421,7 +449,7 @@ const Products = () => {
             <div className="filter-group">
               <h4>Category</h4>
               <div className="filter-options">
-                {categories.map(cat => (
+                {categoryOptions.map(cat => (
                   <label key={cat} className="filter-option">
                     <input
                       type="checkbox"
@@ -437,7 +465,7 @@ const Products = () => {
             <div className="filter-group">
               <h4>Collection</h4>
               <div className="filter-options">
-                {collections.map(col => (
+                {collectionOptions.map(col => (
                   <label key={col} className="filter-option">
                     <input
                       type="checkbox"

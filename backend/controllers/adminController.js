@@ -731,7 +731,7 @@ const getCoupons = async (req, res) => {
     }
     
     // Hide auto-generated birthday/anniversary coupons (they're per-user and would spam the list)
-    whereClauses.push("code NOT LIKE 'BDAY-%' AND code NOT LIKE 'ANNIV-%'");
+    whereClauses.push("code NOT LIKE '%-BDAY-%' AND code NOT LIKE '%-ANNIV-%'");
 
     const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
 

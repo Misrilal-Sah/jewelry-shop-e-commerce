@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  LayoutDashboard, Package, ShoppingCart, Users, BarChart3, Tag, Shield, Zap,
+  LayoutDashboard, Package, ShoppingCart, Users, BarChart3, Tag, Shield, Zap, Settings,
   Search, Mail, Phone, Calendar, Plus, Trash2, X,
   ChevronLeft, ChevronRight, ChevronDown, ChevronsUpDown, ChevronUp, Quote, HelpCircle, FileText, Activity
 } from 'lucide-react';
@@ -312,6 +312,9 @@ const AdminUsers = () => {
           </Link>
           <Link to="/admin/email-center" className="nav-item">
             <Mail size={18} /> Email Center
+          </Link>
+          <Link to="/admin/common-details" className="nav-item">
+            <Settings size={18} /> Common Details
           </Link>
           <Link to="/admin/logs" className="nav-item">
             <Activity size={18} /> Logs

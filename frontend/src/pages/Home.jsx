@@ -23,6 +23,39 @@ const Home = () => {
   const [testimonials, setTestimonials] = useState([]);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [showTestimonialModal, setShowTestimonialModal] = useState(false);
+  
+  // Dynamic content from admin settings
+  const [siteSettings, setSiteSettings] = useState({});
+  const [categories, setCategories] = useState([]);
+  const [collections, setCollections] = useState([]);
+
+  // Fetch site settings, categories, and collections on mount
+  useEffect(() => {
+    const fetchDynamicContent = async () => {
+      try {
+        const [settingsRes, categoriesRes, collectionsRes] = await Promise.all([
+          fetch('/api/common/settings/public'),
+          fetch('/api/common/categories/public?homepage=true'),
+          fetch('/api/common/collections/public?homepage=true')
+        ]);
+        
+        if (settingsRes.ok) {
+          const data = await settingsRes.json();
+          setSiteSettings(data);
+        }
+        if (categoriesRes.ok) {
+          setCategories(await categoriesRes.json());
+        }
+        if (collectionsRes.ok) {
+          setCollections(await collectionsRes.json());
+        }
+      } catch (error) {
+        console.error('Failed to fetch dynamic content:', error);
+      }
+    };
+    
+    fetchDynamicContent();
+  }, []);
 
   // Fetch subscription state from DB on mount for logged-in users
   useEffect(() => {
@@ -226,33 +259,31 @@ const Home = () => {
   // Cloudinary base URL
   const cloudinaryBase = 'https://res.cloudinary.com/ddrlxvnsh/image/upload/v1766855925/jewllery_shop/products';
   
-  const categories = [
-    { name: 'Rings', icon: '💍', path: '/products?category=rings', image: `${cloudinaryBase}/jxyw8vx454t3mnr2q8is.jpg` },
-    { name: 'Necklaces', icon: '📿', path: '/products?category=necklaces', image: `${cloudinaryBase}/ygijqk8osfqg10qmlzuu.jpg` },
-    { name: 'Earrings', icon: '✨', path: '/products?category=earrings', image: `${cloudinaryBase}/expgtk7ilimekmrjewg3.jpg` },
-    { name: 'Bangles', icon: '⭕', path: '/products?category=bangles', image: `${cloudinaryBase}/gycyiwsxjsof0i0meafg.jpg` }
+  // Fallback data - used if API doesn't return categories/collections
+  const fallbackCategories = [
+    { name: 'rings', display_name: 'Rings', image: `${cloudinaryBase}/jxyw8vx454t3mnr2q8is.jpg` },
+    { name: 'necklaces', display_name: 'Necklaces', image: `${cloudinaryBase}/ygijqk8osfqg10qmlzuu.jpg` },
+    { name: 'earrings', display_name: 'Earrings', image: `${cloudinaryBase}/expgtk7ilimekmrjewg3.jpg` },
+    { name: 'bangles', display_name: 'Bangles', image: `${cloudinaryBase}/gycyiwsxjsof0i0meafg.jpg` }
   ];
 
-  const collections = [
-    { 
-      name: 'Wedding Collection', 
-      subtitle: 'Celebrate your special day', 
-      path: '/products?collection=wedding',
-      image: `${cloudinaryBase}/fhlj3efhaafo5amfefyy.jpg`
-    },
-    { 
-      name: 'Daily Wear', 
-      subtitle: 'Elegance for everyday', 
-      path: '/products?collection=daily',
-      image: `${cloudinaryBase}/expgtk7ilimekmrjewg3.jpg`
-    },
-    { 
-      name: 'Festive', 
-      subtitle: 'Shine at every celebration', 
-      path: '/products?collection=festive',
-      image: `${cloudinaryBase}/gycyiwsxjsof0i0meafg.jpg`
-    }
+  const fallbackCollections = [
+    { name: 'wedding', display_name: 'Wedding Collection', tagline: 'Celebrate your special day', image: `${cloudinaryBase}/fhlj3efhaafo5amfefyy.jpg` },
+    { name: 'daily', display_name: 'Daily Wear', tagline: 'Elegance for everyday', image: `${cloudinaryBase}/expgtk7ilimekmrjewg3.jpg` },
+    { name: 'festive', display_name: 'Festive', tagline: 'Shine at every celebration', image: `${cloudinaryBase}/gycyiwsxjsof0i0meafg.jpg` }
   ];
+
+  // Use API data if available, otherwise fallback
+  const displayCategories = categories.length > 0 ? categories : fallbackCategories;
+  const displayCollections = collections.length > 0 ? collections : fallbackCollections;
+  
+  // Get hero settings with fallbacks
+  const getSetting = (key, fallback = '') => {
+    const heroSettings = siteSettings.hero;
+    if (!Array.isArray(heroSettings)) return fallback;
+    const setting = heroSettings.find(s => s.setting_key === key);
+    return setting?.setting_value || fallback;
+  };
 
   return (
     <>
@@ -271,10 +302,10 @@ const Home = () => {
         <div className="container hero-content">
           <div className="hero-text animate-slide-up">
             <span className="hero-badge">
-              <Sparkles size={16} /> Premium Indian Jewelry
+              <Sparkles size={16} /> {getSetting('hero_badge', 'PREMIUM INDIAN JEWELRY')}
             </span>
-            <h1>Exquisite Jewelry for <span className="text-gradient">Every Occasion</span></h1>
-            <p>Discover our handcrafted collection of gold, diamond, silver, and platinum jewelry. BIS Hallmarked with lifetime exchange.</p>
+            <h1>{getSetting('hero_title', 'Exquisite Jewelry')} <span className="text-gradient">{getSetting('hero_title_highlight', 'for Every Occasion')}</span></h1>
+            <p>{getSetting('hero_description', 'Discover our handcrafted collection of gold, diamond, silver, and platinum jewelry. BIS Hallmarked with lifetime exchange.')}</p>
             <div className="hero-actions">
               <Link to="/products" className="btn btn-primary btn-lg">
                 Shop Collection <ArrowRight size={20} />
@@ -344,12 +375,12 @@ const Home = () => {
             <p>Find the perfect piece for every style</p>
           </div>
           <div className="categories-grid">
-            {categories.map((cat) => (
-              <Link to={cat.path} key={cat.name} className="category-card">
+            {displayCategories.map((cat) => (
+              <Link to={`/products?category=${cat.name}`} key={cat.name} className="category-card">
                 <div className="category-image">
-                  <img src={cat.image} alt={cat.name} />
+                  <img src={cat.image} alt={cat.display_name || cat.name} />
                 </div>
-                <h3>{cat.name}</h3>
+                <h3>{cat.display_name || cat.name}</h3>
               </Link>
             ))}
           </div>
@@ -399,14 +430,14 @@ const Home = () => {
             <p>From wedding elegance to everyday charm</p>
           </div>
           <div className="collections-grid">
-            {collections.map((col) => (
-              <Link to={col.path} key={col.name} className="collection-card">
+            {displayCollections.map((col) => (
+              <Link to={`/products?collection=${col.name}`} key={col.name} className="collection-card">
                 <div className="collection-image">
-                  <img src={col.image} alt={col.name} />
+                  <img src={col.image} alt={col.display_name || col.name} />
                 </div>
                 <div className="collection-content">
-                  <h3>{col.name}</h3>
-                  <p>{col.subtitle}</p>
+                  <h3>{col.display_name || col.name}</h3>
+                  <p>{col.tagline || ''}</p>
                   <span className="collection-link">
                     Explore <ArrowRight size={16} />
                   </span>

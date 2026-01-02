@@ -16,6 +16,30 @@ const Footer = () => {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [siteSettings, setSiteSettings] = useState({});
+
+  // Fetch site settings on mount
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch('/api/common/settings/public');
+        if (res.ok) {
+          setSiteSettings(await res.json());
+        }
+      } catch (error) {
+        console.error('Failed to fetch site settings:', error);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  // Helper to get setting value by key and category
+  const getSetting = (category, key, fallback = '') => {
+    const categorySettings = siteSettings[category];
+    if (!Array.isArray(categorySettings)) return fallback;
+    const setting = categorySettings.find(s => s.setting_key === key);
+    return setting?.setting_value || fallback;
+  };
 
   // Fetch subscription state from DB on mount for logged-in users
   useEffect(() => {
@@ -162,23 +186,38 @@ const Footer = () => {
                 <span className="logo-text">AABHAR</span>
               </Link>
               <p className="footer-about">
-                Premium Indian jewelry crafted with love and tradition. 
-                Explore our exquisite collection of gold, diamond, silver, 
-                and platinum jewelry for every occasion.
+                {getSetting('footer', 'footer_about', 'Premium Indian jewelry crafted with love and tradition. Explore our exquisite collection of gold, diamond, silver, and platinum jewelry for every occasion.')}
               </p>
               <div className="social-links">
-                <a href="#" className="social-link" aria-label="Facebook">
-                  <Facebook size={18} />
-                </a>
-                <a href="#" className="social-link" aria-label="Instagram">
-                  <Instagram size={18} />
-                </a>
-                <a href="#" className="social-link" aria-label="Twitter">
-                  <Twitter size={18} />
-                </a>
-                <a href="#" className="social-link" aria-label="Youtube">
-                  <Youtube size={18} />
-                </a>
+                {getSetting('social', 'facebook_url') && (
+                  <a href={getSetting('social', 'facebook_url')} className="social-link" aria-label="Facebook" target="_blank" rel="noopener noreferrer">
+                    <Facebook size={18} />
+                  </a>
+                )}
+                {getSetting('social', 'instagram_url') && (
+                  <a href={getSetting('social', 'instagram_url')} className="social-link" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+                    <Instagram size={18} />
+                  </a>
+                )}
+                {getSetting('social', 'twitter_url') && (
+                  <a href={getSetting('social', 'twitter_url')} className="social-link" aria-label="Twitter" target="_blank" rel="noopener noreferrer">
+                    <Twitter size={18} />
+                  </a>
+                )}
+                {getSetting('social', 'youtube_url') && (
+                  <a href={getSetting('social', 'youtube_url')} className="social-link" aria-label="Youtube" target="_blank" rel="noopener noreferrer">
+                    <Youtube size={18} />
+                  </a>
+                )}
+                {/* Show placeholder if no social links configured */}
+                {!getSetting('social', 'facebook_url') && !getSetting('social', 'instagram_url') && !getSetting('social', 'twitter_url') && !getSetting('social', 'youtube_url') && (
+                  <>
+                    <a href="#" className="social-link" aria-label="Facebook"><Facebook size={18} /></a>
+                    <a href="#" className="social-link" aria-label="Instagram"><Instagram size={18} /></a>
+                    <a href="#" className="social-link" aria-label="Twitter"><Twitter size={18} /></a>
+                    <a href="#" className="social-link" aria-label="Youtube"><Youtube size={18} /></a>
+                  </>
+                )}
               </div>
             </div>
 
@@ -215,15 +254,15 @@ const Footer = () => {
               <div className="contact-info">
                 <div className="contact-item">
                   <Phone size={16} />
-                  <span>+91 98765 43210</span>
+                  <span>{getSetting('contact', 'contact_phone', '+91 98765 43210')}</span>
                 </div>
                 <div className="contact-item">
                   <Mail size={16} />
-                  <span>support@Aabhar.in</span>
+                  <span>{getSetting('contact', 'contact_email', 'support@Aabhar.in')}</span>
                 </div>
                 <div className="contact-item">
                   <MapPin size={16} />
-                  <span>123 Jewelry Lane, Mumbai, Maharashtra 400001</span>
+                  <span>{getSetting('contact', 'contact_address', '123 Jewelry Lane, Mumbai, Maharashtra 400001')}</span>
                 </div>
               </div>
 

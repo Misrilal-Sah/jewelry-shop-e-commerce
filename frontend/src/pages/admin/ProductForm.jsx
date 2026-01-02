@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { 
-  LayoutDashboard, Package, ShoppingCart, Users, BarChart3, Tag, Shield, Mail, Zap,
+  LayoutDashboard, Package, ShoppingCart, Users, BarChart3, Tag, Shield, Mail, Zap, Settings, Activity,
   Quote, HelpCircle, FileText, X, Save, ArrowLeft, ImagePlus, AlertCircle, ChevronDown
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -45,21 +45,53 @@ const ProductForm = () => {
     is_limited: false
   });
 
-  // Dropdown options
-  const categoryOptions = [
+  // Dynamic dropdown options from API
+  const [categoryOptions, setCategoryOptions] = useState([
     { value: 'rings', label: 'Rings' },
     { value: 'necklaces', label: 'Necklaces' },
     { value: 'earrings', label: 'Earrings' },
-    { value: 'bangles', label: 'Bangles' },
-    { value: 'bridal', label: 'Bridal' }
-  ];
+    { value: 'bangles', label: 'Bangles' }
+  ]);
 
-  const collectionOptions = [
+  const [collectionOptions, setCollectionOptions] = useState([
     { value: 'daily', label: 'Daily Wear' },
     { value: 'festive', label: 'Festive' },
     { value: 'wedding', label: 'Wedding' },
     { value: 'modern', label: 'Modern' }
-  ];
+  ]);
+
+  // Fetch categories and collections from API on mount
+  useEffect(() => {
+    const fetchOptions = async () => {
+      try {
+        const [catRes, colRes] = await Promise.all([
+          fetch('/api/common/categories/public'),
+          fetch('/api/common/collections/public')
+        ]);
+        if (catRes.ok) {
+          const cats = await catRes.json();
+          if (cats.length > 0) {
+            setCategoryOptions(cats.map(c => ({ 
+              value: c.name, 
+              label: c.display_name || c.name.charAt(0).toUpperCase() + c.name.slice(1) 
+            })));
+          }
+        }
+        if (colRes.ok) {
+          const cols = await colRes.json();
+          if (cols.length > 0) {
+            setCollectionOptions(cols.map(c => ({ 
+              value: c.name, 
+              label: c.display_name || c.name.charAt(0).toUpperCase() + c.name.slice(1) 
+            })));
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch dropdown options:', error);
+      }
+    };
+    fetchOptions();
+  }, []);
 
   const metalOptions = [
     { value: 'gold', label: 'Gold' },
@@ -458,6 +490,12 @@ const ProductForm = () => {
           </Link>
           <Link to="/admin/email-center" className="nav-item">
             <Mail size={18} /> Email Center
+          </Link>
+          <Link to="/admin/common-details" className="nav-item">
+            <Settings size={18} /> Common Details
+          </Link>
+          <Link to="/admin/logs" className="nav-item">
+            <Activity size={18} /> Logs
           </Link>
         </nav>
         <div className="sidebar-footer">

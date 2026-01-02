@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  Zap, Plus, Edit, Trash2, X, Search,
+  Zap, Plus, Edit, Trash2, X, Search, Settings,
   LayoutDashboard, Package, ShoppingCart, Users, Tag, BarChart3, Shield, Mail,
   ChevronDown, ChevronUp, ChevronsUpDown, ChevronLeft, ChevronRight, Quote, HelpCircle, FileText, Activity
 } from 'lucide-react';
@@ -350,6 +350,9 @@ const FlashSales = () => {
           </Link>
           <Link to="/admin/email-center" className="nav-item">
             <Mail size={18} /> Email Center
+          </Link>
+          <Link to="/admin/common-details" className="nav-item">
+            <Settings size={18} /> Common Details
           </Link>
           <Link to="/admin/logs" className="nav-item">
             <Activity size={18} /> Logs
