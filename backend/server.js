@@ -28,10 +28,12 @@ const bulkOrderRoutes = require('./routes/bulkOrders');
 const logsRoutes = require('./routes/logs');
 const chatbotRoutes = require('./routes/chatbot');
 const commonDetailsRoutes = require('./routes/commonDetails');
+const rolesRoutes = require('./routes/roles');
 const requestLogger = require('./middleware/requestLogger');
 const { startCampaignScheduler } = require('./scheduler/campaignScheduler');
 const { startSegmentationScheduler } = require('./scheduler/segmentationScheduler');
 const { startBirthdayScheduler } = require('./scheduler/birthdayScheduler');
+const runPermissionTemplatesMigration = require('./migrations/runPermissionTemplates');
 
 const app = express();
 
@@ -74,6 +76,7 @@ app.use('/api/bulk-orders', bulkOrderRoutes);
 app.use('/api/logs', logsRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/common', commonDetailsRoutes);
+app.use('/api/admin/roles', rolesRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -101,6 +104,9 @@ app.listen(PORT, () => {
   startCampaignScheduler();
   startSegmentationScheduler();
   startBirthdayScheduler();
+  
+  // Run migrations
+  runPermissionTemplatesMigration();
 });
 
 module.exports = app;

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authMiddleware, adminMiddleware } = require('../middleware/authMiddleware');
+const { requirePermission } = require('../middleware/permissionMiddleware');
 const {
   getAllFlashSales,
   getActiveFlashSales,
@@ -15,9 +16,10 @@ router.get('/active', getActiveFlashSales);
 router.get('/product/:productId', getProductFlashSale);
 
 // Admin routes
-router.get('/', authMiddleware, adminMiddleware, getAllFlashSales);
-router.post('/', authMiddleware, adminMiddleware, createFlashSale);
-router.put('/:id', authMiddleware, adminMiddleware, updateFlashSale);
-router.delete('/:id', authMiddleware, adminMiddleware, deleteFlashSale);
+router.get('/', authMiddleware, adminMiddleware, requirePermission('flash_sales', 'view'), getAllFlashSales);
+router.post('/', authMiddleware, adminMiddleware, requirePermission('flash_sales', 'create'), createFlashSale);
+router.put('/:id', authMiddleware, adminMiddleware, requirePermission('flash_sales', 'edit'), updateFlashSale);
+router.delete('/:id', authMiddleware, adminMiddleware, requirePermission('flash_sales', 'delete'), deleteFlashSale);
 
 module.exports = router;
+

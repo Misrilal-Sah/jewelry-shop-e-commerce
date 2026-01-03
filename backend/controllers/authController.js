@@ -249,8 +249,14 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find user
-    const [users] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+    // Find user with role info
+    const [users] = await pool.query(
+      `SELECT u.*, r.permissions, r.name as role_name, r.display_name as role_display_name, r.can_assign_roles
+       FROM users u
+       LEFT JOIN roles r ON u.role_id = r.id
+       WHERE u.email = ?`,
+      [email]
+    );
     if (users.length === 0) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -264,7 +270,7 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { id: user.id, email: user.email, role: user.role, role_name: user.role_name },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN }
     );
@@ -275,10 +281,32 @@ const login = async (req, res) => {
       auditLogger.login(user.id, user.name, req);
     }
 
+    // Parse permissions if admin
+    let permissions = null;
+    let canAssignRoles = [];
+    if (user.role === 'admin' && user.permissions) {
+      permissions = typeof user.permissions === 'string' 
+        ? JSON.parse(user.permissions) 
+        : user.permissions;
+      canAssignRoles = typeof user.can_assign_roles === 'string'
+        ? JSON.parse(user.can_assign_roles)
+        : user.can_assign_roles || [];
+    }
+
     res.json({
       message: 'Login successful',
       token,
-      user: { id: user.id, name: user.name, email: user.email, role: user.role }
+      user: { 
+        id: user.id, 
+        name: user.name, 
+        email: user.email, 
+        role: user.role,
+        role_id: user.role_id,
+        role_name: user.role_name,
+        role_display_name: user.role_display_name,
+        permissions,
+        canAssignRoles
+      }
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -290,7 +318,12 @@ const login = async (req, res) => {
 const getProfile = async (req, res) => {
   try {
     const [users] = await pool.query(
-      'SELECT id, name, email, phone, role, profile_image, created_at FROM users WHERE id = ?',
+      `SELECT u.id, u.name, u.email, u.phone, u.role, u.profile_image, u.created_at,
+              u.role_id, r.name as role_name, r.display_name as role_display_name, 
+              r.permissions, r.can_assign_roles
+       FROM users u
+       LEFT JOIN roles r ON u.role_id = r.id
+       WHERE u.id = ?`,
       [req.user.id]
     );
 
@@ -298,7 +331,34 @@ const getProfile = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.json(users[0]);
+    const user = users[0];
+    
+    // Parse permissions if admin
+    let permissions = null;
+    let canAssignRoles = [];
+    if (user.role === 'admin' && user.permissions) {
+      permissions = typeof user.permissions === 'string' 
+        ? JSON.parse(user.permissions) 
+        : user.permissions;
+      canAssignRoles = typeof user.can_assign_roles === 'string'
+        ? JSON.parse(user.can_assign_roles)
+        : user.can_assign_roles || [];
+    }
+
+    res.json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      profile_image: user.profile_image,
+      created_at: user.created_at,
+      role_id: user.role_id,
+      role_name: user.role_name,
+      role_display_name: user.role_display_name,
+      permissions,
+      canAssignRoles
+    });
   } catch (error) {
     console.error('Profile error:', error);
     res.status(500).json({ message: 'Server error' });

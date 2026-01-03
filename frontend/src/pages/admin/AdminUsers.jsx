@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  LayoutDashboard, Package, ShoppingCart, Users, BarChart3, Tag, Shield, Zap, Settings,
-  Search, Mail, Phone, Calendar, Plus, Trash2, X,
-  ChevronLeft, ChevronRight, ChevronDown, ChevronsUpDown, ChevronUp, Quote, HelpCircle, FileText, Activity
+  Shield, Users, Search, Mail, Phone, Calendar, Plus, Trash2, X, Key,
+  ChevronLeft, ChevronRight, ChevronDown, ChevronsUpDown, ChevronUp
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../components/ui/Toast';
+import RolesManagement from './RolesManagement';
+import AdminSidebar from '../../components/admin/AdminSidebar';
 import './Admin.css';
 
 const AdminUsers = () => {
@@ -43,6 +44,16 @@ const AdminUsers = () => {
   const [modalError, setModalError] = useState('');
   const [promotedUserName, setPromotedUserName] = useState('');
 
+  // Role selection for new admins
+  const [assignableRoles, setAssignableRoles] = useState([]);
+  const [selectedRoleId, setSelectedRoleId] = useState(null);
+
+  // Inline role edit dropdown
+  const [openRoleDropdown, setOpenRoleDropdown] = useState(null);
+
+  // Tab state
+  const [activeTab, setActiveTab] = useState('users');
+
   useEffect(() => {
     if (authLoading) return;
     if (!isAuthenticated || user?.role !== 'admin') {
@@ -50,7 +61,28 @@ const AdminUsers = () => {
       return;
     }
     fetchAdmins();
+    fetchAssignableRoles();
   }, [isAuthenticated, user, authLoading, currentPage, pageSize, sortConfig]);
+
+  // Fetch roles that current user can assign
+  const fetchAssignableRoles = async () => {
+    try {
+      const res = await fetch('/api/admin/roles/assignable', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAssignableRoles(data.roles || []);
+        // Set default role
+        if (data.roles?.length > 0) {
+          const defaultRole = data.roles.find(r => r.name === 'default_staff') || data.roles[0];
+          setSelectedRoleId(defaultRole.id);
+        }
+      }
+    } catch (error) {
+      console.error('Fetch assignable roles error:', error);
+    }
+  };
 
   // Click outside to close dropdowns
   useEffect(() => {
@@ -170,6 +202,38 @@ const AdminUsers = () => {
     }
   };
 
+  // Handle inline role change
+  const handleRoleChange = async (adminId, newRoleId) => {
+    try {
+      const res = await fetch(`/api/admin/users/${adminId}/role`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ roleId: newRoleId })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(data.message);
+        // Update local state
+        setAdmins(prev => prev.map(admin => 
+          admin.id === adminId 
+            ? { ...admin, role_id: newRoleId, role_name: data.admin.role_name }
+            : admin
+        ));
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error('Update role error:', error);
+      toast.error('Failed to update role');
+    } finally {
+      setOpenRoleDropdown(null);
+    }
+  };
+
   // Confirm and promote to admin
   const handleConfirmAddAdmin = async () => {
     if (!validatedUser) return;
@@ -185,7 +249,10 @@ const AdminUsers = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ email: validatedUser.email })
+        body: JSON.stringify({ 
+          email: validatedUser.email,
+          roleId: selectedRoleId 
+        })
       });
       
       const data = await res.json();
@@ -266,72 +333,36 @@ const AdminUsers = () => {
   return (
     <div className="admin-page">
       {/* Sidebar */}
-      <aside className="admin-sidebar">
-        <div className="sidebar-header">
-          <Link to="/" className="admin-logo">
-            <span className="logo-text">Aabhar</span>
-            <span className="logo-accent">Admin</span>
-          </Link>
-        </div>
-        <nav className="admin-nav">
-          <Link to="/admin" className="nav-item">
-            <LayoutDashboard size={18} /> Dashboard
-          </Link>
-          <Link to="/admin/products" className="nav-item">
-            <Package size={18} /> Products
-          </Link>
-          <Link to="/admin/orders" className="nav-item">
-            <ShoppingCart size={18} /> Orders
-          </Link>
-          <Link to="/admin/customers" className="nav-item">
-            <Users size={18} /> Customers
-          </Link>
-          <Link to="/admin/coupons" className="nav-item">
-            <Tag size={18} /> Coupons
-          </Link>
-          <Link to="/admin/flash-sales" className="nav-item">
-            <Zap size={18} /> Flash Sales
-          </Link>
-          <Link to="/admin/bulk-orders" className="nav-item">
-            <Package size={18} /> Bulk Orders
-          </Link>
-          <Link to="/admin/testimonials" className="nav-item">
-            <Quote size={18} /> Testimonials
-          </Link>
-          <Link to="/admin/faqs" className="nav-item">
-            <HelpCircle size={18} /> FAQs
-          </Link>
-          <Link to="/admin/blog" className="nav-item">
-            <FileText size={18} /> Blog
-          </Link>
-          <Link to="/admin/reports" className="nav-item">
-            <BarChart3 size={18} /> Reports
-          </Link>
-          <Link to="/admin/users" className="nav-item active">
-            <Shield size={18} /> Admin Users
-          </Link>
-          <Link to="/admin/email-center" className="nav-item">
-            <Mail size={18} /> Email Center
-          </Link>
-          <Link to="/admin/common-details" className="nav-item">
-            <Settings size={18} /> Common Details
-          </Link>
-          <Link to="/admin/logs" className="nav-item">
-            <Activity size={18} /> Logs
-          </Link>
-        </nav>
-        <div className="sidebar-footer">
-          <Link to="/" className="back-to-store">← Back to Store</Link>
-        </div>
-      </aside>
+      <AdminSidebar />
 
       {/* Main Content */}
       <main className="admin-content">
         <div className="admin-header">
-          <h1 className="page-title">Admin Users</h1>
-          <span className="page-count">{totalAdmins} admin users</span>
+          <h1 className="page-title">Admin Users & Roles</h1>
+          <span className="page-count">{activeTab === 'users' ? `${totalAdmins} admin users` : 'Manage Permissions'}</span>
         </div>
 
+        {/* Horizontal Tabs */}
+        <div className="cd-tabs">
+          <button 
+            className={`cd-tab ${activeTab === 'users' ? 'active' : ''}`} 
+            onClick={() => setActiveTab('users')}
+          >
+            <Users size={18} /> Users
+          </button>
+          <button 
+            className={`cd-tab ${activeTab === 'roles' ? 'active' : ''}`} 
+            onClick={() => setActiveTab('roles')}
+          >
+            <Key size={18} /> Roles & Permissions
+          </button>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'roles' ? (
+          <RolesManagement />
+        ) : (
+          <>
         {/* Search & Controls */}
         <div className="admin-toolbar">
           <div className="search-box">
@@ -389,6 +420,7 @@ const AdminUsers = () => {
                 <th className="sortable-header" onClick={() => handleSort('name')}>
                   Admin {getSortIcon('name')}
                 </th>
+                <th>Role</th>
                 <th className="sortable-header" onClick={() => handleSort('email')}>
                   Email {getSortIcon('email')}
                 </th>
@@ -402,11 +434,11 @@ const AdminUsers = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="5" className="loading-cell">Loading admins...</td>
+                  <td colSpan="6" className="loading-cell">Loading admins...</td>
                 </tr>
               ) : filteredAdmins.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="empty-cell">
+                  <td colSpan="6" className="empty-cell">
                     <div className="empty-state-inline">
                       <Shield size={48} className="empty-icon" />
                       <h3>No Admins Found</h3>
@@ -431,6 +463,45 @@ const AdminUsers = () => {
                           <span className="customer-id">ID: {admin.id}</span>
                         </div>
                       </div>
+                    </td>
+                    <td>
+                      {/* Super Admin roles cannot be changed */}
+                      {admin.role_name === 'Super Admin' ? (
+                        <div className="inline-role-dropdown locked">
+                          <div className="role-dropdown-trigger disabled" title="Super Admin role cannot be changed">
+                            <span className="role-badge-inline super-admin">{admin.role_name}</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="inline-role-dropdown">
+                          <div 
+                            className="role-dropdown-trigger"
+                            onClick={() => setOpenRoleDropdown(openRoleDropdown === admin.id ? null : admin.id)}
+                          >
+                            <span className="role-badge-inline">{admin.role_name || 'No Role'}</span>
+                            <ChevronDown size={14} className={openRoleDropdown === admin.id ? 'rotated' : ''} />
+                          </div>
+                          {openRoleDropdown === admin.id && (
+                            <div className="role-dropdown-options">
+                              {assignableRoles.map(role => (
+                                <div 
+                                  key={role.id}
+                                  className={`role-dropdown-option ${admin.role_id === role.id ? 'selected' : ''}`}
+                                  onClick={() => {
+                                    if (admin.role_id !== role.id) {
+                                      handleRoleChange(admin.id, role.id);
+                                    } else {
+                                      setOpenRoleDropdown(null);
+                                    }
+                                  }}
+                                >
+                                  {role.display_name}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </td>
                     <td>
                       <div className="contact-row">
@@ -526,6 +597,8 @@ const AdminUsers = () => {
             </div>
           </div>
         )}
+          </>
+        )}
       </main>
 
       {/* Add Admin Modal - Step 1: Enter Email */}
@@ -596,17 +669,26 @@ const AdminUsers = () => {
                 </div>
               </div>
               
+              {/* Role Selection */}
+              <div className="form-group" style={{ marginTop: '1rem' }}>
+                <label>Assign Role</label>
+                <select 
+                  className="form-input"
+                  value={selectedRoleId || ''}
+                  onChange={(e) => setSelectedRoleId(Number(e.target.value))}
+                >
+                  {assignableRoles.map(role => (
+                    <option key={role.id} value={role.id}>
+                      {role.display_name}
+                    </option>
+                  ))}
+                </select>
+                <small className="form-hint">Select the role to assign to this admin user.</small>
+              </div>
+              
               <div className="warning-box">
                 <p><strong>⚠️ Important:</strong></p>
-                <p>You are about to grant admin privileges to this user. They will have full access to:</p>
-                <ul>
-                  <li>Manage all products and inventory</li>
-                  <li>View and manage customer orders</li>
-                  <li>Access sales reports and analytics</li>
-                  <li>Manage customer accounts</li>
-                  <li>Create and manage discount coupons</li>
-                  <li>Add or remove other admins</li>
-                </ul>
+                <p>You are about to grant admin privileges to this user with the selected role's permissions.</p>
                 <p>An email notification will be sent to inform them of their new role.</p>
               </div>
             </div>

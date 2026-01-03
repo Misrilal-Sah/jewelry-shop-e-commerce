@@ -618,22 +618,32 @@ const getOrderConfirmationTemplate = (orderData) => {
 // ADMIN PROMOTION EMAIL TEMPLATE
 // ============================================
 const getAdminPromotionTemplate = (userData) => {
-  const { name = 'User', email } = userData;
+  const { name = 'User', email, roleName = '' } = userData;
   const adminDashboardUrl = `${getBaseUrl()}/admin`;
+  // Format role name nicely (capitalize first letter of each word)
+  const formatRoleName = (rn) => {
+    if (!rn) return '';
+    return rn.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+  };
+  const displayRoleName = formatRoleName(roleName);
   
   const content = `
     <tr>
       <td style="padding: 50px 40px; text-align: center; background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);">
-        <div style="width: 80px; height: 80px; margin: 0 auto 25px; background: linear-gradient(135deg, #d4af37 0%, #b7953f 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-          <span style="font-size: 36px; line-height: 80px;">🛡️</span>
-        </div>
+        <table align="center" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto 25px;">
+          <tr>
+            <td style="width: 80px; height: 80px; background: linear-gradient(135deg, #d4af37 0%, #b7953f 100%); border-radius: 50%; text-align: center; vertical-align: middle;">
+              <span style="font-size: 36px; line-height: 80px;">🛡️</span>
+            </td>
+          </tr>
+        </table>
         
         <h2 style="margin: 0 0 15px; font-family: 'Georgia', serif; font-size: 28px; font-weight: normal; color: #ffffff; letter-spacing: 1px;">
           Congratulations, ${name}!
         </h2>
         
         <p style="margin: 0 0 10px; font-family: 'Georgia', serif; font-size: 20px; color: #d4af37; font-style: italic;">
-          You've Been Promoted to Admin
+          You've Been Promoted to Admin${displayRoleName ? ` (${displayRoleName})` : ''}
         </p>
         
         <div style="width: 60px; height: 1px; background: linear-gradient(90deg, transparent, #d4af37, transparent); margin: 25px auto;"></div>

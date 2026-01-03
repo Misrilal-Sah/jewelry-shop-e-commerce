@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 const { authMiddleware, adminMiddleware } = require('../middleware/authMiddleware');
+const { requirePermission } = require('../middleware/permissionMiddleware');
 const emailService = require('../services/emailService');
 
 // Submit bulk order inquiry (public)
@@ -82,7 +83,7 @@ router.post('/', async (req, res) => {
 });
 
 // Get all bulk order inquiries (admin only)
-router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
+router.get('/', authMiddleware, adminMiddleware, requirePermission('bulk_orders', 'view'), async (req, res) => {
   try {
     const { status, search, sortBy = 'created_at', sortOrder = 'DESC' } = req.query;
     
@@ -116,7 +117,7 @@ router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
 });
 
 // Get single bulk order inquiry (admin only)
-router.get('/:id', authMiddleware, adminMiddleware, async (req, res) => {
+router.get('/:id', authMiddleware, adminMiddleware, requirePermission('bulk_orders', 'view'), async (req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT * FROM bulk_order_inquiries WHERE id = ?`,
@@ -135,7 +136,7 @@ router.get('/:id', authMiddleware, adminMiddleware, async (req, res) => {
 });
 
 // Update bulk order status (admin only)
-router.patch('/:id/status', authMiddleware, adminMiddleware, async (req, res) => {
+router.patch('/:id/status', authMiddleware, adminMiddleware, requirePermission('bulk_orders', 'update_status'), async (req, res) => {
   try {
     const { status } = req.body;
     const validStatuses = ['pending', 'contacted', 'quoted', 'closed'];
@@ -157,7 +158,7 @@ router.patch('/:id/status', authMiddleware, adminMiddleware, async (req, res) =>
 });
 
 // Delete bulk order inquiry (admin only)
-router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
+router.delete('/:id', authMiddleware, adminMiddleware, requirePermission('bulk_orders', 'delete'), async (req, res) => {
   try {
     await pool.query(`DELETE FROM bulk_order_inquiries WHERE id = ?`, [req.params.id]);
     res.json({ message: 'Inquiry deleted successfully' });

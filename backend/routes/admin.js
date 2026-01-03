@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authMiddleware, adminMiddleware } = require('../middleware/authMiddleware');
+const { requirePermission } = require('../middleware/permissionMiddleware');
 const { uploadProductImages } = require('../middleware/uploadMiddleware');
 const {
   getDashboardStats,
@@ -27,7 +28,11 @@ const {
   getAdmins,
   promoteToAdmin,
   demoteAdmin,
-  validateUserEmail
+  validateUserEmail,
+  updateAdminRole,
+  getCategorySales,
+  getTopProducts,
+  getOrderStatusStats
 } = require('../controllers/adminController');
 
 // All admin routes require auth and admin role
@@ -35,30 +40,30 @@ router.use(authMiddleware);
 router.use(adminMiddleware);
 
 // Dashboard
-router.get('/dashboard', getDashboardStats);
+router.get('/dashboard', requirePermission('dashboard', 'view'), getDashboardStats);
 
 // Products
-router.get('/products', getAllProducts);
-router.get('/products/:id', getProductById);
-router.post('/products', createProduct);
-router.put('/products/:id', updateProduct);
-router.delete('/products/:id', deleteProduct);
+router.get('/products', requirePermission('products', 'view'), getAllProducts);
+router.get('/products/:id', requirePermission('products', 'view'), getProductById);
+router.post('/products', requirePermission('products', 'create'), createProduct);
+router.put('/products/:id', requirePermission('products', 'edit'), updateProduct);
+router.delete('/products/:id', requirePermission('products', 'delete'), deleteProduct);
 
-// Image upload
-router.post('/products/:id/images', uploadProductImages, uploadImages);
-router.delete('/products/:id/images/:index', deleteImage);
+// Image upload (requires products edit permission)
+router.post('/products/:id/images', requirePermission('products', 'edit'), uploadProductImages, uploadImages);
+router.delete('/products/:id/images/:index', requirePermission('products', 'edit'), deleteImage);
 
 // Orders
-router.get('/orders', getAllOrders);
-router.get('/orders/:id', getOrderById);
-router.put('/orders/:id/status', updateOrderStatus);
+router.get('/orders', requirePermission('orders', 'view'), getAllOrders);
+router.get('/orders/:id', requirePermission('orders', 'view'), getOrderById);
+router.put('/orders/:id/status', requirePermission('orders', 'update_status'), updateOrderStatus);
 
 // Customers
-router.get('/customers', getCustomers);
+router.get('/customers', requirePermission('customers', 'view'), getCustomers);
 
 // Recalculate customer segments
 const { updateAllCustomerSegments } = require('../services/customerSegmentationService');
-router.post('/customers/recalculate-segments', async (req, res) => {
+router.post('/customers/recalculate-segments', requirePermission('customers', 'edit'), async (req, res) => {
   try {
     const result = await updateAllCustomerSegments();
     res.json(result);
@@ -69,25 +74,29 @@ router.post('/customers/recalculate-segments', async (req, res) => {
 });
 
 // Reports
-router.get('/reports/sales', getSalesReport);
+router.get('/reports/sales', requirePermission('reports', 'view'), getSalesReport);
+router.get('/reports/categories', requirePermission('reports', 'view'), getCategorySales);
+router.get('/reports/top-products', requirePermission('reports', 'view'), getTopProducts);
+router.get('/reports/order-status', requirePermission('reports', 'view'), getOrderStatusStats);
 
-// Reviews
-router.get('/reviews/pending', getPendingReviews);
-router.post('/reviews/:id/approve', approveReview);
-router.delete('/reviews/:id', deleteReview);
+// Reviews (uses products permission)
+router.get('/reviews/pending', requirePermission('products', 'view'), getPendingReviews);
+router.post('/reviews/:id/approve', requirePermission('products', 'edit'), approveReview);
+router.delete('/reviews/:id', requirePermission('products', 'delete'), deleteReview);
 
 // Coupons
-router.get('/coupons', getCoupons);
-router.post('/coupons', createCoupon);
-router.put('/coupons/:id', updateCoupon);
-router.delete('/coupons/:id', deleteCoupon);
-router.patch('/coupons/:id/toggle', toggleCouponStatus);
+router.get('/coupons', requirePermission('coupons', 'view'), getCoupons);
+router.post('/coupons', requirePermission('coupons', 'create'), createCoupon);
+router.put('/coupons/:id', requirePermission('coupons', 'edit'), updateCoupon);
+router.delete('/coupons/:id', requirePermission('coupons', 'delete'), deleteCoupon);
+router.patch('/coupons/:id/toggle', requirePermission('coupons', 'edit'), toggleCouponStatus);
 
 // Admin User Management
-router.get('/users', getAdmins);
-router.get('/users/validate', validateUserEmail);
-router.post('/users/promote', promoteToAdmin);
-router.delete('/users/:id', demoteAdmin);
+router.get('/users', requirePermission('users', 'view'), getAdmins);
+router.get('/users/validate', requirePermission('users', 'create'), validateUserEmail);
+router.post('/users/promote', requirePermission('users', 'create'), promoteToAdmin);
+router.put('/users/:id/role', requirePermission('users', 'edit'), updateAdminRole);
+router.delete('/users/:id', requirePermission('users', 'delete'), demoteAdmin);
 
 // Generic Image Upload (for testimonials, blog, etc.)
 const multer = require('multer');

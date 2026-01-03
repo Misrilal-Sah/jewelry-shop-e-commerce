@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authMiddleware, adminMiddleware } = require('../middleware/authMiddleware');
+const { requirePermission } = require('../middleware/permissionMiddleware');
 const {
   getTestimonials,
   getAllTestimonials,
@@ -16,10 +17,11 @@ router.get('/', getTestimonials);
 // Customer submission route (requires auth, not admin)
 router.post('/submit', authMiddleware, submitTestimonial);
 
-// Admin routes (require auth + admin role)
-router.get('/admin', authMiddleware, adminMiddleware, getAllTestimonials);
-router.post('/admin', authMiddleware, adminMiddleware, createTestimonial);
-router.put('/admin/:id', authMiddleware, adminMiddleware, updateTestimonial);
-router.delete('/admin/:id', authMiddleware, adminMiddleware, deleteTestimonial);
+// Admin routes (require auth + admin role + permission)
+router.get('/admin', authMiddleware, adminMiddleware, requirePermission('testimonials', 'view'), getAllTestimonials);
+router.post('/admin', authMiddleware, adminMiddleware, requirePermission('testimonials', 'create'), createTestimonial);
+router.put('/admin/:id', authMiddleware, adminMiddleware, requirePermission('testimonials', 'edit'), updateTestimonial);
+router.delete('/admin/:id', authMiddleware, adminMiddleware, requirePermission('testimonials', 'delete'), deleteTestimonial);
 
 module.exports = router;
+

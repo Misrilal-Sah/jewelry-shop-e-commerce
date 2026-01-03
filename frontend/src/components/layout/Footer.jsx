@@ -301,7 +301,7 @@ const Footer = () => {
       <div className="footer-bottom">
         <div className="container">
           <div className="footer-bottom-content">
-            <p>&copy; {currentYear} Aabhar. All rights reserved.</p>
+            <p>&copy; {currentYear} AABHAR. All rights reserved.</p>
             <div className="footer-legal">
               <a href="/privacy" onClick={(e) => handleLinkClick(e, '/privacy')}>Privacy Policy</a>
               <a href="/terms" onClick={(e) => handleLinkClick(e, '/terms')}>Terms of Service</a>

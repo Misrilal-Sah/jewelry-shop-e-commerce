@@ -3,9 +3,10 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 const { authMiddleware, adminMiddleware } = require('../middleware/authMiddleware');
+const { requirePermission } = require('../middleware/permissionMiddleware');
 
 // Get Audit Logs (Admin only)
-router.get('/audit', authMiddleware, adminMiddleware, async (req, res) => {
+router.get('/audit', authMiddleware, adminMiddleware, requirePermission('logs', 'view'), async (req, res) => {
   try {
     const { 
       page = 1, 
@@ -91,7 +92,7 @@ router.get('/audit', authMiddleware, adminMiddleware, async (req, res) => {
 });
 
 // Get System Logs (Admin only)
-router.get('/system', authMiddleware, adminMiddleware, async (req, res) => {
+router.get('/system', authMiddleware, adminMiddleware, requirePermission('logs', 'view'), async (req, res) => {
   try {
     const { 
       page = 1, 
@@ -172,7 +173,7 @@ router.get('/system', authMiddleware, adminMiddleware, async (req, res) => {
 });
 
 // Get System Log Detail (with stack trace and meta)
-router.get('/system/:id', authMiddleware, adminMiddleware, async (req, res) => {
+router.get('/system/:id', authMiddleware, adminMiddleware, requirePermission('logs', 'view'), async (req, res) => {
   try {
     const [logs] = await pool.query('SELECT * FROM system_logs WHERE id = ?', [req.params.id]);
     
@@ -188,7 +189,7 @@ router.get('/system/:id', authMiddleware, adminMiddleware, async (req, res) => {
 });
 
 // Clear old logs (Admin only) - Keep last 30 days
-router.delete('/cleanup', authMiddleware, adminMiddleware, async (req, res) => {
+router.delete('/cleanup', authMiddleware, adminMiddleware, requirePermission('logs', 'view'), async (req, res) => {
   try {
     const { days = 30 } = req.body;
     
@@ -214,7 +215,7 @@ router.delete('/cleanup', authMiddleware, adminMiddleware, async (req, res) => {
 });
 
 // Export logs as CSV (Admin only)
-router.get('/export/:type', authMiddleware, adminMiddleware, async (req, res) => {
+router.get('/export/:type', authMiddleware, adminMiddleware, requirePermission('logs', 'view'), async (req, res) => {
   try {
     const { type } = req.params;
     const { start_date, end_date } = req.query;

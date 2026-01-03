@@ -2,8 +2,10 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { PermissionProvider } from './context/PermissionContext';
 import { ToastProvider } from './components/ui/Toast';
 import { ModalProvider } from './components/ui/Modal';
+import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ui/ScrollToTop';
 import CartSidebar from './components/CartSidebar';
 import Header from './components/layout/Header';
@@ -83,24 +85,27 @@ const AppContent = () => {
             <Route path="/wishlist/shared/:shareCode" element={<SharedWishlist />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/faq" element={<FAQPage />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/products" element={<AdminProducts />} />
-            <Route path="/admin/products/new" element={<AdminProductForm />} />
-            <Route path="/admin/products/edit/:id" element={<AdminProductForm />} />
-            <Route path="/admin/orders" element={<AdminOrders />} />
-            <Route path="/admin/orders/:id" element={<AdminOrderView />} />
-            <Route path="/admin/customers" element={<AdminCustomers />} />
-            <Route path="/admin/coupons" element={<AdminCoupons />} />
-            <Route path="/admin/reports" element={<AdminReports />} />
-            <Route path="/admin/users" element={<AdminUsers />} />
-            <Route path="/admin/email-center" element={<EmailCenter />} />
-            <Route path="/admin/flash-sales" element={<FlashSales />} />
-            <Route path="/admin/testimonials" element={<Testimonials />} />
-            <Route path="/admin/faqs" element={<AdminFAQs />} />
-            <Route path="/admin/blog" element={<AdminBlog />} />
-            <Route path="/admin/bulk-orders" element={<AdminBulkOrders />} />
-            <Route path="/admin/logs" element={<AdminLogs />} />
-            <Route path="/admin/common-details" element={<CommonDetails />} />
+            
+            {/* Admin Routes with Permission Checks */}
+            <Route path="/admin" element={<ProtectedRoute resource="dashboard"><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/admin/products" element={<ProtectedRoute resource="products"><AdminProducts /></ProtectedRoute>} />
+            <Route path="/admin/products/new" element={<ProtectedRoute resource="products" action="create"><AdminProductForm /></ProtectedRoute>} />
+            <Route path="/admin/products/edit/:id" element={<ProtectedRoute resource="products" action="edit"><AdminProductForm /></ProtectedRoute>} />
+            <Route path="/admin/orders" element={<ProtectedRoute resource="orders"><AdminOrders /></ProtectedRoute>} />
+            <Route path="/admin/orders/:id" element={<ProtectedRoute resource="orders"><AdminOrderView /></ProtectedRoute>} />
+            <Route path="/admin/customers" element={<ProtectedRoute resource="customers"><AdminCustomers /></ProtectedRoute>} />
+            <Route path="/admin/coupons" element={<ProtectedRoute resource="coupons"><AdminCoupons /></ProtectedRoute>} />
+            <Route path="/admin/reports" element={<ProtectedRoute resource="reports"><AdminReports /></ProtectedRoute>} />
+            <Route path="/admin/users" element={<ProtectedRoute resource="users"><AdminUsers /></ProtectedRoute>} />
+            <Route path="/admin/email-center" element={<ProtectedRoute resource="email"><EmailCenter /></ProtectedRoute>} />
+            <Route path="/admin/flash-sales" element={<ProtectedRoute resource="flash_sales"><FlashSales /></ProtectedRoute>} />
+            <Route path="/admin/testimonials" element={<ProtectedRoute resource="testimonials"><Testimonials /></ProtectedRoute>} />
+            <Route path="/admin/faqs" element={<ProtectedRoute resource="faqs"><AdminFAQs /></ProtectedRoute>} />
+            <Route path="/admin/blog" element={<ProtectedRoute resource="blog"><AdminBlog /></ProtectedRoute>} />
+            <Route path="/admin/bulk-orders" element={<ProtectedRoute resource="bulk_orders"><AdminBulkOrders /></ProtectedRoute>} />
+            <Route path="/admin/logs" element={<ProtectedRoute resource="logs"><AdminLogs /></ProtectedRoute>} />
+            <Route path="/admin/common-details" element={<ProtectedRoute resource="common_details"><CommonDetails /></ProtectedRoute>} />
+            
             <Route path="/bulk-order" element={<BulkOrder />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
@@ -127,7 +132,9 @@ function App() {
           <ToastProvider>
             <ModalProvider>
               <Router>
-                <AppContent />
+                <PermissionProvider>
+                  <AppContent />
+                </PermissionProvider>
               </Router>
             </ModalProvider>
           </ToastProvider>

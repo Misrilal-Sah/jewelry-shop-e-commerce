@@ -67,7 +67,7 @@ const updateSettings = async (req, res) => {
     }
     
     auditLogger.update(req.user.id, req.user.name || req.user.email, 'SITE_SETTINGS', null, 
-      `Updated ${settings.length} site settings`, { keys: settings.map(s => s.setting_key) }, req);
+      `Updated ${settings.length} site settings`, null, { keys: settings.map(s => s.setting_key) }, req);
     
     res.json({ message: 'Settings updated successfully' });
   } catch (error) {

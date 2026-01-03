@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { usePermission } from '../../context/PermissionContext';
 import { useToast } from '../../components/ui/Toast';
 import { 
   Settings, Tag, Briefcase, Save, Plus, Trash2, Edit2, X, Check,
   Phone, Mail, MapPin, Facebook, Instagram, Twitter, Youtube,
-  Image as ImageIcon, AlertTriangle, Upload,
-  LayoutDashboard, Package, ShoppingCart, Users, BarChart3, Shield, Zap, Quote, HelpCircle, FileText, Activity
+  Image as ImageIcon, AlertTriangle, Upload
 } from 'lucide-react';
+import AdminSidebar from '../../components/admin/AdminSidebar';
 import './Admin.css';
 
 const CommonDetails = () => {
   const { token } = useAuth();
+  const { hasPermission } = usePermission();
   const toast = useToast();
   const [activeTab, setActiveTab] = useState('general');
   const [loading, setLoading] = useState(true);
@@ -363,64 +365,7 @@ const CommonDetails = () => {
 
   return (
     <div className="admin-page">
-      <aside className="admin-sidebar">
-        <div className="sidebar-header">
-          <Link to="/" className="admin-logo">
-            <span className="logo-text">Aabhar</span>
-            <span className="logo-accent">Admin</span>
-          </Link>
-        </div>
-        <nav className="admin-nav">
-          <Link to="/admin" className="nav-item">
-            <LayoutDashboard size={18} /> Dashboard
-          </Link>
-          <Link to="/admin/products" className="nav-item">
-            <Package size={18} /> Products
-          </Link>
-          <Link to="/admin/orders" className="nav-item">
-            <ShoppingCart size={18} /> Orders
-          </Link>
-          <Link to="/admin/customers" className="nav-item">
-            <Users size={18} /> Customers
-          </Link>
-          <Link to="/admin/coupons" className="nav-item">
-            <Tag size={18} /> Coupons
-          </Link>
-          <Link to="/admin/flash-sales" className="nav-item">
-            <Zap size={18} /> Flash Sales
-          </Link>
-          <Link to="/admin/bulk-orders" className="nav-item">
-            <Package size={18} /> Bulk Orders
-          </Link>
-          <Link to="/admin/testimonials" className="nav-item">
-            <Quote size={18} /> Testimonials
-          </Link>
-          <Link to="/admin/faqs" className="nav-item">
-            <HelpCircle size={18} /> FAQs
-          </Link>
-          <Link to="/admin/blog" className="nav-item">
-            <FileText size={18} /> Blog
-          </Link>
-          <Link to="/admin/reports" className="nav-item">
-            <BarChart3 size={18} /> Reports
-          </Link>
-          <Link to="/admin/users" className="nav-item">
-            <Shield size={18} /> Admin Users
-          </Link>
-          <Link to="/admin/email-center" className="nav-item">
-            <Mail size={18} /> Email Center
-          </Link>
-          <Link to="/admin/common-details" className="nav-item active">
-            <Settings size={18} /> Common Details
-          </Link>
-          <Link to="/admin/logs" className="nav-item">
-            <Activity size={18} /> Logs
-          </Link>
-        </nav>
-        <div className="sidebar-footer">
-          <Link to="/" className="back-to-store">← Back to Store</Link>
-        </div>
-      </aside>
+      <AdminSidebar />
 
       <main className="admin-content">
       <div className="page-header">

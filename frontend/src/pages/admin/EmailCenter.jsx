@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  LayoutDashboard, Package, ShoppingCart, Users, BarChart3, Tag, Shield, Mail, Zap, Settings,
-  Plus, Edit2, Trash2, Search, X, ChevronDown, ChevronLeft, ChevronRight, 
+  LayoutDashboard, Mail, Plus, Edit2, Trash2, Search, X, ChevronDown, ChevronLeft, ChevronRight, 
   ChevronUp, Send, Calendar, Clock, Eye, FileText, UserCheck, RefreshCw,
-  AlertTriangle, ChevronsUpDown, Quote, HelpCircle, Activity
+  AlertTriangle, ChevronsUpDown
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { usePermission } from '../../context/PermissionContext';
 import { useToast } from '../../components/ui/Toast';
+import AdminSidebar from '../../components/admin/AdminSidebar';
 import './Admin.css';
 
 const EmailCenter = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, token, loading: authLoading } = useAuth();
+  const { hasPermission } = usePermission();
   const toast = useToast();
   
   // Tab state
@@ -597,62 +599,7 @@ const EmailCenter = () => {
   return (
     <div className="admin-container">
       {/* Sidebar */}
-      <aside className="admin-sidebar">
-        <div className="sidebar-header">
-          <Link to="/" className="sidebar-logo">✦ Aabhar</Link>
-          <span className="sidebar-subtitle">Admin Panel</span>
-        </div>
-        <nav className="sidebar-nav">
-          <Link to="/admin" className="nav-item">
-            <LayoutDashboard size={18} /> Dashboard
-          </Link>
-          <Link to="/admin/products" className="nav-item">
-            <Package size={18} /> Products
-          </Link>
-          <Link to="/admin/orders" className="nav-item">
-            <ShoppingCart size={18} /> Orders
-          </Link>
-          <Link to="/admin/customers" className="nav-item">
-            <Users size={18} /> Customers
-          </Link>
-          <Link to="/admin/coupons" className="nav-item">
-            <Tag size={18} /> Coupons
-          </Link>
-          <Link to="/admin/flash-sales" className="nav-item">
-            <Zap size={18} /> Flash Sales
-          </Link>
-          <Link to="/admin/bulk-orders" className="nav-item">
-            <Package size={18} /> Bulk Orders
-          </Link>
-          <Link to="/admin/testimonials" className="nav-item">
-            <Quote size={18} /> Testimonials
-          </Link>
-          <Link to="/admin/faqs" className="nav-item">
-            <HelpCircle size={18} /> FAQs
-          </Link>
-          <Link to="/admin/blog" className="nav-item">
-            <FileText size={18} /> Blog
-          </Link>
-          <Link to="/admin/reports" className="nav-item">
-            <BarChart3 size={18} /> Reports
-          </Link>
-          <Link to="/admin/users" className="nav-item">
-            <Shield size={18} /> Admin Users
-          </Link>
-          <Link to="/admin/email-center" className="nav-item active">
-            <Mail size={18} /> Email Center
-          </Link>
-          <Link to="/admin/common-details" className="nav-item">
-            <Settings size={18} /> Common Details
-          </Link>
-          <Link to="/admin/logs" className="nav-item">
-            <Activity size={18} /> Logs
-          </Link>
-        </nav>
-        <div className="sidebar-footer">
-          <Link to="/" className="back-to-store">← Back to Store</Link>
-        </div>
-      </aside>
+      <AdminSidebar />
 
       {/* Main Content */}
       <main className="admin-content">

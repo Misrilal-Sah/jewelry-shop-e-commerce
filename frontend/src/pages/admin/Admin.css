@@ -5587,3 +5587,533 @@ h2.modal-title-centered {
     align-items: flex-start;
   }
 }
+
+/* ========================================
+   ROLES MANAGEMENT STYLES
+   ======================================== */
+
+.roles-management {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: var(--space-lg);
+}
+
+.roles-sidebar {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+}
+
+.roles-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.roles-header h3 {
+  margin: 0;
+  margin-right: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.roles-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.role-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.role-item:hover {
+  background: var(--bg-secondary);
+}
+
+.role-item.active {
+  background: rgba(212, 175, 55, 0.1);
+  border-color: var(--accent-gold);
+}
+
+.role-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.role-name {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.role-badge {
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.role-badge.system {
+  background: rgba(99, 102, 241, 0.15);
+  color: #6366f1;
+}
+
+.permissions-editor {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+}
+
+.permissions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.permissions-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.role-description {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: var(--space-xs);
+}
+
+.permissions-notice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: var(--radius-md);
+  color: #6366f1;
+  font-size: 0.85rem;
+  margin-bottom: var(--space-lg);
+}
+
+.permissions-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.permission-category {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  background: var(--bg-secondary);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.category-header:hover {
+  background: var(--bg-tertiary, var(--bg-secondary));
+}
+
+.category-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.category-left svg {
+  color: var(--accent-gold);
+}
+
+.category-name {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.category-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.category-toggle {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.category-toggle.all {
+  background: #10b981;
+  color: white;
+}
+
+.category-toggle.some {
+  background: #f59e0b;
+  color: white;
+}
+
+.category-toggle.none {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+
+.category-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--bg-card);
+}
+
+.action-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  transition: background 0.15s ease;
+}
+
+.action-checkbox:hover {
+  background: var(--bg-secondary);
+}
+
+.action-checkbox.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.action-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-gold);
+}
+
+.action-label {
+  color: var(--text-secondary);
+}
+
+.no-role-selected,
+.roles-no-access {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: var(--text-muted);
+  text-align: center;
+  gap: var(--space-md);
+}
+
+.no-role-selected svg,
+.roles-no-access svg {
+  opacity: 0.3;
+}
+
+.roles-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--text-muted);
+}
+
+.text-warning {
+  color: #f59e0b;
+  font-size: 0.85rem;
+}
+
+/* Responsive Roles */
+@media (max-width: 900px) {
+  .roles-management {
+    grid-template-columns: 1fr;
+  }
+  
+  .roles-sidebar {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .roles-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .role-item {
+    flex: 0 0 auto;
+  }
+}
+
+/* Modal Footer Buttons */
+.modal-footer {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--border-color);
+  margin-top: var(--space-lg);
+}
+
+.modal-footer .btn {
+  min-width: 100px;
+}
+
+/* Role Actions */
+.role-actions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.role-actions .btn-icon {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.role-item:hover .role-actions .btn-icon {
+  opacity: 1;
+}
+
+/* Preset Actions */
+.preset-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.preset-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.preset-actions .btn {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+}
+
+/* Modal Select/Dropdown Styling */
+.modal-content select {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.modal-content select:hover {
+  border-color: var(--accent-gold);
+}
+
+.modal-content select:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.15);
+}
+
+.modal-content select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 10px;
+}
+
+/* Custom Preset Dropdown - Specific styling */
+.preset-dropdown {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-primary);
+  border: 2px solid var(--accent-gold);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23d4af37' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+.preset-dropdown:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25);
+}
+
+.preset-dropdown option {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  padding: 12px;
+}
+
+/* Roles/Templates Tabs - Compact size */
+.roles-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+  grid-column: 1 / -1;
+}
+
+.roles-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.roles-tab:hover {
+  border-color: var(--accent-gold);
+  color: var(--text-primary);
+}
+
+.roles-tab.active {
+  background: rgba(212, 175, 55, 0.15);
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+.roles-tab svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Role badge inline for admin users table */
+.role-badge-inline {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--accent-gold);
+}
+
+/* Inline role dropdown */
+.inline-role-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.role-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.role-dropdown-trigger:hover {
+  opacity: 0.8;
+}
+
+.role-dropdown-trigger svg {
+  color: var(--accent-gold);
+  transition: transform 0.2s;
+}
+
+.role-dropdown-trigger svg.rotated {
+  transform: rotate(180deg);
+}
+
+.role-dropdown-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  min-width: 180px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.role-dropdown-option {
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.role-dropdown-option:hover {
+  background: var(--bg-tertiary);
+}
+
+.role-dropdown-option.selected {
+  background: rgba(212, 175, 55, 0.15);
+  color: var(--accent-gold);
+  font-weight: 500;
+}
+
+/* Locked/Disabled role dropdown for Super Admin */
+.inline-role-dropdown.locked {
+  opacity: 0.9;
+}
+
+.role-dropdown-trigger.disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.role-dropdown-trigger.disabled:hover {
+  opacity: 0.8;
+}
+
+/* Super Admin badge styling */
+.role-badge-inline.super-admin {
+  background: rgba(255, 107, 107, 0.15);
+  border-color: rgba(255, 107, 107, 0.3);
+  color: #ff6b6b;
+}

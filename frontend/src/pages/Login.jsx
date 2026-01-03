@@ -178,10 +178,10 @@ const Login = () => {
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
 
-            <div className="demo-info">
+            {/* <div className="demo-info">
               <Info size={16} />
               <span>Demo: admin@Aabhar.in / admin123</span>
-            </div>
+            </div> */}
           </form>
 
           <div className="auth-footer">

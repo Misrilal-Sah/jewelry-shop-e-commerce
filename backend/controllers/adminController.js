@@ -655,6 +655,86 @@ const getSalesReport = async (req, res) => {
   }
 };
 
+// Category Sales Report
+const getCategorySales = async (req, res) => {
+  try {
+    const [categories] = await pool.query(`
+      SELECT 
+        COALESCE(p.category, 'Uncategorized') as category,
+        COUNT(DISTINCT oi.order_id) as orders,
+        SUM(oi.quantity) as items_sold,
+        SUM(oi.quantity * (p.metal_price + p.making_charges)) as revenue
+      FROM order_items oi
+      JOIN products p ON oi.product_id = p.id
+      JOIN orders o ON oi.order_id = o.id
+      WHERE o.status != 'cancelled'
+      GROUP BY p.category
+      ORDER BY revenue DESC
+      LIMIT 10
+    `);
+
+    res.json({ categories });
+  } catch (error) {
+    console.error('Category sales error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Top Products Report
+const getTopProducts = async (req, res) => {
+  try {
+    const [products] = await pool.query(`
+      SELECT 
+        p.id,
+        p.name,
+        p.images,
+        p.category,
+        SUM(oi.quantity) as total_sold,
+        SUM(oi.quantity * (p.metal_price + p.making_charges)) as revenue,
+        COUNT(DISTINCT oi.order_id) as order_count
+      FROM order_items oi
+      JOIN products p ON oi.product_id = p.id
+      JOIN orders o ON oi.order_id = o.id
+      WHERE o.status != 'cancelled'
+      GROUP BY p.id
+      ORDER BY total_sold DESC
+      LIMIT 5
+    `);
+
+    res.json({ products });
+  } catch (error) {
+    console.error('Top products error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Order Status Stats
+const getOrderStatusStats = async (req, res) => {
+  try {
+    const [statuses] = await pool.query(`
+      SELECT 
+        status,
+        COUNT(*) as count,
+        SUM(total_amount) as revenue
+      FROM orders
+      GROUP BY status
+      ORDER BY count DESC
+    `);
+
+    // Calculate total for percentages
+    const total = statuses.reduce((sum, s) => sum + parseInt(s.count), 0);
+    const statusWithPercentage = statuses.map(s => ({
+      ...s,
+      percentage: total > 0 ? ((s.count / total) * 100).toFixed(1) : 0
+    }));
+
+    res.json({ statuses: statusWithPercentage, total });
+  } catch (error) {
+    console.error('Order status stats error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 // Review moderation
 const getPendingReviews = async (req, res) => {
   try {
@@ -942,8 +1022,10 @@ const getAdmins = async (req, res) => {
     }
 
     const [admins] = await pool.query(
-      `SELECT u.id, u.name, u.email, u.phone, u.created_at, u.profile_image
+      `SELECT u.id, u.name, u.email, u.phone, u.created_at, u.profile_image,
+              u.role_id, r.display_name as role_name
        FROM users u
+       LEFT JOIN roles r ON u.role_id = r.id
        WHERE ${searchCondition}
        ORDER BY ${sortColumn} ${order}
        LIMIT ? OFFSET ?`,
@@ -974,7 +1056,7 @@ const getAdmins = async (req, res) => {
 // Promote user to admin by email
 const promoteToAdmin = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, roleId } = req.body;
 
     if (!email) {
       return res.status(400).json({ message: 'Email is required' });
@@ -1002,19 +1084,45 @@ const promoteToAdmin = async (req, res) => {
       });
     }
 
-    // Update role to admin
+    // Get or validate roleId
+    let assignedRoleId = roleId;
+    let roleName = 'Default Staff';
+    
+    if (roleId) {
+      // Verify role exists
+      const [roles] = await pool.query('SELECT id, display_name FROM roles WHERE id = ?', [roleId]);
+      if (roles.length > 0) {
+        roleName = roles[0].display_name;
+      } else {
+        // Fallback to default_staff
+        const [defaultRole] = await pool.query('SELECT id, display_name FROM roles WHERE name = ?', ['default_staff']);
+        if (defaultRole.length > 0) {
+          assignedRoleId = defaultRole[0].id;
+          roleName = defaultRole[0].display_name;
+        }
+      }
+    } else {
+      // No roleId provided, use default_staff
+      const [defaultRole] = await pool.query('SELECT id, display_name FROM roles WHERE name = ?', ['default_staff']);
+      if (defaultRole.length > 0) {
+        assignedRoleId = defaultRole[0].id;
+        roleName = defaultRole[0].display_name;
+      }
+    }
+
+    // Update role to admin and assign role_id
     await pool.query(
-      'UPDATE users SET role = ? WHERE id = ?',
-      ['admin', user.id]
+      'UPDATE users SET role = ?, role_id = ? WHERE id = ?',
+      ['admin', assignedRoleId, user.id]
     );
     
     // Audit log
-    auditLogger.update(req.user.id, req.user.name, 'USER', user.id, `Promoted ${user.name || user.email} to admin`, { role: 'customer' }, { role: 'admin' }, req);
+    auditLogger.update(req.user.id, req.user.name, 'USER', user.id, `Promoted ${user.name || user.email} to admin with role: ${roleName}`, { role: 'customer', role_id: null }, { role: 'admin', role_id: assignedRoleId }, req);
 
     // Send admin promotion email
     try {
       const { sendAdminPromotionEmail } = require('../services/emailService');
-      await sendAdminPromotionEmail(user.email, { name: user.name, email: user.email });
+      await sendAdminPromotionEmail(user.email, { name: user.name, email: user.email, roleName: roleName });
     } catch (emailError) {
       console.error('Failed to send admin promotion email:', emailError);
       // Don't fail the request if email fails
@@ -1115,6 +1223,55 @@ const demoteAdmin = async (req, res) => {
   }
 };
 
+// Update admin's role
+const updateAdminRole = async (req, res) => {
+  try {
+    const { adminId } = req.params;
+    const { roleId } = req.body;
+
+    if (!roleId) {
+      return res.status(400).json({ message: 'Role ID is required' });
+    }
+
+    // Find the admin user (all admins have role='admin')
+    const [users] = await pool.query('SELECT id, name, email, role, role_id FROM users WHERE id = ? AND role IN (?, ?)', [adminId, 'admin', 'super_admin']);
+    if (users.length === 0) {
+      return res.status(404).json({ message: 'Admin not found' });
+    }
+
+    const admin = users[0];
+
+    // Get the new role details
+    const [roles] = await pool.query('SELECT id, name, display_name FROM roles WHERE id = ?', [roleId]);
+    if (roles.length === 0) {
+      return res.status(404).json({ message: 'Role not found' });
+    }
+
+    const newRole = roles[0];
+
+    // Don't allow assigning super_admin role through this endpoint
+    if (newRole.name === 'super_admin') {
+      return res.status(403).json({ message: 'Super Admin role can only be assigned via database' });
+    }
+
+    // Update the user's role_id
+    await pool.query('UPDATE users SET role_id = ? WHERE id = ?', [roleId, adminId]);
+
+    // Audit log
+    auditLogger.update(req.user.id, req.user.name, 'USER', admin.id, 
+      `Changed role for ${admin.name || admin.email} to ${newRole.display_name}`, 
+      { role_id: admin.role_id }, { role_id: roleId }, req);
+
+    res.json({ 
+      message: `Role updated to ${newRole.display_name}`,
+      admin: { id: admin.id, name: admin.name, email: admin.email, role_id: roleId, role_name: newRole.display_name }
+    });
+  } catch (error) {
+    console.error('Update admin role error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 module.exports = {
   getDashboardStats,
   createProduct,
@@ -1129,6 +1286,9 @@ module.exports = {
   updateOrderStatus,
   getCustomers,
   getSalesReport,
+  getCategorySales,
+  getTopProducts,
+  getOrderStatusStats,
   getPendingReviews,
   approveReview,
   deleteReview,
@@ -1140,5 +1300,6 @@ module.exports = {
   getAdmins,
   promoteToAdmin,
   demoteAdmin,
-  validateUserEmail
+  validateUserEmail,
+  updateAdminRole
 };

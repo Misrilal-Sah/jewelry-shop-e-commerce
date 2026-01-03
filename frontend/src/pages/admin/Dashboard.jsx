@@ -7,11 +7,14 @@ import {
   MessageSquare, Megaphone, Star, Percent, Box
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { usePermission } from '../../context/PermissionContext';
+import AdminSidebar from '../../components/admin/AdminSidebar';
 import './Admin.css';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, token, loading: authLoading } = useAuth();
+  const { canViewPage, hasPermission } = usePermission();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -66,64 +69,7 @@ const Dashboard = () => {
 
   return (
     <div className="admin-page">
-      <aside className="admin-sidebar">
-        <div className="sidebar-header">
-          <Link to="/" className="admin-logo">
-            <span className="logo-text">Aabhar</span>
-            <span className="logo-accent">Admin</span>
-          </Link>
-        </div>
-        <nav className="admin-nav">
-          <Link to="/admin" className="nav-item active">
-            <LayoutDashboard size={18} /> Dashboard
-          </Link>
-          <Link to="/admin/products" className="nav-item">
-            <Package size={18} /> Products
-          </Link>
-          <Link to="/admin/orders" className="nav-item">
-            <ShoppingCart size={18} /> Orders
-          </Link>
-          <Link to="/admin/customers" className="nav-item">
-            <Users size={18} /> Customers
-          </Link>
-          <Link to="/admin/coupons" className="nav-item">
-            <Tag size={18} /> Coupons
-          </Link>
-          <Link to="/admin/flash-sales" className="nav-item">
-            <Zap size={18} /> Flash Sales
-          </Link>
-          <Link to="/admin/bulk-orders" className="nav-item">
-            <Package size={18} /> Bulk Orders
-          </Link>
-          <Link to="/admin/testimonials" className="nav-item">
-            <Quote size={18} /> Testimonials
-          </Link>
-          <Link to="/admin/faqs" className="nav-item">
-            <HelpCircle size={18} /> FAQs
-          </Link>
-          <Link to="/admin/blog" className="nav-item">
-            <FileText size={18} /> Blog
-          </Link>
-          <Link to="/admin/reports" className="nav-item">
-            <BarChart3 size={18} /> Reports
-          </Link>
-          <Link to="/admin/users" className="nav-item">
-            <Shield size={18} /> Admin Users
-          </Link>
-          <Link to="/admin/email-center" className="nav-item">
-            <Mail size={18} /> Email Center
-          </Link>
-          <Link to="/admin/common-details" className="nav-item">
-            <Settings size={18} /> Common Details
-          </Link>
-          <Link to="/admin/logs" className="nav-item">
-            <Activity size={18} /> Logs
-          </Link>
-        </nav>
-        <div className="sidebar-footer">
-          <Link to="/" className="back-to-store">← Back to Store</Link>
-        </div>
-      </aside>
+      <AdminSidebar />
 
       <main className="admin-content">
         <header className="admin-header">
@@ -203,6 +149,7 @@ const Dashboard = () => {
                 <h2><Zap size={20} /> Quick Actions</h2>
               </div>
               <div className="dashboard-actions-grid">
+                {hasPermission('products', 'create') && (
                 <Link to="/admin/products/new" className="dashboard-action-item">
                   <div className="dashboard-action-icon add">
                     <PlusCircle size={24} />
@@ -212,6 +159,8 @@ const Dashboard = () => {
                     <span className="dashboard-action-desc">Create new product listing</span>
                   </div>
                 </Link>
+                )}
+                {canViewPage('orders') && (
                 <Link to="/admin/orders" className="dashboard-action-item">
                   <div className="dashboard-action-icon orders">
                     <ShoppingCart size={24} />
@@ -221,6 +170,8 @@ const Dashboard = () => {
                     <span className="dashboard-action-desc">Manage customer orders</span>
                   </div>
                 </Link>
+                )}
+                {canViewPage('products') && (
                 <Link to="/admin/products" className="dashboard-action-item">
                   <div className="dashboard-action-icon products">
                     <Package size={24} />
@@ -230,6 +181,8 @@ const Dashboard = () => {
                     <span className="dashboard-action-desc">View & edit inventory</span>
                   </div>
                 </Link>
+                )}
+                {canViewPage('customers') && (
                 <Link to="/admin/customers" className="dashboard-action-item">
                   <div className="dashboard-action-icon customers">
                     <Users size={24} />
@@ -239,6 +192,7 @@ const Dashboard = () => {
                     <span className="dashboard-action-desc">View customer data</span>
                   </div>
                 </Link>
+                )}
               </div>
             </div>
 
@@ -248,6 +202,7 @@ const Dashboard = () => {
                 <h2><Settings size={20} /> Management & Marketing</h2>
               </div>
               <div className="dashboard-actions-grid">
+                {canViewPage('coupons') && (
                 <Link to="/admin/coupons" className="dashboard-action-item">
                   <div className="dashboard-action-icon coupons">
                     <Percent size={24} />
@@ -257,6 +212,8 @@ const Dashboard = () => {
                     <span className="dashboard-action-desc">Manage discount codes</span>
                   </div>
                 </Link>
+                )}
+                {canViewPage('flash_sales') && (
                 <Link to="/admin/flash-sales" className="dashboard-action-item">
                   <div className="dashboard-action-icon flash">
                     <Zap size={24} />
@@ -266,7 +223,9 @@ const Dashboard = () => {
                     <span className="dashboard-action-desc">Create limited offers</span>
                   </div>
                 </Link>
-                <Link to="/admin/email" className="dashboard-action-item">
+                )}
+                {canViewPage('email') && (
+                <Link to="/admin/email-center" className="dashboard-action-item">
                   <div className="dashboard-action-icon email">
                     <Mail size={24} />
                   </div>
@@ -275,6 +234,8 @@ const Dashboard = () => {
                     <span className="dashboard-action-desc">Send campaigns</span>
                   </div>
                 </Link>
+                )}
+                {canViewPage('reports') && (
                 <Link to="/admin/reports" className="dashboard-action-item">
                   <div className="dashboard-action-icon reports">
                     <BarChart3 size={24} />
@@ -284,6 +245,7 @@ const Dashboard = () => {
                     <span className="dashboard-action-desc">Analytics & insights</span>
                   </div>
                 </Link>
+                )}
               </div>
             </div>
 
@@ -293,6 +255,7 @@ const Dashboard = () => {
                 <h2><FileText size={20} /> Content Management</h2>
               </div>
               <div className="dashboard-actions-grid">
+                {canViewPage('testimonials') && (
                 <Link to="/admin/testimonials" className="dashboard-action-item">
                   <div className="dashboard-action-icon testimonials">
                     <Star size={24} />
@@ -302,6 +265,8 @@ const Dashboard = () => {
                     <span className="dashboard-action-desc">Customer reviews</span>
                   </div>
                 </Link>
+                )}
+                {canViewPage('faqs') && (
                 <Link to="/admin/faqs" className="dashboard-action-item">
                   <div className="dashboard-action-icon faqs">
                     <HelpCircle size={24} />
@@ -311,6 +276,8 @@ const Dashboard = () => {
                     <span className="dashboard-action-desc">Manage questions</span>
                   </div>
                 </Link>
+                )}
+                {canViewPage('blog') && (
                 <Link to="/admin/blog" className="dashboard-action-item">
                   <div className="dashboard-action-icon blog">
                     <FileText size={24} />
@@ -320,6 +287,8 @@ const Dashboard = () => {
                     <span className="dashboard-action-desc">Write articles</span>
                   </div>
                 </Link>
+                )}
+                {canViewPage('common_details') && (
                 <Link to="/admin/common-details" className="dashboard-action-item">
                   <div className="dashboard-action-icon settings">
                     <Settings size={24} />
@@ -329,6 +298,7 @@ const Dashboard = () => {
                     <span className="dashboard-action-desc">Categories & more</span>
                   </div>
                 </Link>
+                )}
               </div>
             </div>
           </>
