@@ -87,6 +87,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginWithPhone = async (tokenData, userData) => {
+    // Direct login with already verified token and user from phone OTP
+    setToken(tokenData);
+    setUser(userData);
+    localStorage.setItem('jewelry-token', tokenData);
+    return { success: true };
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -94,7 +102,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, loginWithGoogle, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, loginWithGoogle, loginWithPhone, logout, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );

@@ -167,9 +167,13 @@ const getOTPEmailTemplate = (otp, type) => {
   const content = `
     <tr>
       <td style="padding: 50px 40px; text-align: center; background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);">
-        <div style="width: 70px; height: 70px; margin: 0 auto 25px; background: linear-gradient(135deg, #d4af37 0%, #b7953f 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-          <span style="font-size: 32px; line-height: 70px;">${isSignup ? '✉️' : '🔐'}</span>
-        </div>
+        <table align="center" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto 25px;">
+          <tr>
+            <td style="width: 70px; height: 70px; background: linear-gradient(135deg, #d4af37 0%, #b7953f 100%); border-radius: 50%; text-align: center; vertical-align: middle;">
+              <span style="font-size: 32px; line-height: 70px;">${isSignup ? '✉️' : '🔐'}</span>
+            </td>
+          </tr>
+        </table>
         
         <h2 style="margin: 0 0 15px; font-family: 'Georgia', serif; font-size: 28px; font-weight: normal; color: #ffffff; letter-spacing: 1px;">
           ${title}

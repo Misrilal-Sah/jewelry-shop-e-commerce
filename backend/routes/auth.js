@@ -23,7 +23,9 @@ const {
   verifyEmailChange,
   googleAuth,
   getSpecialDates,
-  updateSpecialDates
+  updateSpecialDates,
+  sendPhoneOTP,
+  verifyPhoneOTP
 } = require('../controllers/authController');
 
 // Public routes
@@ -37,6 +39,10 @@ router.post('/verify-signup-otp', verifySignupOTP);
 router.post('/send-reset-otp', sendResetOTP);
 router.post('/verify-reset-otp', verifyResetOTP);
 router.post('/reset-password', resetPassword);
+
+// Phone OTP Login (public)
+router.post('/phone/send-otp', sendPhoneOTP);
+router.post('/phone/verify-otp', verifyPhoneOTP);
 
 // Protected routes
 router.get('/profile', authMiddleware, getProfile);

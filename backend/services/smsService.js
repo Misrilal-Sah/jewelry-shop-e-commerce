@@ -3,12 +3,20 @@ require('dotenv').config();
 
 /**
  * SMS Service using Fast2SMS API
- * Sends order status notifications to customers
+ * Sends OTP and order status notifications to customers
  */
 
 const SMS_API_KEY = process.env.SMS_API_KEY;
 const SMS_ENABLED = process.env.SMS_ENABLED === 'true';
+const SMS_DEV_MODE = process.env.SMS_DEV_MODE === 'true'; // For testing without actual SMS
 const FAST2SMS_URL = 'https://www.fast2sms.com/dev/bulkV2';
+
+/**
+ * Generate 6-digit OTP
+ */
+const generateOTP = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
 
 /**
  * Format phone number for SMS
@@ -77,20 +85,29 @@ const getOrderStatusMessage = (status, orderData) => {
  * @returns {Promise<Object>} - API response
  */
 const sendSMS = async (phone, message) => {
+  const formattedPhone = formatPhoneNumber(phone);
+  if (!formattedPhone) {
+    console.error('❌ Invalid phone number:', phone);
+    return { success: false, error: 'Invalid phone number' };
+  }
+
+  // DEV MODE - Log instead of sending
+  if (SMS_DEV_MODE) {
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log(`📱 SMS DEV MODE - Would send to: ${formattedPhone}`);
+    console.log(`📝 Message: ${message}`);
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    return { success: true, devMode: true, phone: formattedPhone };
+  }
+
   if (!SMS_ENABLED) {
-    console.log('📱 SMS disabled. Would have sent:', { phone, message });
+    console.log('📱 SMS disabled. Would have sent:', { phone: formattedPhone, message });
     return { success: true, disabled: true };
   }
 
   if (!SMS_API_KEY) {
     console.error('❌ SMS API key not configured');
     return { success: false, error: 'SMS API key not configured' };
-  }
-
-  const formattedPhone = formatPhoneNumber(phone);
-  if (!formattedPhone) {
-    console.error('❌ Invalid phone number:', phone);
-    return { success: false, error: 'Invalid phone number' };
   }
 
   try {
@@ -115,6 +132,37 @@ const sendSMS = async (phone, message) => {
     console.error('❌ SMS API error:', error.response?.data || error.message);
     return { success: false, error: error.message };
   }
+};
+
+/**
+ * Send OTP to phone number
+ * @param {string} phone - Phone number
+ * @returns {Promise<Object>} - Result with OTP in dev mode
+ */
+const sendOTP = async (phone) => {
+  const otp = generateOTP();
+  const message = `Your AABHAR login OTP is: ${otp}. Valid for 5 minutes. Do not share with anyone.`;
+  
+  const formattedPhone = formatPhoneNumber(phone);
+  if (!formattedPhone) {
+    return { success: false, error: 'Invalid phone number. Please enter a valid 10-digit number.' };
+  }
+
+  // DEV MODE - Return OTP for testing
+  if (SMS_DEV_MODE) {
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log(`📱 DEV MODE OTP for ${formattedPhone}: ${otp}`);
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    return { success: true, devMode: true, devOtp: otp, phone: formattedPhone };
+  }
+
+  const result = await sendSMS(phone, message);
+  
+  if (result.success) {
+    return { success: true, otp, phone: formattedPhone };
+  }
+  
+  return result;
 };
 
 /**
@@ -150,6 +198,10 @@ module.exports = {
   sendOrderStatusSMS,
   sendCustomSMS,
   sendSMS,
+  sendOTP,
+  generateOTP,
   formatPhoneNumber,
-  getOrderStatusMessage
+  getOrderStatusMessage,
+  SMS_DEV_MODE
 };
+

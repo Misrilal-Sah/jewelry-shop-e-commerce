@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
 const { generateOTP, sendOTPEmail } = require('../services/emailService');
+const { sendOTP: sendSMSOTP, formatPhoneNumber, SMS_DEV_MODE } = require('../services/smsService');
 require('dotenv').config();
 
 // In-memory OTP storage (for simplicity - use Redis in production)
@@ -810,6 +811,152 @@ const googleAuth = async (req, res) => {
   }
 };
 
+// ============================================
+// PHONE OTP LOGIN/REGISTER
+// ============================================
+
+// In-memory phone OTP storage
+const phoneOtpStore = new Map();
+
+// Store phone OTP
+const storePhoneOTP = (phone, otp) => {
+  phoneOtpStore.set(phone, {
+    otp,
+    expiresAt: Date.now() + 5 * 60 * 1000 // 5 minutes
+  });
+};
+
+// Verify phone OTP
+const verifyPhoneOTPStored = (phone, otp) => {
+  const stored = phoneOtpStore.get(phone);
+  if (!stored) return { valid: false, message: 'OTP not found. Please request a new one.' };
+  if (Date.now() > stored.expiresAt) {
+    phoneOtpStore.delete(phone);
+    return { valid: false, message: 'OTP expired. Please request a new one.' };
+  }
+  if (stored.otp !== otp) return { valid: false, message: 'Invalid OTP. Please try again.' };
+  return { valid: true };
+};
+
+// Send Phone OTP
+const sendPhoneOTP = async (req, res) => {
+  try {
+    const { phone } = req.body;
+    
+    if (!phone) {
+      return res.status(400).json({ message: 'Phone number is required' });
+    }
+    
+    const formattedPhone = formatPhoneNumber(phone);
+    if (!formattedPhone) {
+      return res.status(400).json({ message: 'Please enter a valid 10-digit phone number' });
+    }
+    
+    // Send OTP via SMS
+    const result = await sendSMSOTP(formattedPhone);
+    
+    if (!result.success) {
+      return res.status(500).json({ message: result.error || 'Failed to send OTP' });
+    }
+    
+    // Store OTP for verification (use the OTP from result)
+    const otp = result.devOtp || result.otp;
+    storePhoneOTP(formattedPhone, otp);
+    
+    // Response
+    const response = { 
+      message: 'OTP sent successfully',
+      phone: formattedPhone
+    };
+    
+    // In dev mode, include OTP for testing
+    if (SMS_DEV_MODE && result.devOtp) {
+      response.devOtp = result.devOtp;
+      response.devMode = true;
+    }
+    
+    res.json(response);
+  } catch (error) {
+    console.error('Send phone OTP error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Verify Phone OTP and Login/Register
+const verifyPhoneOTP = async (req, res) => {
+  try {
+    const { phone, otp } = req.body;
+    
+    if (!phone || !otp) {
+      return res.status(400).json({ message: 'Phone number and OTP are required' });
+    }
+    
+    const formattedPhone = formatPhoneNumber(phone);
+    if (!formattedPhone) {
+      return res.status(400).json({ message: 'Invalid phone number' });
+    }
+    
+    // Verify OTP
+    const verification = verifyPhoneOTPStored(formattedPhone, otp);
+    if (!verification.valid) {
+      return res.status(400).json({ message: verification.message });
+    }
+    
+    // Clear OTP after successful verification
+    phoneOtpStore.delete(formattedPhone);
+    
+    // Check if user exists with this phone
+    const [existingUsers] = await pool.query(
+      'SELECT * FROM users WHERE phone = ?',
+      [formattedPhone]
+    );
+    
+    let user;
+    let isNewUser = false;
+    
+    if (existingUsers.length > 0) {
+      // Existing user - login
+      user = existingUsers[0];
+    } else {
+      // New user - auto-register (like Google auth)
+      // Generate placeholder email from phone (user can update later)
+      const placeholderEmail = `${formattedPhone}@phone.user`;
+      const [result] = await pool.query(
+        `INSERT INTO users (phone, email, name, role, created_at) VALUES (?, ?, ?, 'customer', NOW())`,
+        [formattedPhone, placeholderEmail, `User_${formattedPhone.slice(-4)}`] // Temp name from last 4 digits
+      );
+      
+      const [newUsers] = await pool.query('SELECT * FROM users WHERE id = ?', [result.insertId]);
+      user = newUsers[0];
+      isNewUser = true;
+    }
+    
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+    
+    res.json({
+      message: isNewUser ? 'Account created successfully!' : 'Login successful!',
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        profile_image: user.profile_image
+      },
+      isNewUser
+    });
+  } catch (error) {
+    console.error('Verify phone OTP error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -831,6 +978,7 @@ module.exports = {
   verifyEmailChange,
   googleAuth,
   getSpecialDates,
-  updateSpecialDates
+  updateSpecialDates,
+  sendPhoneOTP,
+  verifyPhoneOTP
 };
-
