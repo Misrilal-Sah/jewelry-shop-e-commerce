@@ -518,8 +518,8 @@ const uploadProfileImage = async (req, res) => {
     const [users] = await pool.query('SELECT profile_image FROM users WHERE id = ?', [req.user.id]);
     const oldImage = users[0]?.profile_image;
 
-    // Upload new image to Cloudinary (Others folder for profile images)
-    const result = await uploadFromBuffer(req.file.buffer, 'Others', 'profile');
+    // Upload new image to Cloudinary (others folder for profile images)
+    const result = await uploadFromBuffer(req.file.buffer, 'others', 'profile');
     const imageUrl = result.secure_url;
 
     // Update database

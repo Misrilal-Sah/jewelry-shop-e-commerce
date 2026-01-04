@@ -125,6 +125,54 @@ const getDefaultShortcuts = (isAdmin = false) => {
       editable: true,
       adminOnly: true
     };
+    shortcuts['admin.testimonials'] = {
+      keys: ['a', 't'],
+      label: 'Manage Testimonials',
+      category: 'Admin',
+      icon: 'MessageSquare',
+      editable: true,
+      adminOnly: true
+    };
+    shortcuts['admin.blog'] = {
+      keys: ['a', 'b'],
+      label: 'Manage Blog',
+      category: 'Admin',
+      icon: 'BookOpen',
+      editable: true,
+      adminOnly: true
+    };
+    shortcuts['admin.faqs'] = {
+      keys: ['a', 'f'],
+      label: 'Manage FAQs',
+      category: 'Admin',
+      icon: 'HelpCircle',
+      editable: true,
+      adminOnly: true
+    };
+    shortcuts['admin.flashSales'] = {
+      keys: ['a', 's'],
+      label: 'Flash Sales',
+      category: 'Admin',
+      icon: 'Zap',
+      editable: true,
+      adminOnly: true
+    };
+    shortcuts['admin.logs'] = {
+      keys: ['a', 'l'],
+      label: 'View Logs',
+      category: 'Admin',
+      icon: 'FileText',
+      editable: true,
+      adminOnly: true
+    };
+    shortcuts['admin.bulkOrders'] = {
+      keys: ['a', 'k'],
+      label: 'Bulk Orders',
+      category: 'Admin',
+      icon: 'Package',
+      editable: true,
+      adminOnly: true
+    };
   }
   
   return shortcuts;
@@ -290,13 +338,34 @@ export const ShortcutsProvider = ({ children }) => {
         if (isAdmin) navigate('/admin/email');
         break;
       case 'admin.addProduct':
-        if (isAdmin) navigate('/admin?tab=products&action=add');
+        if (isAdmin) navigate('/admin/products/new');
         break;
       case 'admin.users':
-        if (isAdmin) navigate('/admin?tab=users');
+        if (isAdmin) navigate('/admin/users');
         break;
       case 'admin.orders':
-        if (isAdmin) navigate('/admin?tab=orders');
+        if (isAdmin) navigate('/admin/orders');
+        break;
+      case 'admin.categories':
+        if (isAdmin) navigate('/admin/categories');
+        break;
+      case 'admin.testimonials':
+        if (isAdmin) navigate('/admin/testimonials');
+        break;
+      case 'admin.blog':
+        if (isAdmin) navigate('/admin/blog');
+        break;
+      case 'admin.faqs':
+        if (isAdmin) navigate('/admin/faqs');
+        break;
+      case 'admin.flashSales':
+        if (isAdmin) navigate('/admin/flash-sales');
+        break;
+      case 'admin.logs':
+        if (isAdmin) navigate('/admin/logs');
+        break;
+      case 'admin.bulkOrders':
+        if (isAdmin) navigate('/admin/bulk-orders');
         break;
       default:
         console.log('Unknown command:', commandId);

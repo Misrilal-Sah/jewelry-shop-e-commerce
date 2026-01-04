@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { 
   Package, Plus, Edit, Trash2, Search, Image, AlertTriangle,
   ChevronUp, ChevronDown, ChevronsUpDown, Archive, RotateCcw, 
-  ChevronLeft, ChevronRight
+  ChevronLeft, ChevronRight, ImagePlus, X, Upload
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
@@ -36,6 +36,17 @@ const Products = () => {
   
   // Modal state
   const [deleteModal, setDeleteModal] = useState({ show: false, product: null });
+  
+  // Background upload modal
+  const [bgModal, setBgModal] = useState(false);
+  const [bgTab, setBgTab] = useState('upload'); // 'upload' or 'list'
+  const [bgName, setBgName] = useState('');
+  const [bgFile, setBgFile] = useState(null);
+  const [bgUploading, setBgUploading] = useState(false);
+  const [bgDragging, setBgDragging] = useState(false);
+  const [backgrounds, setBackgrounds] = useState([]);
+  const [bgLoading, setBgLoading] = useState(false);
+  const [deleteBgModal, setDeleteBgModal] = useState({ show: false, bg: null });
 
   useEffect(() => {
     if (authLoading) return;
@@ -201,6 +212,79 @@ const Products = () => {
     }
   };
 
+  // Handle background upload
+  const handleBgUpload = async () => {
+    if (!bgName.trim() || !bgFile) {
+      toast.error('Please provide name and image');
+      return;
+    }
+    
+    setBgUploading(true);
+    const formData = new FormData();
+    formData.append('name', bgName);
+    formData.append('image', bgFile);
+    
+    try {
+      const res = await fetch('/api/backgrounds', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData
+      });
+      
+      if (res.ok) {
+        toast.success('Background added successfully!');
+        setBgModal(false);
+        setBgName('');
+        setBgFile(null);
+      } else {
+        const data = await res.json();
+        toast.error(data.message || 'Failed to add background');
+      }
+    } catch (err) {
+      toast.error('Failed to upload background');
+    } finally {
+      setBgUploading(false);
+    }
+  };
+
+  // Fetch backgrounds for modal
+  const fetchBackgrounds = async () => {
+    setBgLoading(true);
+    try {
+      const res = await fetch('/api/backgrounds');
+      if (res.ok) {
+        setBackgrounds(await res.json());
+      }
+    } catch (err) {
+      console.error('Failed to fetch backgrounds');
+    } finally {
+      setBgLoading(false);
+    }
+  };
+
+  // Delete background
+  const handleDeleteBg = async () => {
+    const id = deleteBgModal.bg?.id;
+    if (!id) return;
+    
+    try {
+      const res = await fetch(`/api/backgrounds/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (res.ok) {
+        toast.success('Background deleted');
+        setBackgrounds(prev => prev.filter(b => b.id !== id));
+        setDeleteBgModal({ show: false, bg: null });
+      } else {
+        toast.error('Failed to delete');
+      }
+    } catch (err) {
+      toast.error('Delete failed');
+    }
+  };
+
   // Client-side search filter
   const filteredProducts = products.filter(p => 
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -251,12 +335,20 @@ const Products = () => {
       <main className="admin-content">
         <header className="admin-header">
           <h1>Products</h1>
-          <button 
-            className="btn btn-primary"
-            onClick={() => navigate('/admin/products/new')}
-          >
-            <Plus size={18} /> Add Product
-          </button>
+          <div className="admin-header-actions">
+            <button 
+              className="btn btn-secondary"
+              onClick={() => { setBgModal(true); fetchBackgrounds(); }}
+            >
+              <ImagePlus size={18} /> Backgrounds
+            </button>
+            <button 
+              className="btn btn-primary"
+              onClick={() => navigate('/admin/products/new')}
+            >
+              <Plus size={18} /> Add Product
+            </button>
+          </div>
         </header>
 
         {/* Table Controls: Search, Filter, Page Size */}
@@ -493,6 +585,150 @@ const Products = () => {
           </div>
         )}
       </main>
+
+      {/* Background Upload Modal */}
+      {bgModal && (
+        <div className="confirm-modal-overlay" onClick={() => setBgModal(false)}>
+          <div className="confirm-modal bg-upload-modal" onClick={e => e.stopPropagation()}>
+            <button className="modal-close-btn" onClick={() => setBgModal(false)}>
+              <X size={20} />
+            </button>
+            <h3 className="confirm-modal-title">
+              <ImagePlus size={24} /> Backgrounds
+            </h3>
+            
+            {/* Tab Navigation */}
+            <div className="bg-tabs">
+              <button 
+                className={`bg-tab ${bgTab === 'upload' ? 'active' : ''}`}
+                onClick={() => setBgTab('upload')}
+              >
+                <Upload size={16} /> Upload New
+              </button>
+              <button 
+                className={`bg-tab ${bgTab === 'list' ? 'active' : ''}`}
+                onClick={() => { setBgTab('list'); fetchBackgrounds(); }}
+              >
+                <Image size={16} /> View All ({backgrounds.length})
+              </button>
+            </div>
+
+            {/* Tab Content */}
+            <div className="bg-tab-content">
+              {bgTab === 'upload' ? (
+                /* Upload Tab */
+                <div className="bg-upload-form">
+                  <div className="form-group">
+                    <label className="form-label">Background Name</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="e.g. Gold Silk"
+                      value={bgName}
+                      onChange={e => setBgName(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Background Image</label>
+                    <div 
+                      className={`bg-dropzone ${bgFile ? 'has-file' : ''} ${bgDragging ? 'dragging' : ''}`}
+                      onClick={() => document.getElementById('bg-file-input').click()}
+                      onDragOver={e => { e.preventDefault(); setBgDragging(true); }}
+                      onDragLeave={() => setBgDragging(false)}
+                      onDrop={e => {
+                        e.preventDefault();
+                        setBgDragging(false);
+                        if (e.dataTransfer.files[0]) setBgFile(e.dataTransfer.files[0]);
+                      }}
+                    >
+                      {bgFile ? (
+                        <>
+                          <img src={URL.createObjectURL(bgFile)} alt="Preview" />
+                          <span>{bgFile.name}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload size={32} />
+                          <span>Click or drag image here</span>
+                        </>
+                      )}
+                      <input
+                        id="bg-file-input"
+                        type="file"
+                        accept="image/*"
+                        hidden
+                        onChange={e => setBgFile(e.target.files[0])}
+                      />
+                    </div>
+                  </div>
+                  <button 
+                    className="btn btn-primary full-width"
+                    onClick={handleBgUpload}
+                    disabled={bgUploading || !bgName.trim() || !bgFile}
+                  >
+                    {bgUploading ? 'Uploading...' : 'Add Background'}
+                  </button>
+                </div>
+              ) : (
+                /* List Tab */
+                <div className="bg-list-tab">
+                  {bgLoading ? (
+                    <p className="bg-loading">Loading...</p>
+                  ) : backgrounds.length === 0 ? (
+                    <p className="bg-empty">No backgrounds yet. Upload one!</p>
+                  ) : (
+                    <div className="bg-list">
+                      {backgrounds.map(bg => (
+                        <div key={bg.id} className="bg-list-item">
+                          <img src={bg.image_url} alt={bg.name} />
+                          <span>{bg.name}</span>
+                          <button 
+                            className="btn-icon-danger"
+                            onClick={() => setDeleteBgModal({ show: true, bg })}
+                            title="Delete"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Background Confirmation Modal */}
+      {deleteBgModal.show && (
+        <div className="confirm-modal-overlay" onClick={() => setDeleteBgModal({ show: false, bg: null })}>
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="confirm-modal-icon danger">
+              <AlertTriangle size={48} />
+            </div>
+            <h3 className="confirm-modal-title">Delete Background?</h3>
+            <p className="confirm-modal-message">
+              Are you sure you want to delete "<strong>{deleteBgModal.bg?.name}</strong>"?
+              This cannot be undone.
+            </p>
+            <div className="confirm-modal-actions">
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setDeleteBgModal({ show: false, bg: null })}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn btn-danger"
+                onClick={handleDeleteBg}
+              >
+                <Trash2 size={16} /> Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

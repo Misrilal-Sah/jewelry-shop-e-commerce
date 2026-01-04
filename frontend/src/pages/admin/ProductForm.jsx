@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { 
-  Package, X, Save, ArrowLeft, ImagePlus, AlertCircle, ChevronDown
+  Package, X, Save, ArrowLeft, ImagePlus, AlertCircle, ChevronDown, Sparkles, GripVertical
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../components/ui/Toast';
 import AdminSidebar from '../../components/admin/AdminSidebar';
+import ImageEnhancer from '../../components/admin/ImageEnhancer';
 import './Admin.css';
 
 const API_URL = 'http://localhost:5000';
@@ -25,6 +26,8 @@ const ProductForm = () => {
   const [images, setImages] = useState([]);
   const [dragIndex, setDragIndex] = useState(null);
   const [localFiles, setLocalFiles] = useState([]); // Store actual files for new products
+  const [enhanceIndex, setEnhanceIndex] = useState(null); // Index of image being enhanced
+  const [fileDragging, setFileDragging] = useState(false); // For drag-drop file upload
   
   const [formData, setFormData] = useState({
     name: '',
@@ -245,6 +248,19 @@ const ProductForm = () => {
     }
   };
 
+  // Handle file drop for drag-and-drop upload
+  const handleFileDrop = (e) => {
+    e.preventDefault();
+    setFileDragging(false);
+    
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    if (files.length === 0) return;
+    
+    // Simulate file input change event
+    const fakeEvent = { target: { files, value: '' } };
+    handleImageUpload(fakeEvent);
+  };
+
   const handleDeleteImage = async (index) => {
     console.log('Delete image at index:', index); // Debug
     
@@ -294,21 +310,39 @@ const ProductForm = () => {
     setDragIndex(index);
   };
 
-  const handleDragOver = (e, index) => {
+  const handleDragOver = (e) => {
     e.preventDefault();
-    if (dragIndex === null || dragIndex === index) return;
+  };
+
+  const handleDrop = (e, dropIndex) => {
+    e.preventDefault();
+    if (dragIndex === null || dragIndex === dropIndex) {
+      setDragIndex(null);
+      return;
+    }
     
+    // Simple swap using array copy
     const newImages = [...images];
-    const draggedImage = newImages[dragIndex];
-    newImages.splice(dragIndex, 1);
-    newImages.splice(index, 0, draggedImage);
+    const temp = newImages[dragIndex];
+    newImages[dragIndex] = newImages[dropIndex];
+    newImages[dropIndex] = temp;
+    
+    // Also swap local files if they exist (for new products)
+    if (!isEdit && localFiles.length > 0 && localFiles[dragIndex] && localFiles[dropIndex]) {
+      const newFiles = [...localFiles];
+      const tempFile = newFiles[dragIndex];
+      newFiles[dragIndex] = newFiles[dropIndex];
+      newFiles[dropIndex] = tempFile;
+      setLocalFiles(newFiles);
+    }
+    
     setImages(newImages);
-    setDragIndex(index);
+    setDragIndex(null);
   };
 
   const handleDragEnd = async () => {
     setDragIndex(null);
-    if (isEdit) {
+    if (isEdit && images.length > 0) {
       try {
         await fetch(`/api/admin/products/${id}`, {
           method: 'PUT',
@@ -321,6 +355,35 @@ const ProductForm = () => {
       } catch (error) {
         console.error('Failed to save image order');
       }
+    }
+  };
+
+  // Handle enhanced image replacement
+  const handleEnhanced = async (newImageUrl) => {
+    if (enhanceIndex === null) return;
+    
+    const newImages = [...images];
+    newImages[enhanceIndex] = newImageUrl;
+    setImages(newImages);
+    
+    // If editing, save the updated images
+    if (isEdit) {
+      try {
+        await fetch(`/api/admin/products/${id}`, {
+          method: 'PUT',
+          headers: { 
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}` 
+          },
+          body: JSON.stringify({ images: newImages })
+        });
+        toast.success('Image enhanced and saved!');
+      } catch (error) {
+        console.error('Failed to save enhanced image');
+        toast.error('Enhancement saved locally, will be applied on next save');
+      }
+    } else {
+      toast.success('Image enhanced! Will be saved with product.');
     }
   };
 
@@ -521,7 +584,12 @@ const ProductForm = () => {
             <div className="form-section">
               <h3 className="section-title">Product Images</h3>
               
-              <div className="image-upload-area">
+              <div 
+                className={`image-upload-area ${fileDragging ? 'dragging' : ''}`}
+                onDragOver={e => { e.preventDefault(); setFileDragging(true); }}
+                onDragLeave={() => setFileDragging(false)}
+                onDrop={handleFileDrop}
+              >
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -536,12 +604,23 @@ const ProductForm = () => {
                   <div className="image-slot primary-slot">
                     {images[0] ? (
                       <div 
-                        className={`image-item large ${dragIndex === 0 ? 'dragging' : ''}`}
-                        draggable
-                        onDragStart={() => handleDragStart(0)}
-                        onDragOver={(e) => handleDragOver(e, 0)}
-                        onDragEnd={handleDragEnd}
+                        className={`image-item large ${dragIndex === 0 ? 'dragging' : ''} ${dragIndex !== null ? 'drop-target' : ''}`}
+                        onDragOver={handleDragOver}
+                        onDrop={(e) => handleDrop(e, 0)}
                       >
+                        {/* Grip handle for dragging */}
+                        <div 
+                          className="image-grip"
+                          draggable
+                          onDragStart={(e) => {
+                            e.dataTransfer.effectAllowed = 'move';
+                            handleDragStart(0);
+                          }}
+                          onDragEnd={handleDragEnd}
+                          title="Drag to reorder"
+                        >
+                          <GripVertical size={16} />
+                        </div>
                         <img src={getImageUrl(images[0])} alt="Primary" />
                         <button 
                           type="button"
@@ -549,6 +628,15 @@ const ProductForm = () => {
                           onClick={(e) => { e.stopPropagation(); handleDeleteImage(0); }}
                         >
                           <X size={18} />
+                        </button>
+                        {/* Enhance button for all images */}
+                        <button 
+                          type="button"
+                          className="image-enhance-btn"
+                          onClick={(e) => { e.stopPropagation(); setEnhanceIndex(0); }}
+                          title="Enhance Image"
+                        >
+                          <Sparkles size={12} /> Enhance
                         </button>
                         <span className="primary-badge">PRIMARY</span>
                       </div>
@@ -569,12 +657,23 @@ const ProductForm = () => {
                       <div key={slot} className="image-slot small-slot">
                         {images[slot] ? (
                           <div 
-                            className={`image-item small ${dragIndex === slot ? 'dragging' : ''}`}
-                            draggable
-                            onDragStart={() => handleDragStart(slot)}
-                            onDragOver={(e) => handleDragOver(e, slot)}
-                            onDragEnd={handleDragEnd}
+                            className={`image-item small ${dragIndex === slot ? 'dragging' : ''} ${dragIndex !== null ? 'drop-target' : ''}`}
+                            onDragOver={handleDragOver}
+                            onDrop={(e) => handleDrop(e, slot)}
                           >
+                            {/* Grip handle for dragging */}
+                            <div 
+                              className="image-grip small"
+                              draggable
+                              onDragStart={(e) => {
+                                e.dataTransfer.effectAllowed = 'move';
+                                handleDragStart(slot);
+                              }}
+                              onDragEnd={handleDragEnd}
+                              title="Drag to reorder"
+                            >
+                              <GripVertical size={12} />
+                            </div>
                             <img src={getImageUrl(images[slot])} alt={`Image ${slot + 1}`} />
                             <button 
                               type="button"
@@ -582,6 +681,15 @@ const ProductForm = () => {
                               onClick={(e) => { e.stopPropagation(); handleDeleteImage(slot); }}
                             >
                               <X size={16} />
+                            </button>
+                            {/* Enhance button for all images */}
+                            <button 
+                              type="button"
+                              className="image-enhance-btn"
+                              onClick={(e) => { e.stopPropagation(); setEnhanceIndex(slot); }}
+                              title="Enhance Image"
+                            >
+                              <Sparkles size={10} />
                             </button>
                             <span className="image-number">{slot + 1}</span>
                           </div>
@@ -779,6 +887,15 @@ const ProductForm = () => {
           </div>
         </form>
       </main>
+
+      {/* Image Enhancer Modal */}
+      {enhanceIndex !== null && images[enhanceIndex] && (
+        <ImageEnhancer
+          imageUrl={getImageUrl(images[enhanceIndex])}
+          onEnhanced={handleEnhanced}
+          onClose={() => setEnhanceIndex(null)}
+        />
+      )}
     </div>
   );
 };

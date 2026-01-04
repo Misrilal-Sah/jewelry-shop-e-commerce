@@ -3,7 +3,7 @@
 /* Toggle Button */
 .chatbot-toggle {
   position: fixed;
-  bottom: 24px;
+  bottom: 90px; /* Above scroll-to-top button */
   right: 24px;
   width: 60px;
   height: 60px;
@@ -408,7 +408,7 @@
     width: 54px;
     height: 54px;
     right: 20px;
-    bottom: 20px;
+    bottom: 80px; /* Above scroll-to-top on mobile */
   }
 
   .message {

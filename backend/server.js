@@ -29,6 +29,7 @@ const logsRoutes = require('./routes/logs');
 const chatbotRoutes = require('./routes/chatbot');
 const commonDetailsRoutes = require('./routes/commonDetails');
 const rolesRoutes = require('./routes/roles');
+const backgroundsRoutes = require('./routes/backgrounds');
 const requestLogger = require('./middleware/requestLogger');
 const { startCampaignScheduler } = require('./scheduler/campaignScheduler');
 const { startSegmentationScheduler } = require('./scheduler/segmentationScheduler');
@@ -77,6 +78,7 @@ app.use('/api/logs', logsRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/common', commonDetailsRoutes);
 app.use('/api/admin/roles', rolesRoutes);
+app.use('/api/backgrounds', backgroundsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
