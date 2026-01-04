@@ -49,8 +49,6 @@ app.use(express.urlencoded({ extended: true }));
 // Request logging middleware
 app.use(requestLogger);
 
-// Static files for product images
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // API Routes
 app.use('/api/auth', authRoutes);

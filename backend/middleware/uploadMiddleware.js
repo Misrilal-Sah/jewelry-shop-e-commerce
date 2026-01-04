@@ -2,12 +2,6 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Ensure uploads directory exists for legacy local images
-const productsDir = path.join(__dirname, '..', 'uploads', 'products');
-if (!fs.existsSync(productsDir)) {
-  fs.mkdirSync(productsDir, { recursive: true });
-}
-
 // Memory storage for Cloudinary uploads (images go to buffer)
 const memoryStorage = multer.memoryStorage();
 

@@ -65,27 +65,74 @@ router.get('/preview/admin-promotion', (req, res) => {
 });
 
 // Preview Back In Stock Email
-router.get('/preview/back-in-stock', (req, res) => {
-  const html = emailService.getBackInStockTemplate('test@example.com', {
-    productName: 'Royal Diamond Solitaire Ring',
-    productImage: '/uploads/products/diamond-ring.jpg',
-    productPrice: '₹85,000',
-    productId: 1
-  });
-  res.send(html);
+router.get('/preview/back-in-stock', async (req, res) => {
+  try {
+    // Fetch a real product from database for preview
+    const pool = require('../config/db');
+    const [products] = await pool.query('SELECT id, name, metal_price, making_charges, images FROM products WHERE is_active = TRUE LIMIT 1');
+    
+    let productData = {
+      productName: 'Royal Diamond Solitaire Ring',
+      productImage: 'https://res.cloudinary.com/dbylfhbnz/image/upload/v1/jewllery_shop/products/sample.jpg',
+      productPrice: '₹85,000',
+      productId: 1
+    };
+    
+    if (products.length > 0) {
+      const product = products[0];
+      const images = typeof product.images === 'string' ? JSON.parse(product.images) : product.images;
+      const totalPrice = parseFloat(product.metal_price || 0) + parseFloat(product.making_charges || 0);
+      productData = {
+        productName: product.name,
+        productImage: images?.[0] || productData.productImage,
+        productPrice: `₹${totalPrice.toLocaleString('en-IN')}`,
+        productId: product.id
+      };
+    }
+    
+    const html = emailService.getBackInStockTemplate('test@example.com', productData);
+    res.send(html);
+  } catch (error) {
+    res.status(500).send('Error generating preview: ' + error.message);
+  }
 });
 
 // Preview Price Drop Email
-router.get('/preview/price-drop', (req, res) => {
-  const html = emailService.getPriceDropTemplate('test@example.com', {
-    productName: 'Traditional Gold Necklace Set',
-    productImage: '/uploads/products/gold-necklace.jpg',
-    originalPrice: '₹1,50,000',
-    newPrice: '₹1,27,500',
-    discountPercent: 15,
-    productId: 2
-  });
-  res.send(html);
+router.get('/preview/price-drop', async (req, res) => {
+  try {
+    // Fetch a real product from database for preview
+    const pool = require('../config/db');
+    const [products] = await pool.query('SELECT id, name, metal_price, making_charges, images FROM products WHERE is_active = TRUE LIMIT 1 OFFSET 1');
+    
+    let productData = {
+      productName: 'Traditional Gold Necklace Set',
+      productImage: 'https://res.cloudinary.com/dbylfhbnz/image/upload/v1/jewllery_shop/products/sample.jpg',
+      originalPrice: '₹1,50,000',
+      newPrice: '₹1,27,500',
+      discountPercent: 15,
+      productId: 2
+    };
+    
+    if (products.length > 0) {
+      const product = products[0];
+      const images = typeof product.images === 'string' ? JSON.parse(product.images) : product.images;
+      const originalPrice = parseFloat(product.metal_price || 0) + parseFloat(product.making_charges || 0);
+      const newPrice = Math.round(originalPrice * 0.85); // 15% discount
+      productData = {
+        productName: product.name,
+        productImage: images?.[0] || productData.productImage,
+        originalPrice: `₹${originalPrice.toLocaleString('en-IN')}`,
+        newPrice: `₹${newPrice.toLocaleString('en-IN')}`,
+        discountPercent: 15,
+        productId: product.id
+      };
+    }
+    
+    const html = emailService.getPriceDropTemplate('test@example.com', productData);
+    res.send(html);
+  } catch (error) {
+    res.status(500).send('Error generating preview: ' + error.message);
+  }
 });
 
 // Preview Bulk Order Customer Confirmation Email
