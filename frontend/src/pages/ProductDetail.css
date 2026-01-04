@@ -1,5 +1,7 @@
 .product-detail-page {
   padding: var(--space-xl) 0 var(--space-3xl);
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 .product-detail-page.loading,
@@ -703,6 +705,41 @@
     flex-direction: column;
     gap: var(--space-sm);
   }
+
+  /* Flash Sale Mobile Fixes */
+  .price-main {
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .original-price-crossed {
+    font-size: 1rem;
+  }
+
+  .savings-badge {
+    margin-left: 0;
+    margin-top: var(--space-xs);
+    width: 100%;
+    justify-content: center;
+  }
+
+  .price-section {
+    padding: var(--space-md);
+  }
+
+  .price-breakdown {
+    font-size: 0.875rem;
+  }
+
+  .price-row {
+    font-size: 0.8125rem;
+    flex-wrap: wrap;
+  }
+
+  .flash-timer-right {
+    position: static;
+    margin-bottom: var(--space-sm);
+  }
 }
 
 /* Reviews Section */
@@ -866,6 +903,32 @@
   background: rgba(191, 155, 48, 0.1);
   border-color: var(--accent-gold);
   color: var(--accent-gold);
+}
+
+.review-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.delete-review-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.delete-review-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+  color: #ef4444;
 }
 
 .no-reviews {

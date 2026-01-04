@@ -231,6 +231,7 @@ const Footer = () => {
                 <li><a href="/products?category=earrings" onClick={(e) => handleLinkClick(e, '/products?category=earrings')}>Earrings</a></li>
                 <li><a href="/products?category=bangles" onClick={(e) => handleLinkClick(e, '/products?category=bangles')}>Bangles</a></li>
                 <li><a href="/products?collection=wedding" onClick={(e) => handleLinkClick(e, '/products?collection=wedding')}>Bridal Collection</a></li>
+                <li><a href="/blog" onClick={(e) => handleLinkClick(e, '/blog')}>Blog</a></li>
               </ul>
             </div>
 

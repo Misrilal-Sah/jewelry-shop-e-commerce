@@ -1004,7 +1004,7 @@ const Profile = () => {
                 className={activeTab === 'shortcuts' ? 'active' : ''} 
                 onClick={() => setActiveTab('shortcuts')}
               >
-                <Keyboard size={18} /> Shortcuts
+                <Keyboard size={18} /> Shortcuts (Keyboard)
               </button>
               <button className="logout-btn" onClick={handleLogout}>
                 <LogOut size={18} /> Logout

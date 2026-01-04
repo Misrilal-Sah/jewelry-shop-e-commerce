@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Package, ShoppingCart, Users, Tag,
   BarChart3, AlertTriangle, TrendingUp, IndianRupee, Shield, Mail, Zap, 
   Quote, HelpCircle, FileText, Activity, Settings, PlusCircle, Gift, 
-  MessageSquare, Megaphone, Star, Percent, Box
+  MessageSquare, Megaphone, Star, Percent, Box, Menu
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
@@ -17,6 +17,7 @@ const Dashboard = () => {
   const { canViewPage, hasPermission } = usePermission();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (authLoading) return; // Wait for auth to load
@@ -69,10 +70,20 @@ const Dashboard = () => {
 
   return (
     <div className="admin-page">
-      <AdminSidebar />
+      <AdminSidebar 
+        isMobileOpen={isMobileSidebarOpen} 
+        onMobileClose={() => setIsMobileSidebarOpen(false)} 
+      />
 
       <main className="admin-content">
         <header className="admin-header">
+          <button 
+            className="mobile-menu-toggle-admin"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu size={20} />
+          </button>
           <h1>Dashboard</h1>
           <span className="welcome">Welcome, {user?.name}</span>
         </header>

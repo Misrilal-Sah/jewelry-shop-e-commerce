@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { 
   Plus, Edit2, Trash2, X, Star, Quote, Upload, AlertTriangle,
   ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight,
-  Check, XCircle, Home, Clock
+  Check, XCircle, Home, Clock, Menu
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
@@ -27,6 +27,9 @@ const Testimonials = () => {
   const [testimonialToDelete, setTestimonialToDelete] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
+  
+  // Mobile sidebar state
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -381,11 +384,21 @@ const Testimonials = () => {
   return (
     <div className="admin-page">
       {/* Sidebar */}
-      <AdminSidebar />
+      <AdminSidebar 
+        isMobileOpen={isMobileSidebarOpen} 
+        onMobileClose={() => setIsMobileSidebarOpen(false)} 
+      />
 
       {/* Main Content */}
       <main className="admin-content">
         <header className="admin-header">
+          <button 
+            className="mobile-menu-toggle-admin"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu size={20} />
+          </button>
           <h1>Customer Testimonials</h1>
         </header>
 

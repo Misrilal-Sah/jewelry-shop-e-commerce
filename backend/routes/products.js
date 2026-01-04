@@ -14,7 +14,8 @@ const {
   addReview,
   getProductReviews,
   getRecommendations,
-  toggleReviewHelpful
+  toggleReviewHelpful,
+  deleteReview
 } = require('../controllers/productController');
 
 // Multer for image enhancement uploads
@@ -29,6 +30,7 @@ router.get('/:id/reviews', getProductReviews);
 router.get('/:id/recommendations', getRecommendations);
 router.post('/:id/reviews', authMiddleware, addReview);
 router.post('/reviews/:reviewId/helpful', authMiddleware, toggleReviewHelpful);
+router.delete('/reviews/:reviewId', authMiddleware, adminMiddleware, deleteReview);
 
 // Upload review images to Cloudinary (returns array of URLs)
 router.post('/reviews/upload-images', authMiddleware, uploadReviewImages, async (req, res) => {

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { 
   Search, ChevronDown, ChevronLeft, ChevronRight, ChevronsUpDown, Download, Trash2,
   Activity, AlertCircle, AlertTriangle, Info, Bug,
-  Clock, RefreshCw, Filter, Calendar, User, X
+  Clock, RefreshCw, Filter, Calendar, User, X, Menu
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
@@ -49,6 +49,9 @@ const Logs = () => {
   const [actionDropdownOpen, setActionDropdownOpen] = useState(false);
   const [resourceDropdownOpen, setResourceDropdownOpen] = useState(false);
   const [levelDropdownOpen, setLevelDropdownOpen] = useState(false);
+  
+  // Mobile sidebar state
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   // Detail modal
   const [viewingLog, setViewingLog] = useState(null);
@@ -287,11 +290,21 @@ const Logs = () => {
   return (
     <div className="admin-layout logs-page">
       {/* Sidebar */}
-      <AdminSidebar />
+      <AdminSidebar 
+        isMobileOpen={isMobileSidebarOpen} 
+        onMobileClose={() => setIsMobileSidebarOpen(false)} 
+      />
 
       {/* Main Content */}
       <main className="admin-content">
         <div className="admin-header">
+          <button 
+            className="mobile-menu-toggle-admin"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu size={20} />
+          </button>
           <h1><Activity size={24} /> System Logs</h1>
           <div className="header-actions">
             <button className="btn btn-ghost" onClick={handleCleanup}>

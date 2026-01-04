@@ -760,12 +760,16 @@
 }
 
 @media (max-width: 768px) {
-  .admin-sidebar {
-    transform: translateX(-100%);
-  }
+  /* Admin sidebar mobile is handled in the bottom mobile section */
 
   .admin-content {
     margin-left: 0;
+  }
+
+  /* Stats grid - 2 per row on mobile */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
   }
 
   .stats-grid,
@@ -775,6 +779,373 @@
 
   .alerts-row {
     flex-direction: column;
+  }
+
+  /* Mobile hamburger toggle for admin pages */
+  .mobile-menu-toggle-admin {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    cursor: pointer;
+    margin-right: var(--space-sm);
+    flex-shrink: 0;
+  }
+
+  .mobile-menu-toggle-admin:hover {
+    background: var(--bg-secondary);
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+  }
+
+  /* Admin header flexbox arrangement */
+  .admin-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .admin-header h1 {
+    font-size: 1.25rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Table horizontal scroll on mobile */
+  .admin-card,
+  .data-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table.admin-table,
+  table.data-table,
+  table.sortable-table {
+    min-width: 700px;
+  }
+
+  /* Admin toolbar responsive */
+  .admin-toolbar {
+    flex-direction: column;
+    gap: var(--space-md);
+    align-items: stretch;
+  }
+
+  .admin-toolbar .search-box {
+    width: 100%;
+  }
+
+  .admin-toolbar .toolbar-controls {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .page-size-control {
+    font-size: 0.75rem;
+  }
+
+  /* Logs page tables - horizontal scroll fix */
+  .logs-table-container,
+  .audit-table-container,
+  .system-logs-container,
+  .logs-content .data-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    display: block;
+  }
+
+  /* Logs page header actions - wrap buttons */
+  .logs-page .admin-header,
+  .admin-layout .admin-header {
+    flex-wrap: wrap;
+  }
+
+  .header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    width: 100%;
+    margin-top: var(--space-sm);
+  }
+
+  .header-actions .btn {
+    flex: 1;
+    min-width: 80px;
+    font-size: 0.75rem;
+    padding: var(--space-xs) var(--space-sm);
+    white-space: nowrap;
+  }
+
+  .header-actions .btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Product form containers mobile fix */
+  .product-form .form-section,
+  .admin-content .form-section {
+    max-width: 100%;
+    width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .product-form .form-grid,
+  .admin-content .form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  /* Fix form background color issue */
+  .form-section {
+    background: var(--bg-card) !important;
+  }
+
+  .logs-table-container table,
+  .audit-table-container table,
+  .system-logs-container table,
+  .logs-content .data-table-container table,
+  .data-table-container table {
+    min-width: 800px;
+    table-layout: fixed;
+  }
+
+  /* Product images dropzone mobile fix */
+  .images-grid,
+  .image-upload-grid,
+  .product-images-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: var(--space-xs);
+  }
+
+  .images-grid > div,
+  .image-upload-grid > div {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* Weight field wrap */
+  .pricing-grid,
+  .price-inputs,
+  .metal-pricing-row {
+    flex-wrap: wrap;
+  }
+
+  .pricing-grid .form-group,
+  .metal-pricing-row .form-group {
+    min-width: 80px;
+    flex: 1 1 80px;
+  }
+
+  /* Products page header - prevent overlap */
+  .admin-header .header-actions,
+  .admin-header .btn {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .admin-header h1 {
+    flex: 0 1 auto;
+    margin-right: auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Products toolbar - stack on mobile */
+  .products-toolbar {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .products-toolbar .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Customers page - prevent info cutoff */
+  .customer-info-cell,
+  .customer-info {
+    min-width: 0;
+    word-break: break-word;
+  }
+
+  .contact-row {
+    flex-wrap: wrap;
+    word-break: break-all;
+  }
+
+  .contact-row span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 150px;
+  }
+
+  /* RFM/Segment info mobile */
+  .rfm-info,
+  .segment-info {
+    font-size: 0.7rem;
+  }
+
+  /* Admin table wrapper - ensure scroll on all tables */
+  .admin-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    margin: 0 -var(--space-md);
+    padding: 0 var(--space-md);
+  }
+
+  /* Page header mobile layout */
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+  }
+
+  .page-header .header-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .page-header h1 {
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  /* Filter tabs scroll on mobile */
+  .filter-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    padding-bottom: var(--space-sm);
+  }
+
+  .filter-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* CD tabs (Common Details) scroll */
+  .cd-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+
+  .cd-tabs::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Desktop: hide mobile hamburger */
+@media (min-width: 769px) {
+  .mobile-menu-toggle-admin {
+    display: none;
+  }
+}
+
+/* ========================================= */
+/* Product Form Mobile Responsiveness */
+/* ========================================= */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+
+  .form-section {
+    padding: var(--space-md);
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .form-row .form-group {
+    width: 100%;
+  }
+
+  /* Image upload grid on mobile */
+  .image-upload-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+  }
+
+  .image-preview {
+    aspect-ratio: 1;
+  }
+
+  .upload-zone {
+    padding: var(--space-md);
+  }
+
+  /* Pricing grid mobile */
+  .pricing-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  /* Specification grid mobile */
+  .spec-grid,
+  .specifications-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  /* Form actions mobile */
+  .form-actions {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .form-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Product form header */
+  .product-form-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-md);
+  }
+
+  .product-form-header .back-btn {
+    order: -1;
+  }
+
+  .product-form-header .btn {
+    width: 100%;
+  }
+
+  /* Input fields full width */
+  .form-input,
+  .form-select,
+  .form-textarea {
+    width: 100%;
+  }
+
+  /* Toggle row stack */
+  .toggle-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
   }
 }
 
@@ -6631,3 +7002,452 @@ h2.modal-title-centered {
   color: var(--error);
   background: rgba(255, 0, 0, 0.1);
 }
+
+/* ========================================
+   MOBILE RESPONSIVE STYLES
+   ======================================== */
+
+/* Tablet - Collapse sidebar */
+@media (max-width: 1024px) {
+  .admin-sidebar {
+    width: 70px;
+  }
+
+  .admin-sidebar .admin-logo .logo-text,
+  .admin-sidebar .admin-logo .logo-accent,
+  .admin-sidebar .nav-item span {
+    display: none;
+  }
+
+  .admin-sidebar .nav-item {
+    justify-content: center;
+    padding: var(--space-sm);
+  }
+
+  .admin-content {
+    margin-left: 70px;
+  }
+
+  .admin-header {
+    margin-left: 70px;
+  }
+
+  /* Dashboard stats grid */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile - Hide sidebar by default, show as overlay */
+@media (max-width: 768px) {
+  .admin-page {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    position: fixed;
+    left: -280px;
+    width: 280px;
+    top: 0;
+    bottom: 0;
+    z-index: 1100;
+    transition: left 0.3s ease;
+  }
+
+  .admin-sidebar.mobile-open {
+    left: 0;
+  }
+
+  .admin-sidebar .admin-logo .logo-text,
+  .admin-sidebar .admin-logo .logo-accent,
+  .admin-sidebar .nav-item span {
+    display: inline;
+  }
+
+  .admin-sidebar .nav-item {
+    justify-content: flex-start;
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .admin-content {
+    margin-left: 0;
+    padding: var(--space-md);
+    width: 100%;
+  }
+
+  .admin-header {
+    margin-left: 0;
+    padding: var(--space-md);
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .admin-title {
+    font-size: 1.25rem;
+    flex: 1;
+    min-width: 100%;
+    order: 1;
+  }
+
+  .admin-actions {
+    order: 3;
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  /* Mobile menu toggle button */
+  .mobile-menu-toggle-admin {
+    display: flex;
+    order: 2;
+  }
+
+  /* Dashboard stats */
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  .stat-card {
+    padding: var(--space-md);
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  /* Tables become scrollable */
+  .admin-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-table {
+    min-width: 600px;
+  }
+
+  /* Product grid */
+  .admin-products-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Forms */
+  .product-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .image-slots {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Modals */
+  .admin-modal-content {
+    max-width: 95%;
+    max-height: 90vh;
+    margin: var(--space-md);
+  }
+
+  /* Charts */
+  .chart-container {
+    height: 250px;
+  }
+
+  /* Order details */
+  .order-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .admin-content {
+    padding: var(--space-sm);
+  }
+
+  .admin-header {
+    padding: var(--space-sm);
+  }
+
+  .admin-title {
+    font-size: 1.125rem;
+  }
+
+  .stat-card {
+    flex-direction: column;
+    text-align: center;
+    padding: var(--space-sm);
+  }
+
+  .stat-card .stat-info {
+    align-items: center;
+  }
+
+  .image-slots {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .btn {
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.875rem;
+  }
+}
+
+/* Mobile overlay backdrop when sidebar is open */
+.admin-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+}
+
+.admin-sidebar-overlay.active {
+  display: block;
+}
+
+/* Mobile admin header with menu button */
+.mobile-menu-toggle-admin {
+  display: none;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.mobile-menu-toggle-admin:hover {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-toggle-admin {
+    display: flex;
+  }
+}
+
+/* Mobile close button in sidebar */
+.mobile-close-btn {
+  display: none;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.mobile-close-btn:hover {
+  background: var(--error);
+  border-color: var(--error);
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .mobile-close-btn {
+    display: flex;
+  }
+
+  .sidebar-header {
+    justify-content: space-between;
+  }
+}
+
+/* ========================================= */
+/* Mobile Fixes for Customer Info Popups */
+/* ========================================= */
+@media (max-width: 768px) {
+  /* Customer info popup/tooltip mobile fix */
+  .segmentation-tooltip,
+  .rfm-tooltip,
+  .info-popup,
+  .help-popup,
+  .customer-tooltip,
+  [class*="tooltip"],
+  [class*="popover"] {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 90vw !important;
+    max-width: 320px !important;
+    max-height: 80vh !important;
+    overflow-y: auto !important;
+    z-index: 9999 !important;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Fix logs table to show ALL columns */
+  .logs-page .data-table-container,
+  .logs-content .data-table-container {
+    overflow-x: scroll !important;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    display: block;
+  }
+
+  .logs-page .data-table,
+  .logs-content .data-table,
+  .logs-page table,
+  .logs-content table {
+    min-width: 900px !important;
+    width: max-content !important;
+    table-layout: auto !important;
+  }
+
+  .logs-page .data-table th,
+  .logs-page .data-table td,
+  .logs-content .data-table th,
+  .logs-content .data-table td {
+    white-space: nowrap;
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  /* Ensure message column can wrap */
+  .logs-page .data-table td:nth-child(3),
+  .logs-content .data-table td:nth-child(3) {
+    white-space: normal;
+    min-width: 200px;
+    max-width: 300px;
+  }
+}
+
+/* Backdrop for mobile tooltips */
+.tooltip-backdrop,
+.popup-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9998;
+}
+
+/* ========================================= */
+/* Segment Info Tooltip Styles */
+/* ========================================= */
+.segment-info-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.segment-info-tooltip .info-icon {
+  color: var(--text-muted);
+  transition: color var(--transition-fast);
+}
+
+.segment-info-tooltip:hover .info-icon,
+.segment-info-tooltip.active .info-icon {
+  color: var(--accent-gold);
+}
+
+.segment-tooltip-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  max-width: 380px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  z-index: 10000;
+  font-size: 0.875rem;
+}
+
+.segment-tooltip-content h4 {
+  margin: 0 0 var(--space-md) 0;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.segment-tooltip-content p {
+  margin: var(--space-sm) 0;
+  color: var(--text-secondary);
+}
+
+.segment-tooltip-content ul {
+  margin: var(--space-xs) 0 var(--space-md) 0;
+  padding-left: var(--space-md);
+  list-style: none;
+}
+
+.segment-tooltip-content li {
+  margin: var(--space-xs) 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.segment-tooltip-content li strong {
+  color: var(--text-primary);
+}
+
+/* Desktop hover behavior - only show on hover for non-touch devices */
+@media (hover: hover) and (pointer: fine) {
+  .segment-info-tooltip .segment-tooltip-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: auto;
+    transform: none;
+    width: 320px;
+    max-height: 400px;
+    margin-top: var(--space-sm);
+  }
+
+  .segment-info-tooltip:hover .segment-tooltip-content {
+    display: block;
+  }
+
+  .segment-info-tooltip .tooltip-backdrop {
+    display: none;
+  }
+}
+
+/* ========================================= */
+/* Customer Name Column Width Fix */
+/* ========================================= */
+.customer-info {
+  min-width: 120px;
+}
+
+.customer-info .customer-name {
+  white-space: nowrap;
+  min-width: 80px;
+}
+
+.customer-info .customer-name strong {
+  display: block;
+  white-space: normal;
+  word-break: break-word;
+  min-width: 60px;
+}
+
+/* Modal message whitespace for multi-line content */
+.modal-message {
+  white-space: pre-wrap;
+  text-align: left;
+  line-height: 1.6;
+}
+

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   BarChart3, TrendingUp, TrendingDown, DollarSign, ShoppingBag, Calendar,
   ChevronDown, Download, ArrowUpRight, ArrowDownRight, Package, Users,
-  PieChart, Activity, Award
+  PieChart, Activity, Award, Menu
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
@@ -27,6 +27,10 @@ const Reports = () => {
   const [period, setPeriod] = useState('daily');
   const [periodDropdownOpen, setPeriodDropdownOpen] = useState(false);
   const [hoveredPoint, setHoveredPoint] = useState(null);
+  
+  // Mobile sidebar state
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  
   const [stats, setStats] = useState({
     todayRevenue: 0, weekRevenue: 0, monthRevenue: 0, totalRevenue: 0,
     todayOrders: 0, weekOrders: 0, monthOrders: 0, totalOrders: 0
@@ -387,10 +391,20 @@ const Reports = () => {
 
   return (
     <div className="admin-page">
-      <AdminSidebar />
+      <AdminSidebar 
+        isMobileOpen={isMobileSidebarOpen} 
+        onMobileClose={() => setIsMobileSidebarOpen(false)} 
+      />
 
       <main className="admin-content">
         <div className="admin-header" style={{ marginBottom: '0px' }}>
+          <button 
+            className="mobile-menu-toggle-admin"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu size={20} />
+          </button>
           <div>
             <h1 className="page-title">Reports & Analytics</h1>
             <p className="page-subtitle">Comprehensive business insights</p>

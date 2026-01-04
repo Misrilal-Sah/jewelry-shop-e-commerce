@@ -416,6 +416,34 @@
   color: var(--accent-gold);
 }
 
+/* Review actions container */
+.review-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* Delete review button for admin */
+.delete-review-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.delete-review-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .reviews-layout {
@@ -435,4 +463,11 @@
     justify-content: center;
     flex-wrap: wrap;
   }
+
+  .review-footer {
+    flex-direction: column;
+    gap: var(--space-sm);
+    align-items: flex-start;
+  }
 }
+

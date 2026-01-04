@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Package, Search, Eye, Trash2, X,
+  Package, Search, Eye, Trash2, X, Menu,
   ChevronDown, ChevronUp, ChevronsUpDown, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -16,6 +16,8 @@ const BulkOrders = () => {
   const { hasPermission } = usePermission();
   const toast = useToast();
   const modal = useModal();
+  
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   const [inquiries, setInquiries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -224,10 +226,20 @@ const BulkOrders = () => {
 
   return (
     <div className="admin-page">
-      <AdminSidebar />
+      <AdminSidebar 
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={() => setIsMobileSidebarOpen(false)}
+      />
 
       <main className="admin-content">
         <header className="admin-header">
+          <button
+            className="mobile-menu-toggle-admin"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu size={20} />
+          </button>
           <h1><Package size={24} /> Bulk Order Inquiries</h1>
           <span className="stat-badge">{totalItems} total inquiries</span>
         </header>

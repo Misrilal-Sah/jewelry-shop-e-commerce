@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   ShoppingCart, Eye, ChevronDown, ChevronUp, ChevronsUpDown,
-  ChevronLeft, ChevronRight
+  ChevronLeft, ChevronRight, Menu
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
@@ -15,6 +15,9 @@ const Orders = () => {
   const { user, isAuthenticated, token, loading: authLoading } = useAuth();
   const { hasPermission } = usePermission();
   const toast = useToast();
+  
+  // Mobile sidebar state
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   // Core data state
   const [orders, setOrders] = useState([]);
@@ -179,10 +182,20 @@ const Orders = () => {
 
   return (
     <div className="admin-page">
-      <AdminSidebar />
+      <AdminSidebar 
+        isMobileOpen={isMobileSidebarOpen} 
+        onMobileClose={() => setIsMobileSidebarOpen(false)} 
+      />
 
       <main className="admin-content">
         <header className="admin-header">
+          <button 
+            className="mobile-menu-toggle-admin"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu size={20} />
+          </button>
           <h1>Orders</h1>
         </header>
 

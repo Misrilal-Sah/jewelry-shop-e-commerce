@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Tag, Plus, Edit2, Trash2, Search, X, ChevronDown, ChevronLeft, ChevronRight, 
-  Archive, RotateCcw, AlertTriangle, ChevronUp, ChevronsUpDown
+  Archive, RotateCcw, AlertTriangle, ChevronUp, ChevronsUpDown, Menu
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
@@ -21,6 +21,9 @@ const Coupons = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState(null);
+  
+  // Mobile sidebar state
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -269,11 +272,21 @@ const Coupons = () => {
   return (
     <div className="admin-page">
       {/* Sidebar */}
-      <AdminSidebar />
+      <AdminSidebar 
+        isMobileOpen={isMobileSidebarOpen} 
+        onMobileClose={() => setIsMobileSidebarOpen(false)} 
+      />
 
       {/* Main Content */}
       <main className="admin-content">
         <header className="admin-header">
+          <button 
+            className="mobile-menu-toggle-admin"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu size={20} />
+          </button>
           <h1>Coupons & Discounts</h1>
           <button className="btn btn-primary" onClick={openAddModal}>
             <Plus size={18} /> Add Coupon

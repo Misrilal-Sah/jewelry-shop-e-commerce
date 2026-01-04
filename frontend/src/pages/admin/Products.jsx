@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { 
   Package, Plus, Edit, Trash2, Search, Image, AlertTriangle,
   ChevronUp, ChevronDown, ChevronsUpDown, Archive, RotateCcw, 
-  ChevronLeft, ChevronRight, ImagePlus, X, Upload
+  ChevronLeft, ChevronRight, ImagePlus, X, Upload, Menu
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
@@ -21,6 +21,9 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Mobile sidebar state
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -330,10 +333,20 @@ const Products = () => {
         </div>
       )}
 
-      <AdminSidebar />
+      <AdminSidebar 
+        isMobileOpen={isMobileSidebarOpen} 
+        onMobileClose={() => setIsMobileSidebarOpen(false)} 
+      />
 
       <main className="admin-content">
         <header className="admin-header">
+          <button 
+            className="mobile-menu-toggle-admin"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu size={20} />
+          </button>
           <h1>Products</h1>
           <div className="admin-header-actions">
             <button 

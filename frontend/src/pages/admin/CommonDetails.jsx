@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
 import { useToast } from '../../components/ui/Toast';
 import { 
-  Settings, Tag, Briefcase, Save, Plus, Trash2, Edit2, X, Check,
+  Settings, Tag, Briefcase, Save, Plus, Trash2, Edit2, X, Check, Menu,
   Phone, Mail, MapPin, Facebook, Instagram, Twitter, Youtube,
   Image as ImageIcon, AlertTriangle, Upload
 } from 'lucide-react';
@@ -20,6 +20,7 @@ const CommonDetails = () => {
   const [saving, setSaving] = useState(false);
   const [isEditingSettings, setIsEditingSettings] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(null);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const fileInputRef = { category: null, collection: null };
   
   // Settings state
@@ -365,10 +366,20 @@ const CommonDetails = () => {
 
   return (
     <div className="admin-page">
-      <AdminSidebar />
+      <AdminSidebar 
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={() => setIsMobileSidebarOpen(false)}
+      />
 
       <main className="admin-content">
       <div className="page-header">
+        <button
+          className="mobile-menu-toggle-admin"
+          onClick={() => setIsMobileSidebarOpen(true)}
+          aria-label="Open menu"
+        >
+          <Menu size={20} />
+        </button>
         <div className="header-content">
           <h1><Settings size={24} /> Common Details</h1>
           <p className="subtitle">Manage homepage content, categories, and collections</p>

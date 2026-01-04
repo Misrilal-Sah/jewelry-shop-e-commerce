@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Search, ShoppingBag, Heart, User, Menu, X, 
-  Sun, Moon, ChevronDown, LogOut 
+  Sun, Moon, ChevronDown, LogOut, ShoppingCart, FileText
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
@@ -29,19 +29,23 @@ const Header = () => {
   const dropdownRef = useRef(null);
   const userMenuRef = useRef(null);
 
-  // Sample product names for suggestions
-  const productNames = [
-    'Royal Diamond Solitaire Ring',
-    'Traditional Gold Necklace Set',
-    'Diamond Stud Earrings',
-    'Gold Kada Bangles Set',
-    'Bridal Complete Set',
-    'Platinum Engagement Ring',
-    'Silver Anklet Pair',
-    'Gold Wedding Ring',
-    'Diamond Pendant Necklace',
-    'Pearl Earrings'
-  ];
+  // Fetch products for search suggestions
+  const [allProducts, setAllProducts] = useState([]);
+  
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch('/api/products?limit=100');
+        if (res.ok) {
+          const data = await res.json();
+          setAllProducts(data.products || []);
+        }
+      } catch (error) {
+        console.error('Fetch products error:', error);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -80,17 +84,17 @@ const Header = () => {
 
   // Filter suggestions based on search query
   useEffect(() => {
-    if (searchQuery.trim().length > 0) {
-      const filtered = productNames.filter(name => 
-        name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setSuggestions(filtered.slice(0, 5));
+    if (searchQuery.trim().length > 0 && allProducts.length > 0) {
+      const filtered = allProducts.filter(product => 
+        product.name?.toLowerCase().includes(searchQuery.toLowerCase())
+      ).slice(0, 5);
+      setSuggestions(filtered);
       setShowSuggestions(true);
     } else {
       setSuggestions([]);
       setShowSuggestions(false);
     }
-  }, [searchQuery]);
+  }, [searchQuery, allProducts]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -102,10 +106,9 @@ const Header = () => {
     }
   };
 
-  const handleSuggestionClick = (suggestion) => {
-    setSearchQuery(suggestion);
-    navigate(`/products?search=${encodeURIComponent(suggestion)}`);
+  const handleSuggestionClick = (product) => {
     setSearchQuery('');
+    navigate(`/products/${product.id}`);
     setIsSearchOpen(false);
     setShowSuggestions(false);
   };
@@ -318,14 +321,14 @@ const Header = () => {
           {/* Search Suggestions */}
           {showSuggestions && suggestions.length > 0 && (
             <div className="search-suggestions">
-              {suggestions.map((suggestion, index) => (
+              {suggestions.map((product) => (
                 <div 
-                  key={index}
+                  key={product.id}
                   className="suggestion-item"
-                  onClick={() => handleSuggestionClick(suggestion)}
+                  onClick={() => handleSuggestionClick(product)}
                 >
                   <Search size={16} className="suggestion-icon" />
-                  <span>{suggestion}</span>
+                  <span>{product.name}</span>
                 </div>
               ))}
             </div>
@@ -336,6 +339,86 @@ const Header = () => {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="mobile-menu">
+          {/* Quick Actions - moved from header */}
+          <div className="mobile-quick-actions">
+            <button 
+              className="mobile-action-btn"
+              onClick={toggleTheme}
+            >
+              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+              <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
+            </button>
+
+            <button 
+              className="mobile-action-btn"
+              onClick={() => { navigate('/cart'); setIsMobileMenuOpen(false); }}
+            >
+              <ShoppingCart size={20} />
+              <span>Cart {itemCount > 0 && `(${itemCount})`}</span>
+            </button>
+            
+            {isAuthenticated && (
+              <button 
+                className="mobile-action-btn"
+                onClick={() => { navigate('/wishlist'); setIsMobileMenuOpen(false); }}
+              >
+                <Heart size={20} />
+                <span>Wishlist</span>
+              </button>
+            )}
+
+            <button 
+              className="mobile-action-btn"
+              onClick={() => { navigate('/blog'); setIsMobileMenuOpen(false); }}
+            >
+              <FileText size={20} />
+              <span>Blog</span>
+            </button>
+            
+            {isAuthenticated ? (
+              <>
+                <button 
+                  className="mobile-action-btn"
+                  onClick={() => { navigate('/profile'); setIsMobileMenuOpen(false); }}
+                >
+                  <User size={20} />
+                  <span>My Profile</span>
+                </button>
+                <button 
+                  className="mobile-action-btn"
+                  onClick={() => { navigate('/orders'); setIsMobileMenuOpen(false); }}
+                >
+                  <ShoppingBag size={20} />
+                  <span>My Orders</span>
+                </button>
+                {user?.role === 'admin' && (
+                  <button 
+                    className="mobile-action-btn"
+                    onClick={() => { navigate('/admin'); setIsMobileMenuOpen(false); }}
+                  >
+                    <User size={20} />
+                    <span>Admin Dashboard</span>
+                  </button>
+                )}
+                <button 
+                  className="mobile-action-btn logout"
+                  onClick={() => { logout(); setIsMobileMenuOpen(false); }}
+                >
+                  <LogOut size={20} />
+                  <span>Logout</span>
+                </button>
+              </>
+            ) : (
+              <button 
+                className="mobile-action-btn"
+                onClick={() => { navigate('/login'); setIsMobileMenuOpen(false); }}
+              >
+                <User size={20} />
+                <span>Login / Register</span>
+              </button>
+            )}
+          </div>
+
           <nav className="mobile-nav">
             <div className="mobile-nav-section">
               <span className="mobile-nav-title">Categories</span>

@@ -23,7 +23,7 @@ const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart, isInCart, removeByProductId } = useCart();
-  const { isAuthenticated, token } = useAuth();
+  const { isAuthenticated, token, user } = useAuth();
   const toast = useToast();
   const modal = useModal();
   const { addToRecentlyViewed } = useRecentlyViewed();
@@ -495,6 +495,30 @@ const ProductDetail = () => {
     } catch (error) {
       modal.error('Error', 'Failed to vote');
     }
+  };
+
+  // Admin delete review handler
+  const handleDeleteReview = async (reviewId) => {
+    modal.confirm(
+      'Delete Review',
+      'Are you sure you want to delete this review? This action cannot be undone.',
+      async () => {
+        try {
+          const res = await fetch(`/api/products/reviews/${reviewId}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (res.ok) {
+            toast.success('Review deleted successfully');
+            fetchProduct(); // Refresh to update reviews
+          } else {
+            toast.error('Failed to delete review');
+          }
+        } catch (error) {
+          toast.error('Failed to delete review');
+        }
+      }
+    );
   };
 
   const renderStars = (rating, interactive = false, onRate = null) => {
@@ -974,18 +998,29 @@ const ProductDetail = () => {
                         ))}
                       </div>
                     )}
-                    {/* Footer: Date left, Helpful right */}
+                    {/* Footer: Date left, Helpful right, Admin delete */}
                     <div className="review-footer">
                       <span className="review-date">
                         <Calendar size={14} />
                         {formatDate(rev.created_at)}
                       </span>
-                      <button 
-                        className={`helpful-btn ${helpfulVotes[rev.id] ? 'voted' : ''}`}
-                        onClick={() => handleHelpfulClick(rev.id)}
-                      >
-                        <ThumbsUp size={14} /> Helpful ({rev.helpful_count || 0})
-                      </button>
+                      <div className="review-actions">
+                        <button 
+                          className={`helpful-btn ${helpfulVotes[rev.id] ? 'voted' : ''}`}
+                          onClick={() => handleHelpfulClick(rev.id)}
+                        >
+                          <ThumbsUp size={14} /> Helpful ({rev.helpful_count || 0})
+                        </button>
+                        {user?.role === 'admin' && (
+                          <button 
+                            className="delete-review-btn"
+                            onClick={() => handleDeleteReview(rev.id)}
+                            title="Delete Review"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}

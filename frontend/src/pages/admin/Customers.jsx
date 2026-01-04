@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Users, Search, Mail, Phone, Calendar, ShoppingBag, DollarSign, RefreshCw,
-  ChevronLeft, ChevronRight, ChevronDown, ChevronsUpDown, ChevronUp, HelpCircle
+  ChevronLeft, ChevronRight, ChevronDown, ChevronsUpDown, ChevronUp, HelpCircle, Menu
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
 import { useToast } from '../../components/ui/Toast';
+import { useModal } from '../../components/ui/Modal';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import './Admin.css';
 
@@ -15,10 +16,14 @@ const Customers = () => {
   const { user, isAuthenticated, token, loading: authLoading } = useAuth();
   const { hasPermission } = usePermission();
   const toast = useToast();
+  const modal = useModal();
   
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Mobile sidebar state
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -177,11 +182,21 @@ const Customers = () => {
   return (
     <div className="admin-page">
       {/* Sidebar */}
-      <AdminSidebar />
+      <AdminSidebar 
+        isMobileOpen={isMobileSidebarOpen} 
+        onMobileClose={() => setIsMobileSidebarOpen(false)} 
+      />
 
       {/* Main Content */}
       <main className="admin-content">
         <div className="admin-header">
+          <button 
+            className="mobile-menu-toggle-admin"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu size={20} />
+          </button>
           <h1 className="page-title">Customers</h1>
           <span className="page-count">{totalCustomers} registered customers</span>
         </div>
@@ -268,29 +283,33 @@ const Customers = () => {
               {recalculating ? 'Processing...' : 'Recalculate'}
             </button>
             
-            {/* Segmentation Info */}
-            <div className="segment-info-tooltip">
-              <HelpCircle size={18} className="info-icon" />
-              <div className="segment-tooltip-content">
-                <h4>How Segmentation Works</h4>
-                <p><strong>RF Scoring (Recency-Frequency)</strong></p>
-                <ul>
-                  <li><strong>Recency:</strong> Days since last order (0-7d=5, 8-30d=4, 31-60d=3, 61-120d=2, 120+d=1)</li>
-                  <li><strong>Frequency:</strong> Total orders (10+=5, 5-9=4, 3-4=3, 2=2, 1=1)</li>
-                </ul>
-                <p><strong>Segments:</strong></p>
-                <ul>
-                  <li>🏆 <strong>Champions:</strong> R≥4, F≥4</li>
-                  <li>💜 <strong>Loyal:</strong> R≥3, F≥3</li>
-                  <li>💙 <strong>Potential Loyalist:</strong> R≥4, F=2</li>
-                  <li>💚 <strong>New Customer:</strong> R=5, F=1</li>
-                  <li>🟡 <strong>At Risk:</strong> R=2, F≥3</li>
-                  <li>🔴 <strong>Can't Lose:</strong> R≤2, F≥4</li>
-                  <li>⚫ <strong>Dormant:</strong> R=1, F≤2</li>
-                  <li>⚪ <strong>Others:</strong> All others</li>
-                </ul>
-              </div>
-            </div>
+            {/* Segmentation Info Button */}
+            <button 
+              className="btn btn-ghost"
+              onClick={() => modal.info(
+                'How Segmentation Works',
+                `RF Scoring (Recency-Frequency):
+
+• Recency: Days since last order
+  0-7d=5, 8-30d=4, 31-60d=3, 61-120d=2, 120+d=1
+
+• Frequency: Total orders
+  10+=5, 5-9=4, 3-4=3, 2=2, 1=1
+
+Segments:
+🏆 Champions: R≥4, F≥4
+💜 Loyal: R≥3, F≥3
+💙 Potential Loyalist: R≥4, F=2
+💚 New Customer: R=5, F=1
+🟡 At Risk: R=2, F≥3
+🔴 Can't Lose: R≤2, F≥4
+⚫ Dormant: R=1, F≤2
+⚪ Others: All others`
+              )}
+              title="Learn about segmentation"
+            >
+              <HelpCircle size={16} /> Info
+            </button>
           </div>
         </div>
 

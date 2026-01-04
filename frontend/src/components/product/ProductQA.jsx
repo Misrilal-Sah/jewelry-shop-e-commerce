@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
-import { MessageCircle, ChevronDown, ChevronUp, Send, User, CheckCircle } from 'lucide-react';
+import { MessageCircle, ChevronDown, ChevronUp, Send, User, CheckCircle, Trash2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../ui/Toast';
+import { useModal } from '../ui/Modal';
 import './ProductQA.css';
 
 const ProductQA = ({ productId }) => {
   const { isAuthenticated, token, user } = useAuth();
   const toast = useToast();
+  const modal = useModal();
   
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -111,6 +113,53 @@ const ProductQA = ({ productId }) => {
     });
   };
 
+  // Admin delete handlers
+  const handleDeleteQuestion = async (questionId) => {
+    modal.confirm(
+      'Delete Question',
+      'Are you sure you want to delete this question and all its answers? This action cannot be undone.',
+      async () => {
+        try {
+          const res = await fetch(`/api/admin/questions/${questionId}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (res.ok) {
+            toast.success('Question deleted successfully');
+            fetchQuestions();
+          } else {
+            toast.error('Failed to delete question');
+          }
+        } catch (error) {
+          toast.error('Failed to delete question');
+        }
+      }
+    );
+  };
+
+  const handleDeleteAnswer = async (answerId) => {
+    modal.confirm(
+      'Delete Answer',
+      'Are you sure you want to delete this answer? This action cannot be undone.',
+      async () => {
+        try {
+          const res = await fetch(`/api/admin/answers/${answerId}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (res.ok) {
+            toast.success('Answer deleted successfully');
+            fetchQuestions();
+          } else {
+            toast.error('Failed to delete answer');
+          }
+        } catch (error) {
+          toast.error('Failed to delete answer');
+        }
+      }
+    );
+  };
+
   if (loading) {
     return <div className="product-qa-loading">Loading Q&A...</div>;
   }
@@ -187,6 +236,15 @@ const ProductQA = ({ productId }) => {
               
               <div className="question-info">
                 <User size={14} /> {q.user_name} • {formatDate(q.created_at)}
+                {user?.role === 'admin' && (
+                  <button 
+                    className="qa-delete-btn"
+                    onClick={(e) => { e.stopPropagation(); handleDeleteQuestion(q.id); }}
+                    title="Delete Question"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                )}
               </div>
 
               {expandedQuestion === q.id && (
@@ -205,6 +263,15 @@ const ProductQA = ({ productId }) => {
                             </span>
                           )}
                           <span>{a.user_name || 'Store'} • {formatDate(a.created_at)}</span>
+                          {user?.role === 'admin' && (
+                            <button 
+                              className="qa-delete-btn"
+                              onClick={() => handleDeleteAnswer(a.id)}
+                              title="Delete Answer"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          )}
                         </div>
                       </div>
                     ))

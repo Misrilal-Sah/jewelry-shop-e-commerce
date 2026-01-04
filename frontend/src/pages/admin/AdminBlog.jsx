@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   FileText, Plus, Edit2, Trash2, Eye, Search, Calendar, Save, X,
-  ChevronDown, ChevronUp, ChevronsUpDown, ChevronLeft, ChevronRight, Upload, Image, BookOpen
+  ChevronDown, ChevronUp, ChevronsUpDown, ChevronLeft, ChevronRight, Upload, Image, BookOpen, Menu
 } from 'lucide-react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -30,6 +30,9 @@ const AdminBlog = () => {
   const [editingPost, setEditingPost] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  
+  // Mobile sidebar state
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   // Image upload states
   const [uploading, setUploading] = useState(false);
@@ -418,11 +421,21 @@ const AdminBlog = () => {
   return (
     <div className="admin-page">
       {/* Sidebar */}
-      <AdminSidebar />
+      <AdminSidebar 
+        isMobileOpen={isMobileSidebarOpen} 
+        onMobileClose={() => setIsMobileSidebarOpen(false)} 
+      />
 
       {/* Main Content */}
       <main className="admin-content">
         <header className="admin-header">
+          <button 
+            className="mobile-menu-toggle-admin"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu size={20} />
+          </button>
           <h1><FileText size={24} /> Blog Posts</h1>
           <button className="btn btn-primary" onClick={handleNewPost}>
             <Plus size={18} /> New Post

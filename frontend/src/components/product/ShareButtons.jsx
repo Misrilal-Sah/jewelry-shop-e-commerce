@@ -98,11 +98,25 @@ const ShareButtons = ({ product, positionBelow = false }) => {
   };
 
   return (
-    <div className={`share-buttons-container ${positionBelow ? 'position-below' : ''}`} ref={dropdownRef}>
+    <div className={`share-buttons-container ${positionBelow ? 'position-below' : ''} ${showShare ? 'open' : ''}`} ref={dropdownRef}>
       <button 
         className="share-trigger-btn"
-        onClick={() => setShowShare(!showShare)}
+        onClick={(e) => { 
+          console.log('[ShareButtons] onClick triggered', { showShare, event: e.type, target: e.target });
+          e.stopPropagation(); 
+          setShowShare(!showShare); 
+        }}
+        onTouchStart={(e) => {
+          console.log('[ShareButtons] onTouchStart triggered', { showShare, touches: e.touches.length });
+        }}
+        onTouchEnd={(e) => { 
+          console.log('[ShareButtons] onTouchEnd triggered - preventing default and toggling', { showShare });
+          e.preventDefault(); 
+          e.stopPropagation(); 
+          setShowShare(!showShare); 
+        }}
         title="Share this product"
+        type="button"
       >
         <Share2 size={20} />
       </button>

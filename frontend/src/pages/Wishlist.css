@@ -435,4 +435,32 @@
   .social-buttons {
     flex-direction: column;
   }
+
+  /* Share modal mobile fixes */
+  .share-modal {
+    padding: var(--space-md);
+    margin: var(--space-md);
+    max-width: calc(100% - var(--space-xl));
+  }
+
+  .share-link-box {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .share-link-box .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .share-link-input {
+    width: 100%;
+    font-size: 0.8rem;
+  }
+
+  .share-stats {
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+  }
 }

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Plus, Edit2, Trash2, X, HelpCircle, ChevronDown, ChevronUp, Search,
-  ChevronsUpDown, ChevronLeft, ChevronRight, AlertTriangle
+  ChevronsUpDown, ChevronLeft, ChevronRight, AlertTriangle, Menu
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
@@ -23,6 +23,9 @@ const FAQs = () => {
   const [editingFaq, setEditingFaq] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [faqToDelete, setFaqToDelete] = useState(null);
+  
+  // Mobile sidebar state
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -221,11 +224,21 @@ const FAQs = () => {
   return (
     <div className="admin-page">
       {/* Sidebar */}
-      <AdminSidebar />
+      <AdminSidebar 
+        isMobileOpen={isMobileSidebarOpen} 
+        onMobileClose={() => setIsMobileSidebarOpen(false)} 
+      />
 
       {/* Main Content */}
       <main className="admin-content">
         <header className="admin-header">
+          <button 
+            className="mobile-menu-toggle-admin"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu size={20} />
+          </button>
           <h1>FAQs</h1>
           <button className="btn btn-primary" onClick={openAddModal}>
             <Plus size={18} /> Add FAQ

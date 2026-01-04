@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Mail, Plus, Edit2, Trash2, Search, X, ChevronDown, ChevronLeft, ChevronRight, 
   ChevronUp, Send, Calendar, Clock, Eye, FileText, UserCheck, RefreshCw,
-  AlertTriangle, ChevronsUpDown
+  AlertTriangle, ChevronsUpDown, Menu
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
@@ -26,6 +26,9 @@ const EmailCenter = () => {
     campaigns: { total: 0, sent: 0, scheduled: 0, drafts: 0 },
     recentCampaigns: []
   });
+  
+  // Mobile sidebar state
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   // Campaigns state
   const [campaigns, setCampaigns] = useState([]);
@@ -599,11 +602,21 @@ const EmailCenter = () => {
   return (
     <div className="admin-container">
       {/* Sidebar */}
-      <AdminSidebar />
+      <AdminSidebar 
+        isMobileOpen={isMobileSidebarOpen} 
+        onMobileClose={() => setIsMobileSidebarOpen(false)} 
+      />
 
       {/* Main Content */}
       <main className="admin-content">
         <header className="admin-header">
+          <button 
+            className="mobile-menu-toggle-admin"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu size={20} />
+          </button>
           <h1>Email Center</h1>
           <div className="header-actions">
             <span className="header-count">{stats.subscribers} subscribers</span>

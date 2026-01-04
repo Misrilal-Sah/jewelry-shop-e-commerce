@@ -235,6 +235,28 @@
   text-decoration: underline;
 }
 
+/* Admin delete button for Q&A */
+.qa-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  margin-left: var(--space-sm);
+  transition: all var(--transition-fast);
+}
+
+.qa-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
 .product-qa-loading {
   text-align: center;
   padding: var(--space-xl);

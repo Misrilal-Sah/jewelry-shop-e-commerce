@@ -481,6 +481,49 @@ const getRecommendations = async (req, res) => {
   }
 };
 
+// Admin: Delete a review
+const deleteReview = async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+    
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+
+    // Get review to find product_id for updating stats
+    const [reviews] = await pool.query('SELECT product_id FROM reviews WHERE id = ?', [reviewId]);
+    if (reviews.length === 0) {
+      return res.status(404).json({ message: 'Review not found' });
+    }
+
+    const productId = reviews[0].product_id;
+
+    // Delete helpful votes first (foreign key constraint)
+    await pool.query('DELETE FROM review_helpful_votes WHERE review_id = ?', [reviewId]);
+    
+    // Delete the review
+    await pool.query('DELETE FROM reviews WHERE id = ?', [reviewId]);
+
+    // Update product rating and review count
+    const [stats] = await pool.query(
+      `SELECT AVG(rating) as avg_rating, COUNT(*) as count 
+       FROM reviews WHERE product_id = ? AND is_approved = TRUE`,
+      [productId]
+    );
+
+    await pool.query(
+      'UPDATE products SET rating = ?, review_count = ? WHERE id = ?',
+      [stats[0].avg_rating || 0, stats[0].count || 0, productId]
+    );
+
+    res.json({ message: 'Review deleted successfully' });
+  } catch (error) {
+    console.error('Delete review error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 module.exports = {
   getProducts,
   getProduct,
@@ -490,5 +533,6 @@ module.exports = {
   addReview,
   getProductReviews,
   getRecommendations,
-  toggleReviewHelpful
+  toggleReviewHelpful,
+  deleteReview
 };

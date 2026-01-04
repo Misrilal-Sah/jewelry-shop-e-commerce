@@ -383,11 +383,12 @@
   top: var(--header-height);
   left: 0;
   right: 0;
-  bottom: 0;
+  height: calc(100vh - var(--header-height));
   background: var(--bg-primary);
   padding: var(--space-lg);
   overflow-y: auto;
   animation: fadeIn var(--transition-fast);
+  z-index: 999;
 }
 
 .mobile-nav-section {
@@ -423,6 +424,55 @@
   color: var(--accent-gold);
 }
 
+/* Mobile Quick Actions */
+.mobile-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  padding-bottom: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.mobile-action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex: 1 1 calc(50% - var(--space-sm));
+  min-width: 140px;
+  padding: var(--space-md);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mobile-action-btn:hover {
+  border-color: var(--accent-gold);
+  background: linear-gradient(135deg, rgba(191, 155, 48, 0.1), rgba(212, 175, 55, 0.1));
+}
+
+.mobile-action-btn svg {
+  color: var(--accent-gold);
+}
+
+.mobile-action-btn.logout {
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.mobile-action-btn.logout svg {
+  color: var(--error);
+}
+
+.mobile-action-btn.logout:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .header-nav {
@@ -432,23 +482,49 @@
 
 @media (max-width: 768px) {
   .header-container {
-    padding: 0 var(--space-md);
+    padding: 0 var(--space-xs);
+    gap: var(--space-xs);
   }
 
   .header-logo .logo-emblem {
-    height: 36px;
+    height: 34px;
   }
 
   .header-logo .logo-text {
-    font-size: 1.375rem;
-  }
-
-  .header-logo .logo-divider {
     font-size: 1.25rem;
   }
 
-  .action-btn:not(.cart-btn):not(.mobile-menu-btn):not(.theme-toggle) {
+  .header-logo .logo-divider {
+    font-size: 1rem;
+    margin: 0 4px;
+  }
+
+  .header-actions {
+    gap: 4px;
+  }
+
+  /* Hide most action buttons on mobile */
+  .header-actions .action-btn {
     display: none;
+  }
+
+  /* Show search, notification, cart and menu button on mobile */
+  .header-actions .action-btn[aria-label="Search"],
+  .header-actions .notification-bell,
+  .header-actions .cart-btn,
+  .header-actions .mobile-menu-btn {
+    display: flex !important;
+  }
+
+  /* Button size for mobile - slightly smaller to fit */
+  .header-actions .action-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .header-actions .action-btn svg {
+    width: 18px;
+    height: 18px;
   }
 
   .mobile-menu-btn {
@@ -459,3 +535,4 @@
     display: block;
   }
 }
+

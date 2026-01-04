@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, Package, ShoppingCart, Users, BarChart3, Tag, Shield, Zap, 
-  Settings, Mail, Quote, HelpCircle, FileText, Activity
+  Settings, Mail, Quote, HelpCircle, FileText, Activity, X
 } from 'lucide-react';
 import { usePermission } from '../../context/PermissionContext';
 
@@ -24,7 +24,7 @@ const NAV_ITEMS = [
   { path: '/admin/logs', icon: Activity, label: 'Logs', resource: 'logs' }
 ];
 
-const AdminSidebar = () => {
+const AdminSidebar = ({ isMobileOpen = false, onMobileClose = () => {} }) => {
   const location = useLocation();
   const { canViewPage, loading } = usePermission();
 
@@ -36,53 +36,74 @@ const AdminSidebar = () => {
     return canViewPage(item.resource);
   });
 
+  const handleNavClick = () => {
+    // Close mobile menu when clicking a nav item
+    if (window.innerWidth <= 768) {
+      onMobileClose();
+    }
+  };
+
   if (loading) {
     return (
-      <aside className="admin-sidebar">
+      <>
+        {isMobileOpen && <div className="admin-sidebar-overlay active" onClick={onMobileClose} />}
+        <aside className={`admin-sidebar ${isMobileOpen ? 'mobile-open' : ''}`}>
+          <div className="sidebar-header">
+            <Link to="/" className="admin-logo">
+              <span className="logo-text">Aabhar</span>
+              <span className="logo-accent">Admin</span>
+            </Link>
+            <button className="mobile-close-btn" onClick={onMobileClose}>
+              <X size={20} />
+            </button>
+          </div>
+          <nav className="admin-nav">
+            <div className="nav-loading">Loading...</div>
+          </nav>
+        </aside>
+      </>
+    );
+  }
+
+  return (
+    <>
+      {isMobileOpen && <div className="admin-sidebar-overlay active" onClick={onMobileClose} />}
+      <aside className={`admin-sidebar ${isMobileOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-header">
           <Link to="/" className="admin-logo">
             <span className="logo-text">Aabhar</span>
             <span className="logo-accent">Admin</span>
           </Link>
+          <button className="mobile-close-btn" onClick={onMobileClose}>
+            <X size={20} />
+          </button>
         </div>
         <nav className="admin-nav">
-          <div className="nav-loading">Loading...</div>
+          {visibleNavItems.map(item => {
+            const Icon = item.icon;
+            const isActive = item.path === '/admin' 
+              ? location.pathname === '/admin'
+              : location.pathname.startsWith(item.path);
+            
+            return (
+              <Link 
+                key={item.path}
+                to={item.path} 
+                className={`nav-item ${isActive ? 'active' : ''}`}
+                onClick={handleNavClick}
+              >
+                <Icon size={18} /> <span>{item.label}</span>
+              </Link>
+            );
+          })}
         </nav>
+        <div className="sidebar-footer">
+          <Link to="/" className="back-to-store" onClick={handleNavClick}>← Back to Store</Link>
+        </div>
       </aside>
-    );
-  }
-
-  return (
-    <aside className="admin-sidebar">
-      <div className="sidebar-header">
-        <Link to="/" className="admin-logo">
-          <span className="logo-text">Aabhar</span>
-          <span className="logo-accent">Admin</span>
-        </Link>
-      </div>
-      <nav className="admin-nav">
-        {visibleNavItems.map(item => {
-          const Icon = item.icon;
-          const isActive = item.path === '/admin' 
-            ? location.pathname === '/admin'
-            : location.pathname.startsWith(item.path);
-          
-          return (
-            <Link 
-              key={item.path}
-              to={item.path} 
-              className={`nav-item ${isActive ? 'active' : ''}`}
-            >
-              <Icon size={18} /> {item.label}
-            </Link>
-          );
-        })}
-      </nav>
-      <div className="sidebar-footer">
-        <Link to="/" className="back-to-store">← Back to Store</Link>
-      </div>
-    </aside>
+    </>
   );
 };
 
 export default AdminSidebar;
+

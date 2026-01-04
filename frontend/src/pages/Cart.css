@@ -1,5 +1,7 @@
 .cart-page {
   padding: var(--space-2xl) 0;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 .cart-page.empty {
@@ -257,6 +259,8 @@
   display: flex;
   justify-content: space-between;
   color: var(--text-secondary);
+  gap: var(--space-sm);
+  flex-wrap: wrap;
 }
 
 .summary-row .free {
@@ -411,14 +415,40 @@
 }
 
 @media (max-width: 768px) {
+  .cart-page {
+    padding: var(--space-md) 0;
+  }
+
+  .cart-page .container {
+    padding: 0 var(--space-xs);
+    overflow-x: hidden;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .cart-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .cart-list {
+    max-width: 100%;
+  }
+
   .cart-item {
-    grid-template-columns: 80px 1fr auto;
-    gap: var(--space-md);
+    grid-template-columns: 60px 1fr 36px;
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .item-image {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
+  }
+
+  .item-details .item-name {
+    font-size: 0.875rem;
   }
 
   .item-price {
@@ -427,11 +457,17 @@
 
   .item-price-mobile {
     display: block;
+    font-size: 0.9rem;
   }
 
   .item-quantity {
     grid-column: 2;
     justify-self: start;
+  }
+
+  .item-quantity button {
+    width: 30px;
+    height: 30px;
   }
 
   .item-actions-btns {
@@ -441,12 +477,50 @@
     flex-direction: column;
   }
 
+  .item-actions-btns .remove-btn,
+  .item-actions-btns .save-btn {
+    width: 32px;
+    height: 32px;
+  }
+
   .save-btn {
     display: none;
   }
 
   .save-for-later-mobile {
     display: flex;
+  }
+
+  .cart-summary {
+    padding: var(--space-md);
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .cart-summary h3 {
+    font-size: 1rem;
+  }
+
+  .summary-row {
+    font-size: 0.875rem;
+  }
+
+  .summary-row span:last-child {
+    text-align: right;
+    word-break: break-word;
+  }
+
+  .summary-total {
+    font-size: 1rem;
+  }
+
+  .cart-actions {
+    flex-direction: column;
+  }
+
+  .cart-actions .btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 

@@ -59,7 +59,8 @@ const Products = () => {
     purity: parseArrayParam('purity'),
     min_price: searchParams.get('min_price') || '',
     max_price: searchParams.get('max_price') || '',
-    sort: searchParams.get('sort') || 'popular'
+    sort: searchParams.get('sort') || 'popular',
+    search: searchParams.get('search') || ''
   });
 
   // Sort options
@@ -203,7 +204,8 @@ const Products = () => {
       purity: parseArrayParam('purity'),
       min_price: searchParams.get('min_price') || '',
       max_price: searchParams.get('max_price') || '',
-      sort: searchParams.get('sort') || 'popular'
+      sort: searchParams.get('sort') || 'popular',
+      search: searchParams.get('search') || ''
     };
     setFilters(newFilters);
     window.scrollTo(0, 0);

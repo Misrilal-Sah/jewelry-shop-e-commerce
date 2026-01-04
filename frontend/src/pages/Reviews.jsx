@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Star, ArrowLeft, User, ThumbsUp, Calendar, ChevronDown, Check, Image } from 'lucide-react';
+import { Star, ArrowLeft, User, ThumbsUp, Calendar, ChevronDown, Check, Image, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/ui/Toast';
 import { useModal } from '../components/ui/Modal';
@@ -8,7 +8,7 @@ import './Reviews.css';
 
 const Reviews = () => {
   const { id } = useParams();
-  const { isAuthenticated, token } = useAuth();
+  const { isAuthenticated, token, user } = useAuth();
   const toast = useToast();
   const modal = useModal();
   
@@ -89,6 +89,29 @@ const Reviews = () => {
     } catch (error) {
       toast.error('Failed to vote');
     }
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    modal.confirm(
+      'Delete Review',
+      'Are you sure you want to delete this review? This action cannot be undone.',
+      async () => {
+        try {
+          const res = await fetch(`/api/products/reviews/${reviewId}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (res.ok) {
+            toast.success('Review deleted successfully');
+            setReviews(prev => prev.filter(r => r.id !== reviewId));
+          } else {
+            toast.error('Failed to delete review');
+          }
+        } catch (error) {
+          toast.error('Failed to delete review');
+        }
+      }
+    );
   };
 
   // Close dropdown when clicking outside
@@ -208,7 +231,14 @@ const Reviews = () => {
 
             <button 
               className="btn btn-secondary write-review-btn"
-              onClick={() => alert('Review submission coming soon!')}
+              onClick={() => {
+                if (!isAuthenticated) {
+                  modal.warning('Login Required', 'Please login to your account to write a review.');
+                } else {
+                  // Navigate to product page which has the review form
+                  window.location.href = `/products/${id}#write-review`;
+                }
+              }}
             >
               Write a Review
             </button>
@@ -290,12 +320,23 @@ const Reviews = () => {
                           day: 'numeric', month: 'short', year: 'numeric' 
                         })}
                       </span>
-                      <button 
-                        className={`helpful-btn ${helpfulVotes[review.id] ? 'voted' : ''}`}
-                        onClick={() => handleHelpfulClick(review.id)}
-                      >
-                        <ThumbsUp size={14} /> Helpful ({review.helpful_count || 0})
-                      </button>
+                      <div className="review-actions">
+                        <button 
+                          className={`helpful-btn ${helpfulVotes[review.id] ? 'voted' : ''}`}
+                          onClick={() => handleHelpfulClick(review.id)}
+                        >
+                          <ThumbsUp size={14} /> Helpful ({review.helpful_count || 0})
+                        </button>
+                        {user?.role === 'admin' && (
+                          <button 
+                            className="delete-review-btn"
+                            onClick={() => handleDeleteReview(review.id)}
+                            title="Delete Review"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))

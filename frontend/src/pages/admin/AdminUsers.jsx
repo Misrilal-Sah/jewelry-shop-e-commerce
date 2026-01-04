@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  Shield, Users, Search, Mail, Phone, Calendar, Plus, Trash2, X, Key,
+  Shield, Users, Search, Mail, Phone, Calendar, Plus, Trash2, X, Key, Menu,
   ChevronLeft, ChevronRight, ChevronDown, ChevronsUpDown, ChevronUp
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -14,6 +14,8 @@ const AdminUsers = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, token, loading: authLoading } = useAuth();
   const toast = useToast();
+  
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -333,11 +335,21 @@ const AdminUsers = () => {
   return (
     <div className="admin-page">
       {/* Sidebar */}
-      <AdminSidebar />
+      <AdminSidebar 
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={() => setIsMobileSidebarOpen(false)}
+      />
 
       {/* Main Content */}
       <main className="admin-content">
         <div className="admin-header">
+          <button
+            className="mobile-menu-toggle-admin"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu size={20} />
+          </button>
           <h1 className="page-title">Admin Users & Roles</h1>
           <span className="page-count">{activeTab === 'users' ? `${totalAdmins} admin users` : 'Manage Permissions'}</span>
         </div>
