@@ -45,6 +45,8 @@ const allowedOrigins = [
   'https://jewelry-shop-e-commerce-git-dev-misrils-projects.vercel.app',
   'https://jewelry-shop-e-commerce-e79eyd54u-misrils-projects.vercel.app',
   'https://jewelry-shop-e-commerce.vercel.app',
+  'https://aabhar.run.place',
+  'https://www.aabhar.run.place',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
