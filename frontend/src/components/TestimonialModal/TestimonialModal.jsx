@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Star, Info, Loader2, Send } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { apiFetch } from '../../config/api';
 import './TestimonialModal.css';
 
 const TestimonialModal = ({ isOpen, onClose, onSuccess }) => {
@@ -31,7 +32,7 @@ const TestimonialModal = ({ isOpen, onClose, onSuccess }) => {
     setError('');
 
     try {
-      const res = await fetch('/api/testimonials/submit', {
+      const res = await apiFetch('/api/testimonials/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

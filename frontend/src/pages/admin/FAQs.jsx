@@ -7,6 +7,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
 import { useToast } from '../../components/ui/Toast';
+import { apiFetch } from '../../config/api';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import './Admin.css';
 import './FlashSales.css';
@@ -61,7 +62,7 @@ const FAQs = () => {
 
   const fetchFaqs = async () => {
     try {
-      const res = await fetch('/api/faqs/admin', {
+      const res = await apiFetch('/api/faqs/admin', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -113,7 +114,7 @@ const FAQs = () => {
         ? `/api/faqs/admin/${editingFaq.id}`
         : '/api/faqs/admin';
       
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method: editingFaq ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -144,7 +145,7 @@ const FAQs = () => {
     if (!faqToDelete) return;
     
     try {
-      const res = await fetch(`/api/faqs/admin/${faqToDelete.id}`, {
+      const res = await apiFetch(`/api/faqs/admin/${faqToDelete.id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

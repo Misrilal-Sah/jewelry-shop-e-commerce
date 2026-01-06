@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { apiFetch } from '../config/api';
 import SEO from '../components/SEO';
 import './FAQPage.css';
 
@@ -17,7 +18,7 @@ const FAQPage = () => {
 
   const fetchFaqs = async () => {
     try {
-      const res = await fetch('/api/faqs');
+      const res = await apiFetch('/api/faqs');
       if (res.ok) {
         const data = await res.json();
         setFaqs(data);
@@ -31,7 +32,7 @@ const FAQPage = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('/api/faqs/categories');
+      const res = await apiFetch('/api/faqs/categories');
       if (res.ok) {
         const data = await res.json();
         setCategories(data);

@@ -5,6 +5,7 @@ import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../ui/Toast';
 import { useModal } from '../ui/Modal';
+import { apiFetch } from '../../config/api';
 import './QuickViewModal.css';
 
 const QuickViewModal = ({ product, onClose, onAddToWishlist }) => {
@@ -36,7 +37,7 @@ const QuickViewModal = ({ product, onClose, onAddToWishlist }) => {
 
   const checkWishlistStatus = async () => {
     try {
-      const res = await fetch('/api/wishlist', {
+      const res = await apiFetch('/api/wishlist', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -124,14 +125,14 @@ const QuickViewModal = ({ product, onClose, onAddToWishlist }) => {
     setIsProcessing(true);
     try {
       if (isWishlisted) {
-        await fetch(`/api/wishlist/${product.id}`, {
+        await apiFetch(`/api/wishlist/${product.id}`, {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` }
         });
         setIsWishlisted(false);
         toast.info('Removed from wishlist');
       } else {
-        await fetch('/api/wishlist', {
+        await apiFetch('/api/wishlist', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

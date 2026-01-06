@@ -4,6 +4,7 @@ import { Mail, Lock, User, Phone, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/ui/Toast';
 import { useModal } from '../components/ui/Modal';
+import { apiFetch } from '../config/api';
 import './Auth.css';
 
 const GOOGLE_CLIENT_ID = '369652678716-quc851ragg1k8lksqmrnq20vmrkdaanr.apps.googleusercontent.com';
@@ -151,7 +152,7 @@ const Register = () => {
     modal.loading('Sending Verification Email', 'Please wait while we send the OTP to your email...');
     
     try {
-      const res = await fetch('/api/auth/send-signup-otp', {
+      const res = await apiFetch('/api/auth/send-signup-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -189,7 +190,7 @@ const Register = () => {
     modal.loading('Verifying Email', 'Please wait while we verify your email address...');
     
     try {
-      const res = await fetch('/api/auth/verify-signup-otp', {
+      const res = await apiFetch('/api/auth/verify-signup-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -219,7 +220,7 @@ const Register = () => {
     modal.loading('Resending OTP', 'Please wait while we resend the verification code...');
     
     try {
-      const res = await fetch('/api/auth/send-signup-otp', {
+      const res = await apiFetch('/api/auth/send-signup-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

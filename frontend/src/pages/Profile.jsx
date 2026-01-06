@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useShortcuts } from '../context/ShortcutsContext';
 import { useToast } from '../components/ui/Toast';
 import { useModal } from '../components/ui/Modal';
+import { apiFetch } from '../config/api';
 import './Profile.css';
 
 const ADDRESS_TYPES = [
@@ -331,7 +332,7 @@ const Profile = () => {
 
   const fetchProfileImage = async () => {
     try {
-      const res = await fetch('/api/auth/profile', {
+      const res = await apiFetch('/api/auth/profile', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -370,7 +371,7 @@ const Profile = () => {
       const formData = new FormData();
       formData.append('profile_image', file);
 
-      const res = await fetch('/api/auth/profile/image', {
+      const res = await apiFetch('/api/auth/profile/image', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData
@@ -398,7 +399,7 @@ const Profile = () => {
   const handleRemoveProfileImage = async () => {
     try {
       setImageUploading(true);
-      const res = await fetch('/api/auth/profile', {
+      const res = await apiFetch('/api/auth/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -424,7 +425,7 @@ const Profile = () => {
 
   const fetchNotificationPrefs = async () => {
     try {
-      const res = await fetch('/api/email/preferences', {
+      const res = await apiFetch('/api/email/preferences', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -448,7 +449,7 @@ const Profile = () => {
     
     try {
       setPrefLoading(true);
-      const res = await fetch('/api/email/preferences', {
+      const res = await apiFetch('/api/email/preferences', {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -474,7 +475,7 @@ const Profile = () => {
 
   const fetchAddresses = async () => {
     try {
-      const res = await fetch('/api/auth/addresses', {
+      const res = await apiFetch('/api/auth/addresses', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -489,7 +490,7 @@ const Profile = () => {
   // Fetch special dates (birthday/anniversary)
   const fetchSpecialDates = async () => {
     try {
-      const res = await fetch('/api/auth/special-dates', {
+      const res = await apiFetch('/api/auth/special-dates', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -522,7 +523,7 @@ const Profile = () => {
     
     setSpecialDatesLoading(true);
     try {
-      const res = await fetch('/api/auth/special-dates', {
+      const res = await apiFetch('/api/auth/special-dates', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -595,7 +596,7 @@ const Profile = () => {
       
       const method = editingAddress ? 'PUT' : 'POST';
       
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -628,7 +629,7 @@ const Profile = () => {
       'Are you sure you want to delete this address?',
       async () => {
         try {
-          const res = await fetch(`/api/auth/addresses/${addressId}`, {
+          const res = await apiFetch(`/api/auth/addresses/${addressId}`, {
             method: 'DELETE',
             headers: { Authorization: `Bearer ${token}` }
           });
@@ -648,7 +649,7 @@ const Profile = () => {
 
   const handleSetDefault = async (addressId) => {
     try {
-      const res = await fetch(`/api/auth/addresses/${addressId}/default`, {
+      const res = await apiFetch(`/api/auth/addresses/${addressId}/default`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -687,7 +688,7 @@ const Profile = () => {
     
     setPasswordLoading(true);
     try {
-      const res = await fetch('/api/auth/change-password', {
+      const res = await apiFetch('/api/auth/change-password', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -723,7 +724,7 @@ const Profile = () => {
     modal.loading('Sending Verification Code', 'Please wait while we send the code to your new email...');
     
     try {
-      const res = await fetch('/api/auth/send-email-change-otp', {
+      const res = await apiFetch('/api/auth/send-email-change-otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -791,7 +792,7 @@ const Profile = () => {
     modal.loading('Updating Email', 'Please wait while we update your email address...');
     
     try {
-      const res = await fetch('/api/auth/verify-email-change', {
+      const res = await apiFetch('/api/auth/verify-email-change', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -857,7 +858,7 @@ const Profile = () => {
     modal.loading('Saving Changes', 'Please wait while we update your profile...');
 
     try {
-      const res = await fetch('/api/auth/profile', {
+      const res = await apiFetch('/api/auth/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

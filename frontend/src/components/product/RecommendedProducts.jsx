@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { apiFetch } from '../../config/api';
 import ProductCard from './ProductCard';
 import QuickViewModal from './QuickViewModal';
 import './RecommendedProducts.css';
@@ -15,7 +16,7 @@ const RecommendedProducts = ({ productId, title = "You May Also Like", limit = 4
     const fetchRecommendations = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`/api/products/${productId}/recommendations?limit=${limit}`);
+        const res = await apiFetch(`/api/products/${productId}/recommendations?limit=${limit}`);
         if (res.ok) {
           const data = await res.json();
           setProducts(data);

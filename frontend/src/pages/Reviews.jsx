@@ -4,6 +4,7 @@ import { Star, ArrowLeft, User, ThumbsUp, Calendar, ChevronDown, Check, Image, T
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/ui/Toast';
 import { useModal } from '../components/ui/Modal';
+import { apiFetch } from '../config/api';
 import './Reviews.css';
 
 const Reviews = () => {
@@ -39,7 +40,7 @@ const Reviews = () => {
 
   const fetchProduct = async () => {
     try {
-      const res = await fetch(`/api/products/${id}`);
+      const res = await apiFetch(`/api/products/${id}`);
       if (res.ok) {
         const data = await res.json();
         setProduct(data);
@@ -52,7 +53,7 @@ const Reviews = () => {
   const fetchReviews = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/products/${id}/reviews?sortBy=${sortBy}&limit=50`);
+      const res = await apiFetch(`/api/products/${id}/reviews?sortBy=${sortBy}&limit=50`);
       if (res.ok) {
         const data = await res.json();
         setReviews(data.reviews || []);
@@ -72,7 +73,7 @@ const Reviews = () => {
     }
 
     try {
-      const res = await fetch(`/api/products/reviews/${reviewId}/helpful`, {
+      const res = await apiFetch(`/api/products/reviews/${reviewId}/helpful`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -97,7 +98,7 @@ const Reviews = () => {
       'Are you sure you want to delete this review? This action cannot be undone.',
       async () => {
         try {
-          const res = await fetch(`/api/products/reviews/${reviewId}`, {
+          const res = await apiFetch(`/api/products/reviews/${reviewId}`, {
             method: 'DELETE',
             headers: { Authorization: `Bearer ${token}` }
           });

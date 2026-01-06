@@ -9,6 +9,7 @@ import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
 import { useToast } from '../../components/ui/Toast';
 import { useModal } from '../../components/ui/Modal';
+import { apiFetch } from '../../config/api';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import './Admin.css';
 import './Logs.css';
@@ -104,7 +105,7 @@ const Logs = () => {
         limit: 1000 // Get all logs for client-side filtering
       });
       
-      const res = await fetch(`/api/logs/audit?${params}`, {
+      const res = await apiFetch(`/api/logs/audit?${params}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -130,7 +131,7 @@ const Logs = () => {
         limit: 1000 // Get all logs for client-side filtering
       });
       
-      const res = await fetch(`/api/logs/system?${params}`, {
+      const res = await apiFetch(`/api/logs/system?${params}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -159,7 +160,7 @@ const Logs = () => {
 
   const handleExport = async (type) => {
     try {
-      const res = await fetch(`/api/logs/export/${type}`, {
+      const res = await apiFetch(`/api/logs/export/${type}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -185,7 +186,7 @@ const Logs = () => {
       'Are you sure you want to delete logs older than 30 days? This action cannot be undone.',
       async () => {
         try {
-          const res = await fetch('/api/logs/cleanup', {
+          const res = await apiFetch('/api/logs/cleanup', {
             method: 'DELETE',
             headers: { 
               Authorization: `Bearer ${token}`,

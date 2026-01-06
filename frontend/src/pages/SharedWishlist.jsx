@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/ui/Toast';
 import { useModal } from '../components/ui/Modal';
+import { apiFetch } from '../config/api';
 import ProductCard from '../components/product/ProductCard';
 import './SharedWishlist.css';
 
@@ -40,7 +41,7 @@ const SharedWishlist = () => {
   const fetchSharedWishlist = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/wishlist/shared/${shareCode}`);
+      const res = await apiFetch(`/api/wishlist/shared/${shareCode}`);
       
       if (!res.ok) {
         const data = await res.json();
@@ -59,7 +60,7 @@ const SharedWishlist = () => {
 
   const checkLikeStatus = async () => {
     try {
-      const res = await fetch(`/api/wishlist/shared/${shareCode}/like`, {
+      const res = await apiFetch(`/api/wishlist/shared/${shareCode}/like`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -82,7 +83,7 @@ const SharedWishlist = () => {
     
     setLiking(true);
     try {
-      const res = await fetch(`/api/wishlist/shared/${shareCode}/like`, {
+      const res = await apiFetch(`/api/wishlist/shared/${shareCode}/like`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });

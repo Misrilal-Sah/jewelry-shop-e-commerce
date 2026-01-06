@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Sparkles, X, Check, Loader, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { apiFetch } from '../../config/api';
 import '../../pages/admin/Admin.css';
 
 /**
@@ -20,7 +21,7 @@ const ImageEnhancer = ({ imageUrl, onEnhanced, onClose }) => {
   useEffect(() => {
     const fetchBackgrounds = async () => {
       try {
-        const res = await fetch('/api/backgrounds');
+        const res = await apiFetch('/api/backgrounds');
         if (res.ok) {
           const data = await res.json();
           setBackgrounds(data);
@@ -49,14 +50,14 @@ const ImageEnhancer = ({ imageUrl, onEnhanced, onClose }) => {
       // Check if this is a local blob URL or an http URL
       if (imageUrl.startsWith('blob:')) {
         // For blob URLs (new product images), fetch blob and upload as file
-        const blobResponse = await fetch(imageUrl);
+        const blobResponse = await apiFetch(imageUrl);
         const blob = await blobResponse.blob();
         
         const formData = new FormData();
         formData.append('image', blob, 'image.jpg');
         formData.append('backgroundUrl', selectedBg.image_url);
         
-        res = await fetch('/api/products/enhance-image', {
+        res = await apiFetch('/api/products/enhance-image', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`
@@ -65,7 +66,7 @@ const ImageEnhancer = ({ imageUrl, onEnhanced, onClose }) => {
         });
       } else {
         // For http URLs (existing product images), send URL
-        res = await fetch('/api/products/enhance-image-url', {
+        res = await apiFetch('/api/products/enhance-image-url', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

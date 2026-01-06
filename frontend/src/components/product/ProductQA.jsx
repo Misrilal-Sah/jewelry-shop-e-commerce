@@ -3,6 +3,7 @@ import { MessageCircle, ChevronDown, ChevronUp, Send, User, CheckCircle, Trash2 
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../ui/Toast';
 import { useModal } from '../ui/Modal';
+import { apiFetch } from '../../config/api';
 import './ProductQA.css';
 
 const ProductQA = ({ productId }) => {
@@ -27,7 +28,7 @@ const ProductQA = ({ productId }) => {
 
   const fetchQuestions = async () => {
     try {
-      const res = await fetch(`/api/products/${productId}/questions`);
+      const res = await apiFetch(`/api/products/${productId}/questions`);
       if (res.ok) {
         const data = await res.json();
         setQuestions(data);
@@ -50,7 +51,7 @@ const ProductQA = ({ productId }) => {
     
     setSubmitting(true);
     try {
-      const res = await fetch(`/api/products/${productId}/questions`, {
+      const res = await apiFetch(`/api/products/${productId}/questions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,7 +81,7 @@ const ProductQA = ({ productId }) => {
     
     setSubmitting(true);
     try {
-      const res = await fetch(`/api/questions/${questionId}/answers`, {
+      const res = await apiFetch(`/api/questions/${questionId}/answers`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -120,7 +121,7 @@ const ProductQA = ({ productId }) => {
       'Are you sure you want to delete this question and all its answers? This action cannot be undone.',
       async () => {
         try {
-          const res = await fetch(`/api/admin/questions/${questionId}`, {
+          const res = await apiFetch(`/api/admin/questions/${questionId}`, {
             method: 'DELETE',
             headers: { Authorization: `Bearer ${token}` }
           });
@@ -143,7 +144,7 @@ const ProductQA = ({ productId }) => {
       'Are you sure you want to delete this answer? This action cannot be undone.',
       async () => {
         try {
-          const res = await fetch(`/api/admin/answers/${answerId}`, {
+          const res = await apiFetch(`/api/admin/answers/${answerId}`, {
             method: 'DELETE',
             headers: { Authorization: `Bearer ${token}` }
           });

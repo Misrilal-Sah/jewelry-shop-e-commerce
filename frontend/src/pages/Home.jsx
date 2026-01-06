@@ -7,6 +7,7 @@ import FlashSaleTimer from '../components/product/FlashSaleTimer';
 import TestimonialModal from '../components/TestimonialModal/TestimonialModal';
 import { useToast } from '../components/ui/Toast';
 import { useAuth } from '../context/AuthContext';
+import { apiFetch } from '../config/api';
 import SEO from '../components/SEO';
 import './Home.css';
 
@@ -34,9 +35,9 @@ const Home = () => {
     const fetchDynamicContent = async () => {
       try {
         const [settingsRes, categoriesRes, collectionsRes] = await Promise.all([
-          fetch('/api/common/settings/public'),
-          fetch('/api/common/categories/public?homepage=true'),
-          fetch('/api/common/collections/public?homepage=true')
+          apiFetch('/api/common/settings/public'),
+          apiFetch('/api/common/categories/public?homepage=true'),
+          apiFetch('/api/common/collections/public?homepage=true')
         ]);
         
         if (settingsRes.ok) {
@@ -63,7 +64,7 @@ const Home = () => {
       if (!isAuthenticated || !token) return;
       
       try {
-        const res = await fetch('/api/email/preferences', {
+        const res = await apiFetch('/api/email/preferences', {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.ok) {
@@ -91,7 +92,7 @@ const Home = () => {
     setIsSubmitting(true);
     try {
       // Update email preferences to enable newsletter
-      const res = await fetch('/api/email/preferences', {
+      const res = await apiFetch('/api/email/preferences', {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -123,7 +124,7 @@ const Home = () => {
 
     setIsSubmitting(true);
     try {
-      const res = await fetch('/api/newsletter/subscribe', {
+      const res = await apiFetch('/api/newsletter/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: newsletterEmail })
@@ -143,75 +144,21 @@ const Home = () => {
     }
   };
 
-  // Mock products data for initial display
-  const mockProducts = [
-    {
-      id: 1,
-      name: 'Royal Diamond Solitaire Ring',
-      category: 'rings',
-      metal_type: 'diamond',
-      purity: '18K',
-      weight_grams: 4.5,
-      metal_price: 125000,
-      making_charges: 15000,
-      images: ['https://res.cloudinary.com/ddrlxvnsh/image/upload/v1766855925/jewllery_shop/products/jxyw8vx454t3mnr2q8is.jpg'],
-      rating: 4.8,
-      review_count: 124
-    },
-    {
-      id: 2,
-      name: 'Traditional Gold Necklace Set',
-      category: 'necklaces',
-      metal_type: 'gold',
-      purity: '22K',
-      weight_grams: 45,
-      metal_price: 285000,
-      making_charges: 35000,
-      images: ['https://res.cloudinary.com/ddrlxvnsh/image/upload/v1766855925/jewllery_shop/products/ygijqk8osfqg10qmlzuu.jpg'],
-      rating: 4.9,
-      review_count: 89
-    },
-    {
-      id: 3,
-      name: 'Diamond Stud Earrings',
-      category: 'earrings',
-      metal_type: 'diamond',
-      purity: '18K',
-      weight_grams: 3.2,
-      metal_price: 85000,
-      making_charges: 10000,
-      images: ['https://res.cloudinary.com/ddrlxvnsh/image/upload/v1766855925/jewllery_shop/products/expgtk7ilimekmrjewg3.jpg'],
-      rating: 4.7,
-      review_count: 156
-    },
-    {
-      id: 4,
-      name: 'Gold Kada Bangles Set',
-      category: 'bangles',
-      metal_type: 'gold',
-      purity: '22K',
-      weight_grams: 32,
-      metal_price: 195000,
-      making_charges: 25000,
-      images: ['https://res.cloudinary.com/ddrlxvnsh/image/upload/v1766855925/jewllery_shop/products/gycyiwsxjsof0i0meafg.jpg'],
-      rating: 4.6,
-      review_count: 78
-    }
-  ];
-
   useEffect(() => {
-    // Try to fetch from API, fallback to mock data
+    // Fetch featured products from API
     const fetchFeatured = async () => {
       try {
-        const res = await fetch('/api/products/featured');
+        const res = await apiFetch('/api/products/featured');
         if (res.ok) {
           const data = await res.json();
-          setFeaturedProducts(data.length > 0 ? data : mockProducts);
+          setFeaturedProducts(data || []);
         } else {
-          setFeaturedProducts(mockProducts);
+          console.error('Failed to fetch featured products');
+          setFeaturedProducts([]);
         }
       } catch (error) {
-        setFeaturedProducts(mockProducts);
+        console.error('Error fetching featured products:', error);
+        setFeaturedProducts([]);
       } finally {
         setLoading(false);
       }
@@ -224,7 +171,7 @@ const Home = () => {
   // Fetch active flash sales
   const fetchFlashSales = async () => {
     try {
-      const res = await fetch('/api/flash-sales/active');
+      const res = await apiFetch('/api/flash-sales/active');
       if (res.ok) {
         const data = await res.json();
         setFlashSales(data);
@@ -237,7 +184,7 @@ const Home = () => {
   // Fetch testimonials
   const fetchTestimonials = async () => {
     try {
-      const res = await fetch('/api/testimonials');
+      const res = await apiFetch('/api/testimonials');
       if (res.ok) {
         const data = await res.json();
         setTestimonials(data);

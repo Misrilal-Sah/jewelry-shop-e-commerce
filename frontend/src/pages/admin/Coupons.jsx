@@ -7,6 +7,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
 import { useToast } from '../../components/ui/Toast';
+import { apiFetch } from '../../config/api';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import './Admin.css';
 
@@ -83,7 +84,7 @@ const Coupons = () => {
   const fetchCoupons = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/admin/coupons?search=${searchQuery}&page=${currentPage}&limit=${pageSize}&showInactive=${showInactive}&sortField=${sortField}&sortOrder=${sortOrder}`, {
+      const res = await apiFetch(`/api/admin/coupons?search=${searchQuery}&page=${currentPage}&limit=${pageSize}&showInactive=${showInactive}&sortField=${sortField}&sortOrder=${sortOrder}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -160,7 +161,7 @@ const Coupons = () => {
     const method = editingCoupon ? 'PUT' : 'POST';
 
     try {
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -197,7 +198,7 @@ const Coupons = () => {
   const handleDeactivate = async () => {
     if (!couponToDelete) return;
     try {
-      const res = await fetch(`/api/admin/coupons/${couponToDelete.id}/toggle`, {
+      const res = await apiFetch(`/api/admin/coupons/${couponToDelete.id}/toggle`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -215,7 +216,7 @@ const Coupons = () => {
   const handleDeleteForever = async () => {
     if (!couponToDelete) return;
     try {
-      const res = await fetch(`/api/admin/coupons/${couponToDelete.id}`, {
+      const res = await apiFetch(`/api/admin/coupons/${couponToDelete.id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -234,7 +235,7 @@ const Coupons = () => {
 
   const handleToggle = async (id) => {
     try {
-      const res = await fetch(`/api/admin/coupons/${id}/toggle`, {
+      const res = await apiFetch(`/api/admin/coupons/${id}/toggle`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` }
       });

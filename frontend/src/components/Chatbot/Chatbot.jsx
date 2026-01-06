@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { MessageCircle, X, Send, Loader2, Bot, User, Sparkles } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { apiFetch } from '../../config/api';
 import './Chatbot.css';
 
 const Chatbot = () => {
@@ -41,7 +42,7 @@ const Chatbot = () => {
 
   const fetchQuickActions = async () => {
     try {
-      const res = await fetch('/api/chatbot/quick-actions');
+      const res = await apiFetch('/api/chatbot/quick-actions');
       if (res.ok) {
         const data = await res.json();
         setQuickActions(data.actions || []);
@@ -83,7 +84,7 @@ const Chatbot = () => {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const res = await fetch('/api/chatbot/message', {
+      const res = await apiFetch('/api/chatbot/message', {
         method: 'POST',
         headers,
         body: JSON.stringify({

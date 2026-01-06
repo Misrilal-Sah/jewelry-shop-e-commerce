@@ -5,6 +5,7 @@ import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../ui/Toast';
 import { useModal } from '../ui/Modal';
+import { apiFetch } from '../../config/api';
 import './ProductCard.css';
 
 const ProductCard = ({ product, onQuickView }) => {
@@ -39,7 +40,7 @@ const ProductCard = ({ product, onQuickView }) => {
 
   const checkWishlistStatus = async () => {
     try {
-      const res = await fetch('/api/wishlist', {
+      const res = await apiFetch('/api/wishlist', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -101,7 +102,7 @@ const ProductCard = ({ product, onQuickView }) => {
     try {
       if (isWishlisted) {
         // Remove from wishlist
-        const res = await fetch(`/api/wishlist/${product.id}`, {
+        const res = await apiFetch(`/api/wishlist/${product.id}`, {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -114,7 +115,7 @@ const ProductCard = ({ product, onQuickView }) => {
         }
       } else {
         // Add to wishlist
-        const res = await fetch('/api/wishlist', {
+        const res = await apiFetch('/api/wishlist', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

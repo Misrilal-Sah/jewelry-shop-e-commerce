@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Package, Eye, ChevronRight, Calendar, CreditCard, Truck, Copy, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/ui/Toast';
+import { apiFetch } from '../config/api';
 import EmptyState from '../components/ui/EmptyState';
 import './Orders.css';
 
@@ -29,7 +30,7 @@ const Orders = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch('/api/orders', {
+      const res = await apiFetch('/api/orders', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {

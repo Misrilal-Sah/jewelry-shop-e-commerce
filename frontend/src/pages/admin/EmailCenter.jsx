@@ -8,6 +8,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
 import { useToast } from '../../components/ui/Toast';
+import { apiFetch } from '../../config/api';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import './Admin.css';
 
@@ -163,7 +164,7 @@ const EmailCenter = () => {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch('/api/admin/email/stats', {
+      const res = await apiFetch('/api/admin/email/stats', {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -178,7 +179,7 @@ const EmailCenter = () => {
   const fetchCampaigns = async () => {
     try {
       setCampaignsLoading(true);
-      const res = await fetch(
+      const res = await apiFetch(
         `/api/admin/email/campaigns?page=${campaignPage}&limit=${campaignPageSize}&sortBy=${campaignSortField}&sortOrder=${campaignSortOrder}&search=${debouncedCampaignSearch}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -212,7 +213,7 @@ const EmailCenter = () => {
   const fetchTemplates = async () => {
     try {
       setTemplatesLoading(true);
-      const res = await fetch('/api/admin/email/templates', {
+      const res = await apiFetch('/api/admin/email/templates', {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -229,7 +230,7 @@ const EmailCenter = () => {
   const fetchSubscribers = async () => {
     try {
       setSubscribersLoading(true);
-      const res = await fetch(
+      const res = await apiFetch(
         `/api/admin/email/subscribers?page=${subscriberPage}&limit=${subscriberPageSize}&search=${subscriberSearch}&sortBy=${subscriberSortField}&sortOrder=${subscriberSortOrder}&type=${subscriberTypeFilter}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -267,7 +268,7 @@ const EmailCenter = () => {
     }
 
     try {
-      const res = await fetch('/api/admin/email/campaigns', {
+      const res = await apiFetch('/api/admin/email/campaigns', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -299,7 +300,7 @@ const EmailCenter = () => {
 
     try {
       // First create the campaign
-      const createRes = await fetch('/api/admin/email/campaigns', {
+      const createRes = await apiFetch('/api/admin/email/campaigns', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -318,7 +319,7 @@ const EmailCenter = () => {
       setShowCampaignModal(false);
       setShowLoadingModal(true);
 
-      const sendRes = await fetch(`/api/admin/email/campaigns/${createData.campaign.id}/send`, {
+      const sendRes = await apiFetch(`/api/admin/email/campaigns/${createData.campaign.id}/send`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -345,7 +346,7 @@ const EmailCenter = () => {
     if (!editingCampaign) return;
 
     try {
-      const res = await fetch(`/api/admin/email/campaigns/${editingCampaign.id}`, {
+      const res = await apiFetch(`/api/admin/email/campaigns/${editingCampaign.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -376,7 +377,7 @@ const EmailCenter = () => {
     setShowLoadingModal(true);
 
     try {
-      const res = await fetch(`/api/admin/email/campaigns/${campaignToSend.id}/send`, {
+      const res = await apiFetch(`/api/admin/email/campaigns/${campaignToSend.id}/send`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -402,7 +403,7 @@ const EmailCenter = () => {
 
   const handleScheduleCampaign = async (campaignId, scheduledAt) => {
     try {
-      const res = await fetch(`/api/admin/email/campaigns/${campaignId}/schedule`, {
+      const res = await apiFetch(`/api/admin/email/campaigns/${campaignId}/schedule`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -432,7 +433,7 @@ const EmailCenter = () => {
         ? `/api/admin/email/campaigns/${itemToDelete.id}`
         : `/api/admin/email/subscribers/${itemToDelete.id}`;
       
-      const res = await fetch(endpoint, {
+      const res = await apiFetch(endpoint, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -461,7 +462,7 @@ const EmailCenter = () => {
 
   const handlePreviewTemplate = async (templateId) => {
     try {
-      const res = await fetch(`/api/admin/email/templates/${templateId}/preview`, {
+      const res = await apiFetch(`/api/admin/email/templates/${templateId}/preview`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -520,7 +521,7 @@ const EmailCenter = () => {
 
     try {
       // Generate preview HTML based on campaign type
-      const res = await fetch(`/api/admin/email/templates/preview-by-type`, {
+      const res = await apiFetch(`/api/admin/email/templates/preview-by-type`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

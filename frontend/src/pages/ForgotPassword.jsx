@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mail, ArrowLeft, Lock, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '../components/ui/Toast';
 import { useModal } from '../components/ui/Modal';
+import { apiFetch } from '../config/api';
 import './Auth.css';
 
 const ForgotPassword = () => {
@@ -62,7 +63,7 @@ const ForgotPassword = () => {
     modal.loading('Sending Reset Code', 'Please wait while we send the OTP to your email...');
 
     try {
-      const res = await fetch('/api/auth/send-reset-otp', {
+      const res = await apiFetch('/api/auth/send-reset-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
@@ -95,7 +96,7 @@ const ForgotPassword = () => {
     modal.loading('Verifying Code', 'Please wait while we verify your OTP...');
 
     try {
-      const res = await fetch('/api/auth/verify-reset-otp', {
+      const res = await apiFetch('/api/auth/verify-reset-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp })
@@ -133,7 +134,7 @@ const ForgotPassword = () => {
     modal.loading('Resetting Password', 'Please wait while we update your password...');
 
     try {
-      const res = await fetch('/api/auth/reset-password', {
+      const res = await apiFetch('/api/auth/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -161,7 +162,7 @@ const ForgotPassword = () => {
     modal.loading('Resending OTP', 'Please wait while we resend the verification code...');
     
     try {
-      const res = await fetch('/api/auth/send-reset-otp', {
+      const res = await apiFetch('/api/auth/send-reset-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })

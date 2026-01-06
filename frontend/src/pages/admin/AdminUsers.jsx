@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../components/ui/Toast';
+import { apiFetch } from '../../config/api';
 import RolesManagement from './RolesManagement';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import './Admin.css';
@@ -69,7 +70,7 @@ const AdminUsers = () => {
   // Fetch roles that current user can assign
   const fetchAssignableRoles = async () => {
     try {
-      const res = await fetch('/api/admin/roles/assignable', {
+      const res = await apiFetch('/api/admin/roles/assignable', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -127,7 +128,7 @@ const AdminUsers = () => {
         params.append('search', searchQuery);
       }
 
-      const res = await fetch(`/api/admin/users?${params}`, {
+      const res = await apiFetch(`/api/admin/users?${params}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -184,7 +185,7 @@ const AdminUsers = () => {
     setModalError('');
     
     try {
-      const res = await fetch(`/api/admin/users/validate?email=${encodeURIComponent(newAdminEmail.trim())}`, {
+      const res = await apiFetch(`/api/admin/users/validate?email=${encodeURIComponent(newAdminEmail.trim())}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -207,7 +208,7 @@ const AdminUsers = () => {
   // Handle inline role change
   const handleRoleChange = async (adminId, newRoleId) => {
     try {
-      const res = await fetch(`/api/admin/users/${adminId}/role`, {
+      const res = await apiFetch(`/api/admin/users/${adminId}/role`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -245,7 +246,7 @@ const AdminUsers = () => {
     setShowLoadingModal(true);
     
     try {
-      const res = await fetch('/api/admin/users/promote', {
+      const res = await apiFetch('/api/admin/users/promote', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -293,7 +294,7 @@ const AdminUsers = () => {
 
     setModalLoading(true);
     try {
-      const res = await fetch(`/api/admin/users/${selectedAdmin.id}`, {
+      const res = await apiFetch(`/api/admin/users/${selectedAdmin.id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

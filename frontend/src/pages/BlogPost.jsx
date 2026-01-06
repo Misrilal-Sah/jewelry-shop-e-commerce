@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Calendar, Clock, Eye, ArrowLeft, User } from 'lucide-react';
+import { apiFetch } from '../config/api';
 import SEO from '../components/SEO';
 import ShareButtons from '../components/product/ShareButtons';
 import './BlogPost.css';
@@ -24,7 +25,7 @@ const BlogPost = () => {
   const fetchPost = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/blog/posts/${slug}`);
+      const res = await apiFetch(`/api/blog/posts/${slug}`);
       if (res.ok) {
         const data = await res.json();
         setPost(data);
@@ -39,7 +40,7 @@ const BlogPost = () => {
 
   const fetchRelatedPosts = async (postId) => {
     try {
-      const res = await fetch(`/api/blog/posts/${postId}/related?limit=3`);
+      const res = await apiFetch(`/api/blog/posts/${postId}/related?limit=3`);
       if (res.ok) {
         const data = await res.json();
         setRelatedPosts(data);

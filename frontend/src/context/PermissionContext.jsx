@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { apiFetch } from '../config/api';
 
 const PermissionContext = createContext(null);
 
@@ -35,7 +36,7 @@ export const PermissionProvider = ({ children }) => {
 
   const fetchPermissions = async () => {
     try {
-      const res = await fetch('/api/auth/profile', {
+      const res = await apiFetch('/api/auth/profile', {
         headers: { Authorization: `Bearer ${token}` }
       });
       

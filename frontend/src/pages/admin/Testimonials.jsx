@@ -8,6 +8,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
 import { useToast } from '../../components/ui/Toast';
+import { apiFetch } from '../../config/api';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import './Admin.css';
 import './FlashSales.css';
@@ -82,7 +83,7 @@ const Testimonials = () => {
 
   const fetchTestimonials = async () => {
     try {
-      const res = await fetch('/api/testimonials/admin', {
+      const res = await apiFetch('/api/testimonials/admin', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -154,7 +155,7 @@ const Testimonials = () => {
     formDataUpload.append('folder', 'jewllery_shop/others');
 
     try {
-      const res = await fetch('/api/admin/upload-image', {
+      const res = await apiFetch('/api/admin/upload-image', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formDataUpload
@@ -197,7 +198,7 @@ const Testimonials = () => {
         ? `/api/testimonials/admin/${editingTestimonial.id}`
         : '/api/testimonials/admin';
       
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method: editingTestimonial ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -228,7 +229,7 @@ const Testimonials = () => {
     if (!testimonialToDelete) return;
     
     try {
-      const res = await fetch(`/api/testimonials/admin/${testimonialToDelete.id}`, {
+      const res = await apiFetch(`/api/testimonials/admin/${testimonialToDelete.id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -302,7 +303,7 @@ const Testimonials = () => {
   // Quick status update for approve/decline
   const handleQuickStatusChange = async (id, newStatus, is_homepage) => {
     try {
-      const res = await fetch(`/api/testimonials/admin/${id}`, {
+      const res = await apiFetch(`/api/testimonials/admin/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -325,7 +326,7 @@ const Testimonials = () => {
   const handleHomepageToggle = async (id, currentStatus, currentIsHomepage) => {
     const newIsHomepage = currentIsHomepage ? 0 : 1;
     try {
-      const res = await fetch(`/api/testimonials/admin/${id}`, {
+      const res = await apiFetch(`/api/testimonials/admin/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../components/ui/Toast';
+import { apiFetch } from '../../config/api';
 
 // Permission categories with their available actions
 const PERMISSION_CATEGORIES = {
@@ -86,7 +87,7 @@ const RolesManagement = () => {
   const fetchRoles = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/admin/roles', {
+      const res = await apiFetch('/api/admin/roles', {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -111,7 +112,7 @@ const RolesManagement = () => {
 
   const fetchPresets = async () => {
     try {
-      const res = await fetch('/api/admin/roles/presets', {
+      const res = await apiFetch('/api/admin/roles/presets', {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -126,7 +127,7 @@ const RolesManagement = () => {
 
   const fetchTemplates = async () => {
     try {
-      const res = await fetch('/api/admin/roles/templates', {
+      const res = await apiFetch('/api/admin/roles/templates', {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -152,12 +153,12 @@ const RolesManagement = () => {
     
     try {
       // Get empty permissions template
-      const templateRes = await fetch('/api/admin/roles/template', {
+      const templateRes = await apiFetch('/api/admin/roles/template', {
         headers: { Authorization: `Bearer ${token}` }
       });
       const templateData = await templateRes.json();
       
-      const res = await fetch('/api/admin/roles/templates', {
+      const res = await apiFetch('/api/admin/roles/templates', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -192,7 +193,7 @@ const RolesManagement = () => {
     
     setSavingTemplate(true);
     try {
-      const res = await fetch(`/api/admin/roles/templates/${selectedTemplate.id}`, {
+      const res = await apiFetch(`/api/admin/roles/templates/${selectedTemplate.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -220,7 +221,7 @@ const RolesManagement = () => {
 
   const handleDeleteTemplate = async (templateId) => {
     try {
-      const res = await fetch(`/api/admin/roles/templates/${templateId}`, {
+      const res = await apiFetch(`/api/admin/roles/templates/${templateId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -311,7 +312,7 @@ const RolesManagement = () => {
     
     setSaving(true);
     try {
-      const res = await fetch(`/api/admin/roles/${selectedRole.id}`, {
+      const res = await apiFetch(`/api/admin/roles/${selectedRole.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -347,14 +348,14 @@ const RolesManagement = () => {
       if (newRole.preset && presets[newRole.preset]) {
         permissions = presets[newRole.preset].permissions;
       } else {
-        const templateRes = await fetch('/api/admin/roles/template', {
+        const templateRes = await apiFetch('/api/admin/roles/template', {
           headers: { Authorization: `Bearer ${token}` }
         });
         const templateData = await templateRes.json();
         permissions = templateData.template;
       }
       
-      const res = await fetch('/api/admin/roles', {
+      const res = await apiFetch('/api/admin/roles', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -391,7 +392,7 @@ const RolesManagement = () => {
     }
     
     try {
-      const res = await fetch(`/api/admin/roles/${duplicateSource.id}/duplicate`, {
+      const res = await apiFetch(`/api/admin/roles/${duplicateSource.id}/duplicate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -428,7 +429,7 @@ const RolesManagement = () => {
 
   const handleDeleteRole = async (roleId) => {
     try {
-      const res = await fetch(`/api/admin/roles/${roleId}`, {
+      const res = await apiFetch(`/api/admin/roles/${roleId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

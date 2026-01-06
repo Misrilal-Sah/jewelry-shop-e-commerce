@@ -3,6 +3,7 @@ import { Bell, BellOff, TrendingDown } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from './Toast';
 import { useModal } from './Modal';
+import { apiFetch } from '../../config/api';
 import './AlertButton.css';
 
 const AlertButton = ({ productId, productStock, alertType = 'back_in_stock', className = '' }) => {
@@ -21,7 +22,7 @@ const AlertButton = ({ productId, productStock, alertType = 'back_in_stock', cla
 
   const checkAlertStatus = async () => {
     try {
-      const res = await fetch(`/api/alerts/check/${productId}`, {
+      const res = await apiFetch(`/api/alerts/check/${productId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -46,7 +47,7 @@ const AlertButton = ({ productId, productStock, alertType = 'back_in_stock', cla
     try {
       if (isSubscribed) {
         // Unsubscribe
-        const res = await fetch(`/api/alerts/product/${productId}/${alertType}`, {
+        const res = await apiFetch(`/api/alerts/product/${productId}/${alertType}`, {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -57,7 +58,7 @@ const AlertButton = ({ productId, productStock, alertType = 'back_in_stock', cla
         }
       } else {
         // Subscribe
-        const res = await fetch('/api/alerts', {
+        const res = await apiFetch('/api/alerts', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

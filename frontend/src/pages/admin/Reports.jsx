@@ -8,6 +8,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
 import { useToast } from '../../components/ui/Toast';
+import { apiFetch } from '../../config/api';
 import { getImageUrl, PLACEHOLDER_IMAGE } from '../../config/cloudinary';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import './Admin.css';
@@ -76,10 +77,10 @@ const Reports = () => {
       
       // Fetch all reports in parallel
       const [salesRes, categoryRes, topProductsRes, statusRes] = await Promise.all([
-        fetch(`/api/admin/reports/sales?period=${period}`, { headers: { Authorization: `Bearer ${token}` }}),
-        fetch('/api/admin/reports/categories', { headers: { Authorization: `Bearer ${token}` }}),
-        fetch('/api/admin/reports/top-products', { headers: { Authorization: `Bearer ${token}` }}),
-        fetch('/api/admin/reports/order-status', { headers: { Authorization: `Bearer ${token}` }})
+        apiFetch(`/api/admin/reports/sales?period=${period}`, { headers: { Authorization: `Bearer ${token}` }}),
+        apiFetch('/api/admin/reports/categories', { headers: { Authorization: `Bearer ${token}` }}),
+        apiFetch('/api/admin/reports/top-products', { headers: { Authorization: `Bearer ${token}` }}),
+        apiFetch('/api/admin/reports/order-status', { headers: { Authorization: `Bearer ${token}` }})
       ]);
       
       if (salesRes.ok) {

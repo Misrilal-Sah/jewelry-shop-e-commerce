@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { apiFetch } from '../config/api';
 
 const AuthContext = createContext();
 
@@ -17,7 +18,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch('/api/auth/profile', {
+      const res = await apiFetch('/api/auth/profile', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -35,7 +36,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (email, password) => {
-    const res = await fetch('/api/auth/login', {
+    const res = await apiFetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
@@ -51,7 +52,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (name, email, password, phone) => {
-    const res = await fetch('/api/auth/register', {
+    const res = await apiFetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, password, phone })
@@ -68,7 +69,7 @@ export const AuthProvider = ({ children }) => {
 
   const loginWithGoogle = async (credential) => {
     try {
-      const res = await fetch('/api/auth/google', {
+      const res = await apiFetch('/api/auth/google', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ credential })

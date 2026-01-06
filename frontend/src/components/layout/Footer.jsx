@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '../ui/Toast';
 import { useAuth } from '../../context/AuthContext';
+import { apiFetch } from '../../config/api';
 import './Footer.css';
 
 const Footer = () => {
@@ -22,7 +23,7 @@ const Footer = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await fetch('/api/common/settings/public');
+        const res = await apiFetch('/api/common/settings/public');
         if (res.ok) {
           setSiteSettings(await res.json());
         }
@@ -47,7 +48,7 @@ const Footer = () => {
       if (!isAuthenticated || !token) return;
       
       try {
-        const res = await fetch('/api/email/preferences', {
+        const res = await apiFetch('/api/email/preferences', {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.ok) {
@@ -80,7 +81,7 @@ const Footer = () => {
     
     setIsSubmitting(true);
     try {
-      const res = await fetch('/api/email/preferences', {
+      const res = await apiFetch('/api/email/preferences', {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -112,7 +113,7 @@ const Footer = () => {
 
     setIsSubmitting(true);
     try {
-      const res = await fetch('/api/newsletter/subscribe', {
+      const res = await apiFetch('/api/newsletter/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: newsletterEmail })

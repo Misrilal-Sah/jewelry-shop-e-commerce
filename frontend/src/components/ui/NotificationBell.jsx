@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Bell, Check, X, Package, TrendingDown, ShoppingBag, Cake, Heart } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { apiFetch } from '../../config/api';
 import CelebrationModal from '../CelebrationModal/CelebrationModal';
 import './NotificationBell.css';
 
@@ -36,7 +37,7 @@ const NotificationBell = () => {
 
   const fetchUnreadCount = async () => {
     try {
-      const res = await fetch('/api/notifications/unread-count', {
+      const res = await apiFetch('/api/notifications/unread-count', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -52,7 +53,7 @@ const NotificationBell = () => {
     if (loading) return;
     setLoading(true);
     try {
-      const res = await fetch('/api/notifications?limit=10', {
+      const res = await apiFetch('/api/notifications?limit=10', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -75,7 +76,7 @@ const NotificationBell = () => {
 
   const markAsRead = async (id) => {
     try {
-      await fetch(`/api/notifications/${id}/read`, {
+      await apiFetch(`/api/notifications/${id}/read`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -90,7 +91,7 @@ const NotificationBell = () => {
 
   const markAllAsRead = async () => {
     try {
-      await fetch('/api/notifications/read-all', {
+      await apiFetch('/api/notifications/read-all', {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` }
       });

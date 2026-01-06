@@ -10,6 +10,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/ui/Toast';
 import { useModal } from '../components/ui/Modal';
 import { useRecentlyViewed } from '../hooks/useRecentlyViewed';
+import { apiFetch } from '../config/api';
 import RecentlyViewed from '../components/product/RecentlyViewed';
 import RecommendedProducts from '../components/product/RecommendedProducts';
 import ShareButtons from '../components/product/ShareButtons';
@@ -50,48 +51,6 @@ const ProductDetail = () => {
   // Flash sale state
   const [flashSale, setFlashSale] = useState(null);
 
-  // Mock product data
-  const mockProducts = {
-    1: {
-      id: 1,
-      name: 'Royal Diamond Solitaire Ring',
-      description: 'An exquisite diamond solitaire ring featuring a brilliant-cut diamond set in 18K gold. This stunning piece showcases exceptional craftsmanship with a prong setting that maximizes light reflection. Perfect for engagements, anniversaries, or as a treasured gift for someone special.',
-      category: 'rings',
-      collection: 'wedding',
-      metal_type: 'diamond',
-      purity: '18K',
-      weight_grams: 4.5,
-      metal_price: 125000,
-      making_charges: 15000,
-      gst_percent: 3,
-      images: ['https://res.cloudinary.com/ddrlxvnsh/image/upload/v1766855925/jewllery_shop/products/jxyw8vx454t3mnr2q8is.jpg'],
-      sizes: ['5', '6', '7', '8', '9', '10'],
-      rating: 4.8,
-      review_count: 124,
-      stock: 10,
-      certification: 'BIS Hallmarked, IGI Certified Diamond'
-    },
-    2: {
-      id: 2,
-      name: 'Traditional Gold Necklace Set',
-      description: 'A stunning traditional gold necklace set with intricate temple jewelry design. This masterpiece features detailed filigree work and traditional motifs that celebrate Indian heritage. Includes matching earrings for a complete bridal look.',
-      category: 'necklaces',
-      collection: 'wedding',
-      metal_type: 'gold',
-      purity: '22K',
-      weight_grams: 45,
-      metal_price: 285000,
-      making_charges: 35000,
-      gst_percent: 3,
-      images: ['https://res.cloudinary.com/ddrlxvnsh/image/upload/v1766855925/jewllery_shop/products/ygijqk8osfqg10qmlzuu.jpg'],
-      sizes: ['Standard'],
-      rating: 4.9,
-      review_count: 89,
-      stock: 5,
-      certification: 'BIS Hallmarked'
-    }
-  };
-
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchProduct();
@@ -107,7 +66,7 @@ const ProductDetail = () => {
   const fetchProduct = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/products/${id}`);
+      const res = await apiFetch(`/api/products/${id}`);
       if (res.ok) {
         const data = await res.json();
         setProduct(data);
@@ -115,13 +74,12 @@ const ProductDetail = () => {
           setSelectedSize(data.sizes[0]);
         }
       } else {
-        setProduct(mockProducts[id] || mockProducts[1]);
-        if (mockProducts[id]?.sizes?.length > 0) {
-          setSelectedSize(mockProducts[id].sizes[0]);
-        }
+        console.error('Failed to fetch product');
+        setProduct(null);
       }
     } catch (error) {
-      setProduct(mockProducts[id] || mockProducts[1]);
+      console.error('Error fetching product:', error);
+      setProduct(null);
     } finally {
       setLoading(false);
     }
@@ -138,7 +96,7 @@ const ProductDetail = () => {
   // Fetch flash sale for this product
   const fetchFlashSale = async (productId) => {
     try {
-      const res = await fetch(`/api/flash-sales/product/${productId}`);
+      const res = await apiFetch(`/api/flash-sales/product/${productId}`);
       if (res.ok) {
         const data = await res.json();
         // API returns { hasFlashSale: true, flashSale: {...} } or { hasFlashSale: false }
@@ -158,7 +116,7 @@ const ProductDetail = () => {
 
   const checkWishlistStatus = async () => {
     try {
-      const res = await fetch('/api/wishlist', {
+      const res = await apiFetch('/api/wishlist', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -272,7 +230,7 @@ const ProductDetail = () => {
     
     try {
       if (isWishlisted) {
-        const res = await fetch(`/api/wishlist/${product.id}`, {
+        const res = await apiFetch(`/api/wishlist/${product.id}`, {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -284,7 +242,7 @@ const ProductDetail = () => {
           toast.error(data.message || 'Failed to remove from wishlist');
         }
       } else {
-        const res = await fetch('/api/wishlist', {
+        const res = await apiFetch('/api/wishlist', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -381,7 +339,7 @@ const ProductDetail = () => {
       const formData = new FormData();
       filesToUpload.forEach(file => formData.append('review_images', file));
       
-      const res = await fetch('/api/products/reviews/upload-images', {
+      const res = await apiFetch('/api/products/reviews/upload-images', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData
@@ -436,7 +394,7 @@ const ProductDetail = () => {
 
     setSubmittingReview(true);
     try {
-      const res = await fetch(`/api/products/${id}/reviews`, {
+      const res = await apiFetch(`/api/products/${id}/reviews`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -475,7 +433,7 @@ const ProductDetail = () => {
     }
 
     try {
-      const res = await fetch(`/api/products/reviews/${reviewId}/helpful`, {
+      const res = await apiFetch(`/api/products/reviews/${reviewId}/helpful`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -504,7 +462,7 @@ const ProductDetail = () => {
       'Are you sure you want to delete this review? This action cannot be undone.',
       async () => {
         try {
-          const res = await fetch(`/api/products/reviews/${reviewId}`, {
+          const res = await apiFetch(`/api/products/reviews/${reviewId}`, {
             method: 'DELETE',
             headers: { Authorization: `Bearer ${token}` }
           });

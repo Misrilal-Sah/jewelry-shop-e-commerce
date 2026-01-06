@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../components/ui/Toast';
+import { apiFetch } from '../../config/api';
 import InvoiceTemplate from '../../components/InvoiceTemplate';
 import './Admin.css';
 
@@ -37,7 +38,7 @@ const OrderView = () => {
 
   const fetchOrder = async () => {
     try {
-      const res = await fetch(`/api/admin/orders/${id}`, {
+      const res = await apiFetch(`/api/admin/orders/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -58,7 +59,7 @@ const OrderView = () => {
   const updateStatus = async (newStatus) => {
     try {
       setStatusUpdating(true);
-      const res = await fetch(`/api/admin/orders/${id}/status`, {
+      const res = await apiFetch(`/api/admin/orders/${id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

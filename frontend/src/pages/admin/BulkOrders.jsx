@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
 import { useToast } from '../../components/ui/Toast';
 import { useModal } from '../../components/ui/Modal';
+import { apiFetch } from '../../config/api';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import './Admin.css';
 
@@ -68,7 +69,7 @@ const BulkOrders = () => {
 
   const fetchInquiries = async () => {
     try {
-      const res = await fetch('/api/bulk-orders', {
+      const res = await apiFetch('/api/bulk-orders', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -84,7 +85,7 @@ const BulkOrders = () => {
 
   const handleStatusChange = async (id, newStatus) => {
     try {
-      const res = await fetch(`/api/bulk-orders/${id}/status`, {
+      const res = await apiFetch(`/api/bulk-orders/${id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -111,7 +112,7 @@ const BulkOrders = () => {
       'Are you sure you want to delete this inquiry?',
       async () => {
         try {
-          const res = await fetch(`/api/bulk-orders/${id}`, {
+          const res = await apiFetch(`/api/bulk-orders/${id}`, {
             method: 'DELETE',
             headers: { Authorization: `Bearer ${token}` }
           });

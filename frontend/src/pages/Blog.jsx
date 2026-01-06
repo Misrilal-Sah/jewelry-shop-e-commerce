@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Clock, Eye, ArrowRight, Search, BookOpen } from 'lucide-react';
+import { apiFetch } from '../config/api';
 import SEO from '../components/SEO';
 import './Blog.css';
 
@@ -27,7 +28,7 @@ const Blog = () => {
         ...(activeCategory !== 'all' && { category: activeCategory })
       });
 
-      const res = await fetch(`/api/blog/posts?${params}`);
+      const res = await apiFetch(`/api/blog/posts?${params}`);
       if (res.ok) {
         const data = await res.json();
         setPosts(data.posts);
@@ -42,7 +43,7 @@ const Blog = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('/api/blog/categories');
+      const res = await apiFetch('/api/blog/categories');
       if (res.ok) {
         const data = await res.json();
         setCategories(data);

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
+import { apiFetch } from '../../config/api';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import './Admin.css';
 
@@ -30,7 +31,7 @@ const Dashboard = () => {
 
   const fetchDashboardStats = async () => {
     try {
-      const res = await fetch('/api/admin/dashboard', {
+      const res = await apiFetch('/api/admin/dashboard', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -52,21 +53,21 @@ const Dashboard = () => {
     }).format(amount || 0);
   };
 
-  // Mock stats for display
-  const mockStats = {
+  // Default stats when API hasn't loaded yet
+  const defaultStats = {
     stats: {
-      totalOrders: 156,
-      totalRevenue: 4850000,
-      totalProducts: 48,
-      totalCustomers: 234,
-      pendingOrders: 12,
-      lowStock: 5
+      totalOrders: 0,
+      totalRevenue: 0,
+      totalProducts: 0,
+      totalCustomers: 0,
+      pendingOrders: 0,
+      lowStock: 0
     },
     recentOrders: [],
     topProducts: []
   };
 
-  const displayStats = stats || mockStats;
+  const displayStats = stats || defaultStats;
 
   return (
     <div className="admin-page">

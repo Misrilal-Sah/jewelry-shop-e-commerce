@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
 import { useToast } from '../../components/ui/Toast';
 import { useModal } from '../../components/ui/Modal';
+import { apiFetch } from '../../config/api';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import './Admin.css';
 
@@ -85,7 +86,7 @@ const Customers = () => {
         params.append('sortOrder', sortConfig.direction);
       }
 
-      const res = await fetch(`/api/admin/customers?${params}`, {
+      const res = await apiFetch(`/api/admin/customers?${params}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -141,7 +142,7 @@ const Customers = () => {
   const recalculateSegments = async () => {
     setRecalculating(true);
     try {
-      const res = await fetch('/api/admin/customers/recalculate-segments', {
+      const res = await apiFetch('/api/admin/customers/recalculate-segments', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });

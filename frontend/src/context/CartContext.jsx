@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { apiFetch } from '../config/api';
 
 const CartContext = createContext();
 
@@ -51,7 +52,7 @@ export const CartProvider = ({ children }) => {
     if (!token) return;
     setLoading(true);
     try {
-      const res = await fetch('/api/cart', {
+      const res = await apiFetch('/api/cart', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -96,7 +97,7 @@ export const CartProvider = ({ children }) => {
   const addToCart = async (product, quantity = 1, size = null, skipOpenCart = false) => {
     if (isAuthenticated) {
       try {
-        const res = await fetch('/api/cart', {
+        const res = await apiFetch('/api/cart', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -144,7 +145,7 @@ export const CartProvider = ({ children }) => {
   const updateQuantity = async (itemId, quantity) => {
     if (isAuthenticated) {
       try {
-        await fetch(`/api/cart/${itemId}`, {
+        await apiFetch(`/api/cart/${itemId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -166,7 +167,7 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = async (itemId) => {
     if (isAuthenticated) {
       try {
-        await fetch(`/api/cart/${itemId}`, {
+        await apiFetch(`/api/cart/${itemId}`, {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -194,7 +195,7 @@ export const CartProvider = ({ children }) => {
   const clearCart = async () => {
     if (isAuthenticated) {
       try {
-        await fetch('/api/cart', {
+        await apiFetch('/api/cart', {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` }
         });

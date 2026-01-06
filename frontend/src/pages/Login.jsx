@@ -4,6 +4,7 @@ import { Mail, Lock, Eye, EyeOff, Phone, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/ui/Toast';
 import { useModal } from '../components/ui/Modal';
+import { apiFetch } from '../config/api';
 import './Auth.css';
 
 const GOOGLE_CLIENT_ID = '369652678716-quc851ragg1k8lksqmrnq20vmrkdaanr.apps.googleusercontent.com';
@@ -135,7 +136,7 @@ const Login = () => {
     modal.loading('Sending OTP', 'Please wait while we send the code to your phone...');
     
     try {
-      const res = await fetch('/api/auth/phone/send-otp', {
+      const res = await apiFetch('/api/auth/phone/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone })
@@ -210,7 +211,7 @@ const Login = () => {
     modal.loading('Verifying OTP', 'Please wait while we verify the code...');
     
     try {
-      const res = await fetch('/api/auth/phone/verify-otp', {
+      const res = await apiFetch('/api/auth/phone/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, otp: otpString })

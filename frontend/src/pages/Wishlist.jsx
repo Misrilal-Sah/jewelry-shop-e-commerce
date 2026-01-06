@@ -4,6 +4,7 @@ import { Heart, Trash2, ShoppingBag, Check, Share2, Copy, X, Eye, ThumbsUp, Zap 
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../components/ui/Toast';
+import { apiFetch } from '../config/api';
 import EmptyState from '../components/ui/EmptyState';
 import './Wishlist.css';
 
@@ -35,7 +36,7 @@ const Wishlist = () => {
 
   const fetchWishlist = async () => {
     try {
-      const res = await fetch('/api/wishlist', {
+      const res = await apiFetch('/api/wishlist', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -51,7 +52,7 @@ const Wishlist = () => {
 
   const removeFromWishlist = async (productId) => {
     try {
-      await fetch(`/api/wishlist/${productId}`, {
+      await apiFetch(`/api/wishlist/${productId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -124,7 +125,7 @@ const Wishlist = () => {
   // Share functions
   const fetchShareStatus = async () => {
     try {
-      const res = await fetch('/api/wishlist/share/status', {
+      const res = await apiFetch('/api/wishlist/share/status', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -139,7 +140,7 @@ const Wishlist = () => {
   const handleShare = async () => {
     setGeneratingLink(true);
     try {
-      const res = await fetch('/api/wishlist/share', {
+      const res = await apiFetch('/api/wishlist/share', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -162,7 +163,7 @@ const Wishlist = () => {
 
   const handleDisableShare = async () => {
     try {
-      await fetch('/api/wishlist/share', {
+      await apiFetch('/api/wishlist/share', {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

@@ -4,6 +4,7 @@ import { MapPin, Check, ArrowLeft, Tag, X, Loader2, Shield, CreditCard, Banknote
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useModal } from '../components/ui/Modal';
+import { apiFetch } from '../config/api';
 import SEO from '../components/SEO';
 import './Checkout.css';
 
@@ -53,7 +54,7 @@ const Checkout = () => {
 
   const fetchAddresses = async () => {
     try {
-      const res = await fetch('/api/auth/addresses', {
+      const res = await apiFetch('/api/auth/addresses', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -74,7 +75,7 @@ const Checkout = () => {
   const handleAddAddress = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/auth/addresses', {
+      const res = await apiFetch('/api/auth/addresses', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -105,7 +106,7 @@ const Checkout = () => {
     modal.loading('Verifying Coupon', 'Please wait while we verify your coupon code...');
 
     try {
-      const res = await fetch('/api/cart/coupon/validate', {
+      const res = await apiFetch('/api/cart/coupon/validate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -173,7 +174,7 @@ const Checkout = () => {
     }
 
     // Get Razorpay key
-    const keyRes = await fetch('/api/payment/key');
+    const keyRes = await apiFetch('/api/payment/key');
     const { key } = await keyRes.json();
 
     const selectedAddr = addresses.find(a => a.id === selectedAddress);
@@ -196,7 +197,7 @@ const Checkout = () => {
       handler: async function (response) {
         // Verify payment on backend
         try {
-          const verifyRes = await fetch('/api/payment/verify', {
+          const verifyRes = await apiFetch('/api/payment/verify', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -248,7 +249,7 @@ const Checkout = () => {
     setLoading(true);
     try {
       // Step 1: Create order in database
-      const res = await fetch('/api/orders', {
+      const res = await apiFetch('/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -283,7 +284,7 @@ const Checkout = () => {
       }
 
       // Step 3: For online payment, create Razorpay order
-      const paymentRes = await fetch('/api/payment/create-order', {
+      const paymentRes = await apiFetch('/api/payment/create-order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

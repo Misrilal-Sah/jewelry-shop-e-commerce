@@ -7,6 +7,7 @@ import {
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import { apiFetch } from '../../config/api';
 import NotificationBell from '../ui/NotificationBell';
 import './Header.css';
 
@@ -35,7 +36,7 @@ const Header = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch('/api/products?limit=100');
+        const res = await apiFetch('/api/products?limit=100');
         if (res.ok) {
           const data = await res.json();
           setAllProducts(data.products || []);

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { X, Mail, Gift, Sparkles, Copy, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from './ui/Toast';
+import { apiFetch } from '../config/api';
 import './NewsletterPopup.css';
 
 const COUPON_CODE = 'SAVE10';
@@ -106,7 +107,7 @@ const NewsletterPopup = () => {
     try {
       if (isAuthenticated) {
         // Update user preferences
-        const res = await fetch('/api/auth/email-preferences', {
+        const res = await apiFetch('/api/auth/email-preferences', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -121,7 +122,7 @@ const NewsletterPopup = () => {
         }
       } else {
         // Guest subscription
-        const res = await fetch('/api/newsletter/subscribe', {
+        const res = await apiFetch('/api/newsletter/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email })

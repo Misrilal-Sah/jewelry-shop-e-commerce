@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
 import { useToast } from '../../components/ui/Toast';
+import { apiFetch } from '../../config/api';
 import { 
   Settings, Tag, Briefcase, Save, Plus, Trash2, Edit2, X, Check, Menu,
   Phone, Mail, MapPin, Facebook, Instagram, Twitter, Youtube,
@@ -50,9 +51,9 @@ const CommonDetails = () => {
     setLoading(true);
     try {
       const [settingsRes, categoriesRes, collectionsRes] = await Promise.all([
-        fetch('/api/common/settings', { headers: { Authorization: `Bearer ${token}` } }),
-        fetch('/api/common/categories', { headers: { Authorization: `Bearer ${token}` } }),
-        fetch('/api/common/collections', { headers: { Authorization: `Bearer ${token}` } })
+        apiFetch('/api/common/settings', { headers: { Authorization: `Bearer ${token}` } }),
+        apiFetch('/api/common/categories', { headers: { Authorization: `Bearer ${token}` } }),
+        apiFetch('/api/common/collections', { headers: { Authorization: `Bearer ${token}` } })
       ]);
       
       if (settingsRes.ok) {
@@ -87,7 +88,7 @@ const CommonDetails = () => {
         setting_value: s.setting_value
       }));
       
-      const res = await fetch('/api/common/settings', {
+      const res = await apiFetch('/api/common/settings', {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -120,7 +121,7 @@ const CommonDetails = () => {
       formData.append('folder', 'jewllery_shop/Others');
       formData.append('prefix', type);
       
-      const res = await fetch('/api/admin/upload-image', {
+      const res = await apiFetch('/api/admin/upload-image', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData
@@ -186,7 +187,7 @@ const CommonDetails = () => {
       return;
     }
     try {
-      const res = await fetch('/api/common/categories', {
+      const res = await apiFetch('/api/common/categories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(newCategory)
@@ -207,7 +208,7 @@ const CommonDetails = () => {
 
   const handleUpdateCategory = async (id) => {
     try {
-      const res = await fetch(`/api/common/categories/${id}`, {
+      const res = await apiFetch(`/api/common/categories/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(editingCategory)
@@ -224,7 +225,7 @@ const CommonDetails = () => {
 
   const handleDeleteCategory = async (id) => {
     try {
-      const res = await fetch(`/api/common/categories/${id}`, {
+      const res = await apiFetch(`/api/common/categories/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -252,7 +253,7 @@ const CommonDetails = () => {
       return;
     }
     try {
-      const res = await fetch('/api/common/collections', {
+      const res = await apiFetch('/api/common/collections', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(newCollection)
@@ -273,7 +274,7 @@ const CommonDetails = () => {
 
   const handleUpdateCollection = async (id) => {
     try {
-      const res = await fetch(`/api/common/collections/${id}`, {
+      const res = await apiFetch(`/api/common/collections/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(editingCollection)
@@ -290,7 +291,7 @@ const CommonDetails = () => {
 
   const handleDeleteCollection = async (id) => {
     try {
-      const res = await fetch(`/api/common/collections/${id}`, {
+      const res = await apiFetch(`/api/common/collections/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

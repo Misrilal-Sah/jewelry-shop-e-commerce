@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { CheckCircle, Package, MapPin, CreditCard, ArrowLeft, Gift, Printer } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { apiFetch } from '../config/api';
 import InvoiceTemplate from '../components/InvoiceTemplate';
 import './OrderDetail.css';
 
@@ -31,7 +32,7 @@ const OrderDetail = () => {
 
   const fetchOrder = async () => {
     try {
-      const res = await fetch(`/api/orders/${id}`, {
+      const res = await apiFetch(`/api/orders/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {

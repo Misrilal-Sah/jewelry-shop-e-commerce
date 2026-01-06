@@ -8,6 +8,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
 import { useToast } from '../../components/ui/Toast';
+import { apiFetch } from '../../config/api';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import './Admin.css';
 
@@ -79,7 +80,7 @@ const Products = () => {
       console.log('showInactive:', showInactive);
       console.log('sortConfig:', sortConfig);
       
-      const res = await fetch(`/api/admin/products?${params}`, {
+      const res = await apiFetch(`/api/admin/products?${params}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -145,7 +146,7 @@ const Products = () => {
         ? `/api/admin/products/${product.id}?permanent=true`
         : `/api/admin/products/${product.id}`;
       
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -177,7 +178,7 @@ const Products = () => {
 
   const handleRestore = async (product) => {
     try {
-      const res = await fetch(`/api/admin/products/${product.id}`, {
+      const res = await apiFetch(`/api/admin/products/${product.id}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -228,7 +229,7 @@ const Products = () => {
     formData.append('image', bgFile);
     
     try {
-      const res = await fetch('/api/backgrounds', {
+      const res = await apiFetch('/api/backgrounds', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData
@@ -254,7 +255,7 @@ const Products = () => {
   const fetchBackgrounds = async () => {
     setBgLoading(true);
     try {
-      const res = await fetch('/api/backgrounds');
+      const res = await apiFetch('/api/backgrounds');
       if (res.ok) {
         setBackgrounds(await res.json());
       }
@@ -271,7 +272,7 @@ const Products = () => {
     if (!id) return;
     
     try {
-      const res = await fetch(`/api/backgrounds/${id}`, {
+      const res = await apiFetch(`/api/backgrounds/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

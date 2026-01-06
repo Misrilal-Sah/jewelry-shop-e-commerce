@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useModal } from '../components/ui/Modal';
 import { useToast } from '../components/ui/Toast';
+import { apiFetch } from '../config/api';
 import EmptyState from '../components/ui/EmptyState';
 import SEO from '../components/SEO';
 import './Cart.css';
@@ -40,7 +41,7 @@ const Cart = () => {
     if (!isAuthenticated) return;
     setLoadingSaved(true);
     try {
-      const res = await fetch('/api/saved', {
+      const res = await apiFetch('/api/saved', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -61,7 +62,7 @@ const Cart = () => {
 
     setSavingItem(item.id);
     try {
-      const res = await fetch('/api/saved', {
+      const res = await apiFetch('/api/saved', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +111,7 @@ const Cart = () => {
       addToCart(productData, 1, savedItem.selected_size, true); // Skip opening cart sidebar
 
       // Remove from saved
-      await fetch(`/api/saved/${savedItem.id}`, {
+      await apiFetch(`/api/saved/${savedItem.id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -125,7 +126,7 @@ const Cart = () => {
 
   const handleRemoveSaved = async (savedItemId) => {
     try {
-      const res = await fetch(`/api/saved/${savedItemId}`, {
+      const res = await apiFetch(`/api/saved/${savedItemId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -200,7 +201,7 @@ const Cart = () => {
     modal.loading('Verifying Coupon', 'Please wait while we verify your coupon code...');
 
     try {
-      const res = await fetch('/api/cart/coupon/validate', {
+      const res = await apiFetch('/api/cart/coupon/validate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

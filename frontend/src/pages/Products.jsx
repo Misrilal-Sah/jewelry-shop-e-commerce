@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Filter, SlidersHorizontal, Grid, List, X, ChevronDown, Check } from 'lucide-react';
 import ProductCard from '../components/product/ProductCard';
 import QuickViewModal from '../components/product/QuickViewModal';
+import { apiFetch } from '../config/api';
 import SEO from '../components/SEO';
 import './Products.css';
 
@@ -25,8 +26,8 @@ const Products = () => {
     const fetchFilterOptions = async () => {
       try {
         const [catRes, colRes] = await Promise.all([
-          fetch('/api/common/categories/public'),
-          fetch('/api/common/collections/public')
+          apiFetch('/api/common/categories/public'),
+          apiFetch('/api/common/collections/public')
         ]);
         if (catRes.ok) {
           const cats = await catRes.json();
@@ -71,119 +72,6 @@ const Products = () => {
     { value: 'newest', label: 'Newest First' }
   ];
 
-  // Mock products for testing
-  const mockProducts = [
-    {
-      id: 1,
-      name: 'Royal Diamond Solitaire Ring',
-      category: 'rings',
-      collection: 'wedding',
-      metal_type: 'diamond',
-      purity: '18K',
-      weight_grams: 4.5,
-      metal_price: 125000,
-      making_charges: 15000,
-      images: ['https://res.cloudinary.com/ddrlxvnsh/image/upload/v1766855925/jewllery_shop/products/jxyw8vx454t3mnr2q8is.jpg'],
-      rating: 4.8,
-      review_count: 124,
-      is_featured: true,
-      stock: 10
-    },
-    {
-      id: 2,
-      name: 'Traditional Gold Necklace Set',
-      category: 'necklaces',
-      collection: 'wedding',
-      metal_type: 'gold',
-      purity: '22K',
-      weight_grams: 45,
-      metal_price: 285000,
-      making_charges: 35000,
-      images: ['https://res.cloudinary.com/ddrlxvnsh/image/upload/v1766855925/jewllery_shop/products/ygijqk8osfqg10qmlzuu.jpg'],
-      rating: 4.9,
-      review_count: 89,
-      is_featured: true,
-      stock: 5
-    },
-    {
-      id: 3,
-      name: 'Diamond Stud Earrings',
-      category: 'earrings',
-      collection: 'daily',
-      metal_type: 'diamond',
-      purity: '18K',
-      weight_grams: 3.2,
-      metal_price: 85000,
-      making_charges: 10000,
-      images: ['https://res.cloudinary.com/ddrlxvnsh/image/upload/v1766855925/jewllery_shop/products/expgtk7ilimekmrjewg3.jpg'],
-      rating: 4.7,
-      review_count: 156,
-      is_featured: true,
-      stock: 15
-    },
-    {
-      id: 4,
-      name: 'Gold Kada Bangles Set',
-      category: 'bangles',
-      collection: 'festive',
-      metal_type: 'gold',
-      purity: '22K',
-      weight_grams: 32,
-      metal_price: 195000,
-      making_charges: 25000,
-      images: ['https://res.cloudinary.com/ddrlxvnsh/image/upload/v1766855925/jewllery_shop/products/gycyiwsxjsof0i0meafg.jpg'],
-      rating: 4.6,
-      review_count: 78,
-      stock: 8
-    },
-    {
-      id: 5,
-      name: 'Bridal Complete Set',
-      category: 'bridal',
-      collection: 'wedding',
-      metal_type: 'gold',
-      purity: '22K',
-      weight_grams: 120,
-      metal_price: 750000,
-      making_charges: 95000,
-      images: ['https://res.cloudinary.com/ddrlxvnsh/image/upload/v1766855925/jewllery_shop/products/fhlj3efhaafo5amfefyy.jpg'],
-      rating: 4.9,
-      review_count: 45,
-      is_featured: true,
-      stock: 3
-    },
-    {
-      id: 6,
-      name: 'Platinum Engagement Ring',
-      category: 'rings',
-      collection: 'wedding',
-      metal_type: 'platinum',
-      purity: '950',
-      weight_grams: 5.8,
-      metal_price: 185000,
-      making_charges: 22000,
-      images: ['https://res.cloudinary.com/ddrlxvnsh/image/upload/v1766855925/jewllery_shop/products/jxyw8vx454t3mnr2q8is.jpg'],
-      rating: 4.8,
-      review_count: 67,
-      stock: 6
-    },
-    {
-      id: 7,
-      name: 'Silver Anklet Pair',
-      category: 'bangles',
-      collection: 'daily',
-      metal_type: 'silver',
-      purity: '925',
-      weight_grams: 25,
-      metal_price: 3500,
-      making_charges: 1500,
-      images: ['https://res.cloudinary.com/ddrlxvnsh/image/upload/v1766855925/jewllery_shop/products/gycyiwsxjsof0i0meafg.jpg'],
-      rating: 4.5,
-      review_count: 234,
-      stock: 20
-    }
-  ];
-
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -223,67 +111,20 @@ const Products = () => {
         if (value) params.append(key, value);
       });
 
-      const res = await fetch(`/api/products?${params}`);
+      const res = await apiFetch(`/api/products?${params}`);
       if (res.ok) {
         const data = await res.json();
-        setProducts(data.products?.length > 0 ? data.products : filterMockProducts());
+        setProducts(data.products || []);
       } else {
-        setProducts(filterMockProducts());
+        console.error('Failed to fetch products');
+        setProducts([]);
       }
     } catch (error) {
-      setProducts(filterMockProducts());
+      console.error('Error fetching products:', error);
+      setProducts([]);
     } finally {
       setLoading(false);
     }
-  };
-
-  const filterMockProducts = () => {
-    let filtered = [...mockProducts];
-
-    // Multiselect filters - check if product matches any selected value
-    if (filters.category.length > 0) {
-      filtered = filtered.filter(p => filters.category.includes(p.category));
-    }
-    if (filters.collection.length > 0) {
-      filtered = filtered.filter(p => filters.collection.includes(p.collection));
-    }
-    if (filters.metal_type.length > 0) {
-      filtered = filtered.filter(p => filters.metal_type.includes(p.metal_type));
-    }
-    if (filters.purity.length > 0) {
-      filtered = filtered.filter(p => filters.purity.includes(p.purity));
-    }
-    if (filters.min_price) {
-      filtered = filtered.filter(p => 
-        (parseFloat(p.metal_price) + parseFloat(p.making_charges)) >= parseFloat(filters.min_price)
-      );
-    }
-    if (filters.max_price) {
-      filtered = filtered.filter(p => 
-        (parseFloat(p.metal_price) + parseFloat(p.making_charges)) <= parseFloat(filters.max_price)
-      );
-    }
-
-    // Sort
-    switch (filters.sort) {
-      case 'price_low':
-        filtered.sort((a, b) => 
-          (a.metal_price + a.making_charges) - (b.metal_price + b.making_charges)
-        );
-        break;
-      case 'price_high':
-        filtered.sort((a, b) => 
-          (b.metal_price + b.making_charges) - (a.metal_price + a.making_charges)
-        );
-        break;
-      case 'newest':
-        // Keep original order for mock data
-        break;
-      default:
-        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-    }
-
-    return filtered;
   };
 
   // Handle multiselect toggle for array filters

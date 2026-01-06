@@ -10,6 +10,7 @@ import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
 import { useToast } from '../../components/ui/Toast';
 import { useModal } from '../../components/ui/Modal';
+import { apiFetch } from '../../config/api';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import './Admin.css';
 import './FlashSales.css';
@@ -104,7 +105,7 @@ const AdminBlog = () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({ limit: 100 });
-      const res = await fetch(`/api/blog/admin/posts?${params}`, {
+      const res = await apiFetch(`/api/blog/admin/posts?${params}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -120,7 +121,7 @@ const AdminBlog = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('/api/blog/categories');
+      const res = await apiFetch('/api/blog/categories');
       if (res.ok) {
         const data = await res.json();
         setCategories(data);
@@ -169,14 +170,14 @@ const AdminBlog = () => {
       'Are you sure you want to delete this post? This action cannot be undone.',
       async () => {
         try {
-          const res = await fetch(`/api/blog/admin/posts/${id}`, {
+          const res = await apiFetch(`/api/blog/admin/posts/${id}`, {
             method: 'DELETE',
             headers: { Authorization: `Bearer ${token}` }
           });
 
           if (res.ok) {
             if (coverImage && coverImage.includes('cloudinary.com')) {
-              await fetch('/api/admin/delete-image', {
+              await apiFetch('/api/admin/delete-image', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -216,7 +217,7 @@ const AdminBlog = () => {
         ? `/api/blog/admin/posts/${editingPost.id}`
         : '/api/blog/admin/posts';
 
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -259,7 +260,7 @@ const AdminBlog = () => {
     uploadFormData.append('folder', 'others');
 
     try {
-      const res = await fetch('/api/admin/upload-image', {
+      const res = await apiFetch('/api/admin/upload-image', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: uploadFormData
@@ -304,7 +305,7 @@ const AdminBlog = () => {
   const handleRemoveImage = async () => {
     if (formData.cover_image && formData.cover_image.includes('cloudinary.com')) {
       try {
-        await fetch('/api/admin/delete-image', {
+        await apiFetch('/api/admin/delete-image', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

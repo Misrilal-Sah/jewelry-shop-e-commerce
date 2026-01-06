@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Bell, Check, Trash2, Package, TrendingDown, ShoppingBag, ArrowLeft, Cake, Heart } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/ui/Toast';
+import { apiFetch } from '../config/api';
 import CelebrationModal from '../components/CelebrationModal/CelebrationModal';
 import './Notifications.css';
 
@@ -27,7 +28,7 @@ const Notifications = () => {
 
   const fetchNotifications = async () => {
     try {
-      const res = await fetch('/api/notifications?limit=50', {
+      const res = await apiFetch('/api/notifications?limit=50', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -43,7 +44,7 @@ const Notifications = () => {
 
   const markAsRead = async (id) => {
     try {
-      await fetch(`/api/notifications/${id}/read`, {
+      await apiFetch(`/api/notifications/${id}/read`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -57,7 +58,7 @@ const Notifications = () => {
 
   const markAllAsRead = async () => {
     try {
-      await fetch('/api/notifications/read-all', {
+      await apiFetch('/api/notifications/read-all', {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -70,7 +71,7 @@ const Notifications = () => {
 
   const deleteNotification = async (id) => {
     try {
-      await fetch(`/api/notifications/${id}`, {
+      await apiFetch(`/api/notifications/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

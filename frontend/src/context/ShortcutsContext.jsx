@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { useTheme } from './ThemeContext';
+import { apiFetch } from '../config/api';
 
 const ShortcutsContext = createContext();
 
@@ -218,7 +219,7 @@ export const ShortcutsProvider = ({ children }) => {
       }
       
       try {
-        const response = await fetch('/api/preferences', {
+        const response = await apiFetch('/api/preferences', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {
@@ -249,7 +250,7 @@ export const ShortcutsProvider = ({ children }) => {
     }
     
     try {
-      await fetch('/api/preferences', {
+      await apiFetch('/api/preferences', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -289,7 +290,7 @@ export const ShortcutsProvider = ({ children }) => {
     }
     
     try {
-      await fetch('/api/preferences/reset-shortcuts', {
+      await apiFetch('/api/preferences/reset-shortcuts', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });

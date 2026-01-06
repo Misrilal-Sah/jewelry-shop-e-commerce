@@ -7,6 +7,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
 import { useToast } from '../../components/ui/Toast';
+import { apiFetch } from '../../config/api';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import './Admin.css';
 
@@ -64,7 +65,7 @@ const Orders = () => {
         params.append('sortOrder', sortConfig.direction);
       }
       
-      const res = await fetch(`/api/admin/orders?${params}`, {
+      const res = await apiFetch(`/api/admin/orders?${params}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -81,7 +82,7 @@ const Orders = () => {
 
   const updateOrderStatus = async (orderId, status) => {
     try {
-      const res = await fetch(`/api/admin/orders/${orderId}/status`, {
+      const res = await apiFetch(`/api/admin/orders/${orderId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

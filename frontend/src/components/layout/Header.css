@@ -500,6 +500,8 @@
   }
 
   .header-actions {
+    flex: 1;
+    justify-content: flex-end;
     gap: 4px;
   }
 

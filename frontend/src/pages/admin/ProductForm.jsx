@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../components/ui/Toast';
+import { apiFetch } from '../../config/api';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import ImageEnhancer from '../../components/admin/ImageEnhancer';
 import './Admin.css';
@@ -128,7 +129,7 @@ const ProductForm = () => {
   const fetchProduct = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/products/${id}`, {
+      const res = await apiFetch(`/api/admin/products/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -223,7 +224,7 @@ const ProductForm = () => {
     try {
       console.log('Sending upload request to:', `/api/admin/products/${id}/images`);
       
-      const res = await fetch(`/api/admin/products/${id}/images`, {
+      const res = await apiFetch(`/api/admin/products/${id}/images`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formDataUpload
@@ -281,7 +282,7 @@ const ProductForm = () => {
     }
 
     try {
-      const res = await fetch(`/api/admin/products/${id}/images/${index}`, {
+      const res = await apiFetch(`/api/admin/products/${id}/images/${index}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -344,7 +345,7 @@ const ProductForm = () => {
     setDragIndex(null);
     if (isEdit && images.length > 0) {
       try {
-        await fetch(`/api/admin/products/${id}`, {
+        await apiFetch(`/api/admin/products/${id}`, {
           method: 'PUT',
           headers: { 
             'Content-Type': 'application/json',
@@ -369,7 +370,7 @@ const ProductForm = () => {
     // If editing, save the updated images
     if (isEdit) {
       try {
-        await fetch(`/api/admin/products/${id}`, {
+        await apiFetch(`/api/admin/products/${id}`, {
           method: 'PUT',
           headers: { 
             'Content-Type': 'application/json',
@@ -412,7 +413,7 @@ const ProductForm = () => {
         stock: parseInt(formData.stock) || 0
       };
 
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -429,7 +430,7 @@ const ProductForm = () => {
           const formDataUpload = new FormData();
           localFiles.forEach(file => formDataUpload.append('images', file));
           
-          await fetch(`/api/admin/products/${data.id}/images`, {
+          await apiFetch(`/api/admin/products/${data.id}/images`, {
             method: 'POST',
             headers: { Authorization: `Bearer ${token}` },
             body: formDataUpload

@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import { usePermission } from '../../context/PermissionContext';
 import { useToast } from '../../components/ui/Toast';
 import { useModal } from '../../components/ui/Modal';
+import { apiFetch } from '../../config/api';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import './Admin.css';
 import './FlashSales.css';
@@ -65,7 +66,7 @@ const FlashSales = () => {
 
   const fetchFlashSales = async () => {
     try {
-      const res = await fetch('/api/flash-sales', {
+      const res = await apiFetch('/api/flash-sales', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -81,7 +82,7 @@ const FlashSales = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('/api/products?limit=500');
+      const res = await apiFetch('/api/products?limit=500');
       if (res.ok) {
         const data = await res.json();
         setProducts(data.products || data);
@@ -101,7 +102,7 @@ const FlashSales = () => {
     const method = editingSale ? 'PUT' : 'POST';
     
     try {
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -130,7 +131,7 @@ const FlashSales = () => {
       'Are you sure you want to delete this flash sale?',
       async () => {
         try {
-          const res = await fetch(`/api/flash-sales/${id}`, {
+          const res = await apiFetch(`/api/flash-sales/${id}`, {
             method: 'DELETE',
             headers: { Authorization: `Bearer ${token}` }
           });
@@ -147,7 +148,7 @@ const FlashSales = () => {
 
   const handleToggleActive = async (sale) => {
     try {
-      const res = await fetch(`/api/flash-sales/${sale.id}`, {
+      const res = await apiFetch(`/api/flash-sales/${sale.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Package, Loader, Send, Award, DollarSign, Palette, Truck } from 'lucide-react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { apiFetch } from '../config/api';
 import SEO from '../components/SEO';
 import './BulkOrder.css';
 
@@ -61,7 +62,7 @@ const BulkOrder = () => {
     setSubmitting(true);
 
     try {
-      const res = await fetch('/api/bulk-orders', {
+      const res = await apiFetch('/api/bulk-orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
