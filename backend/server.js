@@ -38,10 +38,13 @@ const runPermissionTemplatesMigration = require('./migrations/runPermissionTempl
 
 const app = express();
 
-// CORS configuration - allow both localhost and 127.0.0.1
+// CORS configuration - allow local, Vercel, and production origins
 const allowedOrigins = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
+  'https://jewelry-shop-e-commerce-git-dev-misrils-projects.vercel.app',
+  'https://jewelry-shop-e-commerce-e79eyd54u-misrils-projects.vercel.app',
+  'https://jewelry-shop-e-commerce.vercel.app',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
