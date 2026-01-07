@@ -114,12 +114,12 @@ const Checkout = () => {
         },
         body: JSON.stringify({ 
           code: couponCode,
-          subtotal: subtotal + gst
+          cart_total: total
         })
       });
 
       const data = await res.json();
-      modal.close();
+      modal.hide();
 
       if (res.ok && data.valid) {
         const couponData = {
@@ -131,13 +131,13 @@ const Checkout = () => {
         };
         applyCoupon(couponData, data.discount);
         setCouponCode('');
-        modal.success('Coupon Applied!', `You saved ₹${Math.round(data.discount).toLocaleString('en-IN')}!`);
+        modal.success('Coupon Applied!', <span style={{display:'block',textAlign:'center'}}>You saved ₹{Math.round(data.discount).toLocaleString('en-IN')}!</span>);
       } else {
         setCouponError(data.message || 'Invalid coupon code');
         modal.error('Invalid Coupon', data.message || 'This coupon code is not valid');
       }
     } catch (error) {
-      modal.close();
+      modal.hide();
       setCouponError('Failed to apply coupon');
       modal.error('Error', 'Failed to verify coupon. Please try again.');
     } finally {
@@ -631,6 +631,7 @@ const Checkout = () => {
                       placeholder="Enter coupon code"
                       value={couponCode}
                       onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(''); }}
+                      onKeyDown={(e) => { if (e.key === 'Enter' && !couponLoading) handleApplyCoupon(); }}
                     />
                     <button 
                       className="btn btn-secondary" 

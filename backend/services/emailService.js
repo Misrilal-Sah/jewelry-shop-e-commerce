@@ -1,17 +1,41 @@
-const nodemailer = require('nodemailer');
+const axios = require('axios');
 require('dotenv').config();
 
-// Create transporter
-const createTransporter = () => {
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT) || 587,
-    secure: false,
-    auth: {
-      user: process.env.SMTP_EMAIL,
-      pass: process.env.SMTP_PASSWORD
-    }
-  });
+// Resend API configuration
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL;
+const RESEND_FROM_NAME = process.env.SMTP_FROM_NAME;
+
+// Send email using Resend REST API (works on Node 14+)
+const sendEmail = async ({ to, subject, html }) => {
+  if (!RESEND_API_KEY) {
+    throw new Error('RESEND_API_KEY not configured');
+  }
+
+  try {
+    const response = await axios.post(
+      'https://api.resend.com/emails',
+      {
+        from: `${RESEND_FROM_NAME} <${RESEND_FROM_EMAIL}>`,
+        to: [to],
+        subject: subject,
+        html: html,
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    console.log(`Email sent via Resend to ${to}, ID: ${response.data.id}`);
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || error.message;
+    console.error('Resend API error:', errorMessage);
+    throw new Error(errorMessage);
+  }
 };
 
 // Generate 6-digit OTP
@@ -740,22 +764,16 @@ const sendAdminPromotionEmail = async (email, userData) => {
 // Send OTP email
 const sendOTPEmail = async (email, otp, type) => {
   try {
-    const transporter = createTransporter();
-    const fromName = process.env.SMTP_FROM_NAME || 'AABHAR';
-    const fromEmail = process.env.SMTP_EMAIL;
-    
     const subject = type === 'signup' 
       ? 'Verify Your Email - AABHAR' 
       : 'Reset Your Password - AABHAR';
     
-    const mailOptions = {
-      from: `"${fromName}" <${fromEmail}>`,
+    await sendEmail({
       to: email,
       subject: subject,
       html: getOTPEmailTemplate(otp, type)
-    };
+    });
     
-    await transporter.sendMail(mailOptions);
     console.log(`OTP email sent to ${email}`);
     return true;
   } catch (error) {
@@ -767,10 +785,6 @@ const sendOTPEmail = async (email, otp, type) => {
 // Send marketing email
 const sendMarketingEmail = async (email, type, data = {}) => {
   try {
-    const transporter = createTransporter();
-    const fromName = process.env.SMTP_FROM_NAME || 'AABHAR';
-    const fromEmail = process.env.SMTP_EMAIL;
-    
     let subject, html;
     
     switch (type) {
@@ -799,14 +813,12 @@ const sendMarketingEmail = async (email, type, data = {}) => {
         throw new Error('Invalid email type');
     }
     
-    const mailOptions = {
-      from: `"${fromName}" <${fromEmail}>`,
+    await sendEmail({
       to: email,
       subject: subject,
       html: html
-    };
+    });
     
-    await transporter.sendMail(mailOptions);
     console.log(`${type} email sent to ${email}`);
     return true;
   } catch (error) {

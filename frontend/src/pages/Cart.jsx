@@ -219,7 +219,7 @@ const Cart = () => {
       if (res.ok) {
         applyCoupon(data.coupon, data.discount);
         setCouponCode('');
-        modal.success('Coupon Applied!', data.message);
+        modal.success('Coupon Applied!', <span style={{display:'block',textAlign:'center'}}>{data.message}</span>);
       } else {
         setCouponError(data.message);
         modal.error('Invalid Coupon', data.message);

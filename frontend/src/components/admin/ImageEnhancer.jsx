@@ -50,7 +50,7 @@ const ImageEnhancer = ({ imageUrl, onEnhanced, onClose }) => {
       // Check if this is a local blob URL or an http URL
       if (imageUrl.startsWith('blob:')) {
         // For blob URLs (new product images), fetch blob and upload as file
-        const blobResponse = await apiFetch(imageUrl);
+        const blobResponse = await fetch(imageUrl);
         const blob = await blobResponse.blob();
         
         const formData = new FormData();
