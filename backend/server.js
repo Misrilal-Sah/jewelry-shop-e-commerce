@@ -38,18 +38,15 @@ const runPermissionTemplatesMigration = require('./migrations/runPermissionTempl
 
 const app = express();
 
-// CORS configuration - allow local, Vercel, and production origins
+// CORS configuration - allow local and Vercel origins
 const allowedOrigins = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
-  // Vercel domains (new project name: aabhar)
+  // Vercel domains (project name: aabhar)
   'https://aabhar.vercel.app',
   'https://aabhar-misrils-projects.vercel.app',
   'https://aabhar-git-main-misrils-projects.vercel.app',
   'https://aabhar-git-dev-misrils-projects.vercel.app',
-  // Custom domain
-  'https://aabhar.run.place',
-  'https://www.aabhar.run.place',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
