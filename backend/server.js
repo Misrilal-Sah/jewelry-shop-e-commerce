@@ -42,9 +42,12 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
-  'https://jewelry-shop-e-commerce-git-dev-misrils-projects.vercel.app',
-  'https://jewelry-shop-e-commerce-e79eyd54u-misrils-projects.vercel.app',
-  'https://jewelry-shop-e-commerce.vercel.app',
+  // Vercel domains (new project name: aabhar)
+  'https://aabhar.vercel.app',
+  'https://aabhar-misrils-projects.vercel.app',
+  'https://aabhar-git-main-misrils-projects.vercel.app',
+  'https://aabhar-git-dev-misrils-projects.vercel.app',
+  // Custom domain
   'https://aabhar.run.place',
   'https://www.aabhar.run.place',
   process.env.FRONTEND_URL
