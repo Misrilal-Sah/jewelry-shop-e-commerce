@@ -1,39 +1,43 @@
 const axios = require('axios');
 require('dotenv').config();
 
-// Resend API configuration
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL;
-const RESEND_FROM_NAME = process.env.SMTP_FROM_NAME;
+// Brevo (Sendinblue) API configuration
+// Free tier: 300 emails/day without domain verification
+const BREVO_API_KEY = process.env.BREVO_API_KEY;
+const BREVO_FROM_EMAIL = process.env.BREVO_FROM_EMAIL || process.env.SMTP_EMAIL;
+const BREVO_FROM_NAME = process.env.SMTP_FROM_NAME || 'AABHAR';
 
-// Send email using Resend REST API (works on Node 14+)
+// Send email using Brevo REST API (works on Node 14+)
 const sendEmail = async ({ to, subject, html }) => {
-  if (!RESEND_API_KEY) {
-    throw new Error('RESEND_API_KEY not configured');
+  if (!BREVO_API_KEY) {
+    throw new Error('BREVO_API_KEY not configured');
   }
 
   try {
     const response = await axios.post(
-      'https://api.resend.com/emails',
+      'https://api.brevo.com/v3/smtp/email',
       {
-        from: `${RESEND_FROM_NAME} <${RESEND_FROM_EMAIL}>`,
-        to: [to],
+        sender: {
+          name: BREVO_FROM_NAME,
+          email: BREVO_FROM_EMAIL
+        },
+        to: [{ email: to }],
         subject: subject,
-        html: html,
+        htmlContent: html,
       },
       {
         headers: {
-          'Authorization': `Bearer ${RESEND_API_KEY}`,
+          'api-key': BREVO_API_KEY,
           'Content-Type': 'application/json',
         },
       }
     );
 
-    console.log(`Email sent via Resend to ${to}, ID: ${response.data.id}`);
+    console.log(`Email sent via Brevo to ${to}, ID: ${response.data.messageId}`);
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || error.message;
-    console.error('Resend API error:', errorMessage);
+    console.error('Brevo API error:', errorMessage);
     throw new Error(errorMessage);
   }
 };
