@@ -70,6 +70,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
 
 
+// Health check - must be registered BEFORE other API routes
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', message: 'Jewelry Shop API is running' });
+});
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
@@ -98,10 +103,7 @@ app.use('/api/common', commonDetailsRoutes);
 app.use('/api/admin/roles', rolesRoutes);
 app.use('/api/backgrounds', backgroundsRoutes);
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Jewelry Shop API is running' });
-});
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {

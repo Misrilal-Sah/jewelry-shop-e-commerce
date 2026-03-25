@@ -21,24 +21,32 @@ const getProducts = async (req, res) => {
     let query = 'SELECT * FROM products WHERE is_active = TRUE';
     const params = [];
 
+    // Helper: split comma-separated values into an array, trimming whitespace
+    const toArray = (val) => val.split(',').map(v => v.trim()).filter(Boolean);
+
+    // Multi-value filters using IN (?)
     if (category) {
-      query += ' AND category = ?';
-      params.push(category);
+      const vals = toArray(category);
+      query += ` AND category IN (${vals.map(() => '?').join(',')})`;
+      params.push(...vals);
     }
 
     if (collection) {
-      query += ' AND collection = ?';
-      params.push(collection);
+      const vals = toArray(collection);
+      query += ` AND collection IN (${vals.map(() => '?').join(',')})`;
+      params.push(...vals);
     }
 
     if (metal_type) {
-      query += ' AND metal_type = ?';
-      params.push(metal_type);
+      const vals = toArray(metal_type);
+      query += ` AND metal_type IN (${vals.map(() => '?').join(',')})`;
+      params.push(...vals);
     }
 
     if (purity) {
-      query += ' AND purity = ?';
-      params.push(purity);
+      const vals = toArray(purity);
+      query += ` AND purity IN (${vals.map(() => '?').join(',')})`;
+      params.push(...vals);
     }
 
     if (min_price) {
@@ -62,8 +70,9 @@ const getProducts = async (req, res) => {
     }
 
     if (gemstone) {
-      query += ' AND gemstone_type = ?';
-      params.push(gemstone);
+      const vals = toArray(gemstone);
+      query += ` AND gemstone_type IN (${vals.map(() => '?').join(',')})`;
+      params.push(...vals);
     }
 
     // Sorting
@@ -91,13 +100,25 @@ const getProducts = async (req, res) => {
 
     const [products] = await pool.query(query, params);
 
-    // Get total count
-    let countQuery = 'SELECT COUNT(*) as total FROM products WHERE is_active = TRUE';
+    // Get total count — reuse same filter params (strip last 2 pagination params)
     const countParams = params.slice(0, -2);
-    if (category) countQuery += ' AND category = ?';
-    if (collection) countQuery += ' AND collection = ?';
-    if (metal_type) countQuery += ' AND metal_type = ?';
-    if (purity) countQuery += ' AND purity = ?';
+    let countQuery = 'SELECT COUNT(*) as total FROM products WHERE is_active = TRUE';
+    if (category) {
+      const vals = toArray(category);
+      countQuery += ` AND category IN (${vals.map(() => '?').join(',')})`;
+    }
+    if (collection) {
+      const vals = toArray(collection);
+      countQuery += ` AND collection IN (${vals.map(() => '?').join(',')})`;
+    }
+    if (metal_type) {
+      const vals = toArray(metal_type);
+      countQuery += ` AND metal_type IN (${vals.map(() => '?').join(',')})`;
+    }
+    if (purity) {
+      const vals = toArray(purity);
+      countQuery += ` AND purity IN (${vals.map(() => '?').join(',')})`;
+    }
 
     const [countResult] = await pool.query(countQuery, countParams);
     const total = countResult[0].total;
