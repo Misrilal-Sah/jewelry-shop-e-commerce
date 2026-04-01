@@ -2,7 +2,7 @@
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=200&section=header&text=✦%20AABHAR%20✦&fontSize=72&fontColor=ffffff&animation=twinkling&fontAlignY=36&desc=Premium%20Jewellery%20E-Commerce%20Platform&descSize=18&descAlignY=60&descColor=D4AF37" width="100%" />
 
-<a href="#"><img src="https://readme-typing-svg.demolab.com?font=Cinzel+Decorative&weight=600&size=22&duration=3000&pause=1200&color=D4AF37&center=true&vCenter=true&multiline=true&width=800&height=80&lines=Where+Elegance+Meets+Technology+✨;Full-Stack+Jewellery+Shopping+Experience+💍;Crafted+with+React+%2B+Node.js+%2B+MySQL+⚡" alt="animated-typing" /></a>
+<a href="#"><img src="https://readme-typing-svg.demolab.com/?font=Cinzel+Decorative&weight=600&size=22&duration=3000&pause=1200&color=D4AF37&center=true&vCenter=true&multiline=true&width=800&height=80&lines=Where+Elegance+Meets+Technology+%E2%9C%A8;Full-Stack+Jewellery+Shopping+Experience+%F0%9F%92%8D;Crafted+with+React+%2B+Node.js+%2B+MySQL+%E2%9A%A1" alt="animated-typing" /></a>
 
 <br/>
 
