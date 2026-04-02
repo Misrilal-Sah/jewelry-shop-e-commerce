@@ -7,7 +7,7 @@ import { useModal } from '../components/ui/Modal';
 import { apiFetch } from '../config/api';
 import './Auth.css';
 
-const GOOGLE_CLIENT_ID = '369652678716-quc851ragg1k8lksqmrnq20vmrkdaanr.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = '369652678716-kpjvodsstodbnh5qi5j2qsiso41lfjo7.apps.googleusercontent.com';
 
 const Login = () => {
   const navigate = useNavigate();
